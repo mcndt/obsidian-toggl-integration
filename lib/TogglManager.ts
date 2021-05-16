@@ -14,7 +14,6 @@ export default class TogglManager {
 
 	constructor(plugin: MyPlugin) {
 		this.plugin = plugin;
-		// this.startTimerInterval();
 		this.statusBarItem = this.plugin.addStatusBarItem();
 		this.updateStatusBarText();
 	}
@@ -24,8 +23,14 @@ export default class TogglManager {
 	 * @param token the API token for the client.
 	 */
 	async setToken(token: string) {
+		window.clearInterval(this.currentTimerInterval);
 		this.api = togglClient({ apiToken: token });
-		// this.startTimerInterval();
+		try {
+			await this.testConnection();
+			this.startTimerInterval();
+		} catch {
+			this.statusBarItem.setText('Cannot connect to Toggl API');
+		}
 	}
 
 	/**
@@ -33,7 +38,6 @@ export default class TogglManager {
 	 * currently running timer.
 	 */
 	private startTimerInterval() {
-		window.clearInterval(this.currentTimerInterval);
 		this.currentTimerInterval = window.setInterval(async () => {
 			if (this.api == null) {
 				return;
