@@ -1,56 +1,32 @@
-import { App, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, ButtonComponent, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import TogglManager from 'toggl';
 
 interface MyPluginSettings {
-	mySetting: string;
+	apiToken: string;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
+	apiToken: null
 }
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
+	toggl: TogglManager;
 
 	async onload() {
 		console.log('loading plugin');
 
 		await this.loadSettings();
+		
+		this.addSettingTab(new TogglSettingsTab(this.app, this));
+		
 
-		this.addRibbonIcon('dice', 'Sample Plugin', () => {
-			new Notice('This is a notice!');
-		});
+		// instantiate toggl class
+		this.toggl = new TogglManager(this);
+		if (this.settings.apiToken != null || this.settings.apiToken != '') {
+			this.toggl.setToken(this.settings.apiToken);
+		}
 
-		this.addStatusBarItem().setText('Status Bar Text');
-
-		this.addCommand({
-			id: 'open-sample-modal',
-			name: 'Open Sample Modal',
-			// callback: () => {
-			// 	console.log('Simple Callback');
-			// },
-			checkCallback: (checking: boolean) => {
-				let leaf = this.app.workspace.activeLeaf;
-				if (leaf) {
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-					return true;
-				}
-				return false;
-			}
-		});
-
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-		this.registerCodeMirror((cm: CodeMirror.Editor) => {
-			console.log('codemirror', cm);
-		});
-
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
-
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
 
 	onunload() {
@@ -66,7 +42,50 @@ export default class MyPlugin extends Plugin {
 	}
 }
 
-class SampleModal extends Modal {
+class TogglSettingsTab extends PluginSettingTab {
+	plugin: MyPlugin;
+
+	constructor(app: App, plugin: MyPlugin) {
+		super(app, plugin);
+		this.plugin = plugin;
+	}
+
+	display(): void {
+		let {containerEl} = this;
+
+		containerEl.empty();
+
+		containerEl.createEl('h2', {text: 'Toggl Track integration for Obsidian'});
+
+		new Setting(containerEl)
+			.setName('API Token')
+			.setDesc('Enter your Toggl Track API token to use this plugin. ' 
+				+ 'You can find yours at https://track.toggl.com/profile.')
+			.addText(text => text
+				.setPlaceholder('Your API token')
+				.setValue(this.plugin.settings.apiToken || '')
+				.onChange(async (value) => {
+					console.log('token: ' + value);
+					this.plugin.settings.apiToken = value;
+					this.plugin.toggl.setToken(value);
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
+			.setName('Test API connection')
+			.setDesc('Test your API token by connecting to Toggl Track.')
+			.addButton((button: ButtonComponent) => {
+				button.setButtonText('connect');
+				button.onClick(() => this.testConnection(button));
+			})
+	}
+
+	testConnection(button: ButtonComponent) {
+		console.log(button);
+	}
+}
+
+/* class SampleModal extends Modal {
 	constructor(app: App) {
 		super(app);
 	}
@@ -80,33 +99,4 @@ class SampleModal extends Modal {
 		let {contentEl} = this;
 		contentEl.empty();
 	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		let {containerEl} = this;
-
-		containerEl.empty();
-
-		containerEl.createEl('h2', {text: 'Settings for my awesome plugin.'});
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue('')
-				.onChange(async (value) => {
-					console.log('Secret: ' + value);
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
-	}
-}
+} */

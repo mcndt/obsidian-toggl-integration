@@ -1,10 +1,10 @@
 {
-	"id": "obsidian-sample-plugin",
-	"name": "Sample Plugin",
-	"version": "1.0.1",
+	"id": "obsidian-toggl-integration",
+	"name": "Toggl Track Integration for Obsidian",
+	"version": "0.1.0",
 	"minAppVersion": "0.9.12",
-	"description": "This is a sample plugin for Obsidian. This plugin demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md/about",
+	"description": "This plugin provides features for starting, stopping, and managing timers using Toggl Track.",
+	"author": "Maxime Cannoodt (@mcndt)",
+	"authorUrl": "https://github.com/mcndt",
 	"isDesktopOnly": false
 }
