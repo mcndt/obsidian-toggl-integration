@@ -10,38 +10,18 @@ export default class StartTimerModal extends FuzzySuggestModal<TimeEntry> {
 	constructor(plugin: MyPlugin, timeEntries: TimeEntry[]) {
 		super(plugin.app);
 		this._toggl = plugin.toggl;
-		this._timeEntries = timeEntries;
+		this._timeEntries = this._removeRepeatedEntries(
+			timeEntries != null ? timeEntries : []
+		);
 		this.setPlaceholder('Select a timer to restart...');
 	}
 
 	getItems(): TimeEntry[] {
-		console.debug('Getting recent time entries');
-		if (this._timeEntries == null) {
-			console.debug('still empty tho!');
-			return [];
-		}
-		// remove repeated entries
-		let items = uniqueBy(this._timeEntries, (a: TimeEntry, b: TimeEntry) => {
-			const cond1 = a.description === b.description;
-			const cond2 = a.pid === b.pid;
-			return cond1 && cond2;
-		});
-		// remove the entries with on description
-		items = items.filter(
-			(t: TimeEntry) => t.description != null && t.description != ''
-		);
-		return items;
+		return this._timeEntries;
 	}
 
 	getItemText(item: TimeEntry): string {
 		return `${item.description} (${item.project})`;
-	}
-
-	onChooseItem(item: TimeEntry, evt: MouseEvent | KeyboardEvent): void {
-		this._toggl.startTimer(item).then((v: TimeEntry) => {
-			console.log(v);
-		});
-		this.close();
 	}
 
 	renderSuggestion(item: FuzzyMatch<TimeEntry>, el: HTMLElement): void {
@@ -58,15 +38,25 @@ export default class StartTimerModal extends FuzzySuggestModal<TimeEntry> {
 			}"></span></div>`;
 	}
 
-	async onOpen() {
-		this.inputEl.focus();
-		// let { contentEl } = this;
-		// this._timeEntries = await this._toggl.getRecentTimeEntries();
+	onChooseItem(item: TimeEntry, evt: MouseEvent | KeyboardEvent): void {
+		this._toggl.startTimer(item).then((v: TimeEntry) => {
+			console.log(v);
+		});
+		this.close();
 	}
 
-	onClose() {
-		let { contentEl } = this;
-		contentEl.empty();
+	private _removeRepeatedEntries(items: TimeEntry[]): TimeEntry[] {
+		// remove repeated entries
+		items = uniqueBy(items, (a: TimeEntry, b: TimeEntry) => {
+			const cond1 = a.description === b.description;
+			const cond2 = a.pid === b.pid;
+			return cond1 && cond2;
+		});
+		// remove the entries without a description
+		items = items.filter(
+			(t: TimeEntry) => t.description != null && t.description != ''
+		);
+		return items;
 	}
 }
 
