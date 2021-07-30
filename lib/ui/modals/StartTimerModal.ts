@@ -4,23 +4,20 @@ import { TimeEntry } from '../../model/TimeEntry';
 import TogglManager from '../../toggl/TogglManager';
 
 export default class StartTimerModal extends FuzzySuggestModal<TimeEntry> {
-	private _toggl: TogglManager;
-	private _timeEntries: TimeEntry[];
+	private readonly _toggl: TogglManager;
+	private readonly _timeEntries: TimeEntry[];
 
-	constructor(plugin: MyPlugin) {
+	constructor(plugin: MyPlugin, timeEntries: TimeEntry[]) {
 		super(plugin.app);
 		this._toggl = plugin.toggl;
+		this._timeEntries = timeEntries;
 		this.setPlaceholder('Select a timer to restart...');
-		this.setInstructions([
-			{ command: '↑↓', purpose: 'Move up and down the list' },
-			{ command: '↵', purpose: 'Start timer' },
-			{ command: 'esc', purpose: 'Cancel' }
-		]);
 	}
 
 	getItems(): TimeEntry[] {
 		console.debug('Getting recent time entries');
 		if (this._timeEntries == null) {
+			console.debug('still empty tho!');
 			return [];
 		}
 		// remove repeated entries
@@ -48,6 +45,7 @@ export default class StartTimerModal extends FuzzySuggestModal<TimeEntry> {
 	}
 
 	renderSuggestion(item: FuzzyMatch<TimeEntry>, el: HTMLElement): void {
+		super.renderSuggestion(item, el);
 		el.innerHTML =
 			`<div class="timer-search-item">` +
 			`<span class="timer-search-description">` +
@@ -61,9 +59,9 @@ export default class StartTimerModal extends FuzzySuggestModal<TimeEntry> {
 	}
 
 	async onOpen() {
-		let { contentEl } = this;
 		this.inputEl.focus();
-		this._timeEntries = await this._toggl.getRecentTimeEntries();
+		// let { contentEl } = this;
+		// this._timeEntries = await this._toggl.getRecentTimeEntries();
 	}
 
 	onClose() {

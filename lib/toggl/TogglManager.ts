@@ -80,6 +80,7 @@ export default class TogglManager {
 		const response = await this._api.reports.details(
 			this._plugin.settings.workspace.id
 		);
+		console.debug('Toggl API response: recent time entries');
 		return response.data.map(
 			(e: any) =>
 				({
@@ -124,8 +125,9 @@ export default class TogglManager {
 			icon: 'clock',
 			checkCallback: (checking: boolean) => {
 				if (!checking) {
-					this.executeIfAPIAvailable(() => {
-						new StartTimerModal(this._plugin).open();
+					this.executeIfAPIAvailable(async () => {
+						const timeEntries = await this.getRecentTimeEntries();
+						new StartTimerModal(this._plugin, timeEntries).open();
 					});
 				} else {
 					return true;
