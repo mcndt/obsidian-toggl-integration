@@ -1,0 +1,33 @@
+.extra-button {
+	padding-right: 0.5em;
+}
+
+.timer-search-item {
+	display: flex;
+	justify-content: space-between;
+	flex-direction: row;
+	align-items: center;
+}
+
+.timer-search-description {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 70%;
+}
+
+.timer-search-project {
+	text-align: right;
+	margin-left: 1em;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.timer-search-color {
+	margin-left: 0.75em;
+	display: inline-block;
+	width: 0.7em;
+	height: 0.7em;
+	border-radius: 50%;
+}
