@@ -8,7 +8,7 @@ import UserInputHelper from 'lib/util/UserInputHelper';
 export default class MyPlugin extends Plugin {
 	settings: PluginSettings;
 	toggl: TogglManager;
-	userInputHelper: UserInputHelper;
+	input: UserInputHelper;
 
 	async onload() {
 		console.log('loading plugin');
@@ -21,7 +21,7 @@ export default class MyPlugin extends Plugin {
 		this.toggl = new TogglManager(this);
 		if (this.settings.apiToken != null || this.settings.apiToken != '') {
 			this.toggl.setToken(this.settings.apiToken);
-			this.userInputHelper = new UserInputHelper(this);
+			this.input = new UserInputHelper(this);
 		}
 	}
 

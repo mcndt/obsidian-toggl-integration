@@ -161,8 +161,24 @@ export default class TogglManager {
 			checkCallback: (checking: boolean) => {
 				if (!checking) {
 					this.executeIfAPIAvailable(async () => {
-						const timeEntries = await this.getRecentTimeEntries();
-						new StartTimerModal(this._plugin, timeEntries).open();
+						let new_timer: TimeEntryStart;
+						const timers = await this.getRecentTimeEntries();
+						new_timer = await this._plugin.input.selectTimer(timers);
+
+						// user wants to start a new timer
+						if (new_timer == null) {
+							const project = await this._plugin.input.selectProject();
+							const description =
+								await this._plugin.input.enterTimerDescription();
+							new_timer = {
+								description: description,
+								pid: project != null ? parseInt(project.id) : null
+							};
+						}
+
+						this.startTimer(new_timer).then((t: TimeEntry) => {
+							console.debug(`Started timer: ${t}`);
+						});
 					});
 				} else {
 					return true;

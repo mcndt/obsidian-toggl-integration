@@ -17,12 +17,16 @@ interface TimerListItem {
 }
 
 export default class StartTimerModal extends FuzzySuggestModal<TimerListItem> {
-	private readonly plugin: MyPlugin;
+	private readonly resolve: (value: TimeEntry) => void;
 	private readonly list: TimerListItem[];
 
-	constructor(plugin: MyPlugin, timeEntries: TimeEntry[]) {
+	constructor(
+		plugin: MyPlugin,
+		resolve: (value: TimeEntry) => void,
+		timeEntries: TimeEntry[]
+	) {
 		super(plugin.app);
-		this.plugin = plugin;
+		this.resolve = resolve;
 		this.list = this._generateTimerList(timeEntries != null ? timeEntries : []);
 		this.setPlaceholder('Select a timer to start');
 		this.setInstructions([
@@ -66,37 +70,11 @@ export default class StartTimerModal extends FuzzySuggestModal<TimerListItem> {
 		evt: MouseEvent | KeyboardEvent
 	): Promise<void> {
 		if (item.type === TimerListItemType.NEW_TIMER) {
-			// Start a timer with a new description
-			console.debug('Timer with new description');
-			const project = await this.plugin.userInputHelper.letUserSelectProject();
-			console.debug(`Project selected: ${project}`);
-			const description =
-				await this.plugin.userInputHelper.letUserEnterTimerDescription();
-			console.debug(`Description entered: "${description}"`);
-			const timer = this._createNewTimer(project, description);
-			this.plugin.toggl.startTimer(timer).then((e: TimeEntry) => {
-				console.debug('Restarting a past timer');
-				console.debug(e);
-				this.close();
-			});
+			this.resolve(null);
 		} else if (item.type === TimerListItemType.PAST_ENTRY) {
-			// Reuse a past timer
-			this.plugin.toggl.startTimer(item.entry).then((e: TimeEntry) => {
-				console.debug('Restarting a past timer');
-				console.debug(e);
-				this.close();
-			});
+			this.resolve(item.entry);
 		}
-	}
-
-	private _createNewTimer(
-		project: Project,
-		description: string
-	): TimeEntryStart {
-		return {
-			description: description,
-			pid: project != null ? parseInt(project.id) : null
-		};
+		this.close();
 	}
 
 	private _generateTimerList(items: TimeEntry[]): TimerListItem[] {
