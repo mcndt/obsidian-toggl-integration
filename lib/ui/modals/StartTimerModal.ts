@@ -1,51 +1,105 @@
+import { Project } from 'lib/model/Project';
 import MyPlugin from 'main';
 import { FuzzyMatch, FuzzySuggestModal } from 'obsidian';
-import { TimeEntry } from '../../model/TimeEntry';
-import TogglManager from '../../toggl/TogglManager';
+import { TimeEntry, TimeEntryStart } from '../../model/TimeEntry';
 
-export default class StartTimerModal extends FuzzySuggestModal<TimeEntry> {
-	private readonly _toggl: TogglManager;
-	private readonly _timeEntries: TimeEntry[];
+enum TimerListItemType {
+	NEW_TIMER,
+	PAST_ENTRY
+}
+
+interface TimerListItem {
+	type: TimerListItemType;
+	entry?: TimeEntry;
+	textLeft?: string;
+	textRight?: string;
+	itemColor?: string;
+}
+
+export default class StartTimerModal extends FuzzySuggestModal<TimerListItem> {
+	private readonly plugin: MyPlugin;
+	private readonly list: TimerListItem[];
 
 	constructor(plugin: MyPlugin, timeEntries: TimeEntry[]) {
 		super(plugin.app);
-		this._toggl = plugin.toggl;
-		this._timeEntries = this._removeRepeatedEntries(
-			timeEntries != null ? timeEntries : []
-		);
-		this.setPlaceholder('Select a timer to restart...');
+		this.plugin = plugin;
+		this.list = this._generateTimerList(timeEntries != null ? timeEntries : []);
+		this.setPlaceholder('Select a timer to start');
+		this.setInstructions([
+			{ command: '↑↓', purpose: 'to navigate' },
+			{ command: '⏎', purpose: 'Select project' },
+			{ command: 'esc', purpose: 'cancel' }
+		]);
 	}
 
-	getItems(): TimeEntry[] {
-		return this._timeEntries;
+	getItems(): TimerListItem[] {
+		return this.list;
 	}
 
-	getItemText(item: TimeEntry): string {
-		return `${item.description} (${item.project})`;
+	getItemText(item: TimerListItem): string {
+		if (item.type === TimerListItemType.PAST_ENTRY) {
+			return `${item.textLeft} (${item.textRight})`;
+		} else if (item.type === TimerListItemType.NEW_TIMER) {
+			return `new timer`;
+		}
+		return ``;
 	}
 
-	renderSuggestion(item: FuzzyMatch<TimeEntry>, el: HTMLElement): void {
+	renderSuggestion(item: FuzzyMatch<TimerListItem>, el: HTMLElement): void {
 		super.renderSuggestion(item, el);
 		el.innerHTML =
 			`<div class="timer-search-item">` +
 			`<span class="timer-search-description">` +
-			`${item.item.description}` +
+			`${item.item.textLeft}` +
 			`</span>` +
 			`<span class="timer-search-project">` +
-			`${item.item.project || '(No project)'}` +
+			`${item.item.textRight}` +
 			`<span class="timer-search-color" style="background-color:${
-				item.item.project_hex_color || 'rgba(0,0,0,0)'
+				item.item.itemColor || 'rgba(0,0,0,0)'
 			}"></span></div>`;
 	}
 
-	onChooseItem(item: TimeEntry, evt: MouseEvent | KeyboardEvent): void {
-		this._toggl.startTimer(item).then((v: TimeEntry) => {
-			console.log(v);
-		});
-		this.close();
+	updateSuggestionElForMode(item: FuzzyMatch<TimeEntry>, el: HTMLElement) {}
+
+	async onChooseItem(
+		item: TimerListItem,
+		evt: MouseEvent | KeyboardEvent
+	): Promise<void> {
+		if (item.type === TimerListItemType.NEW_TIMER) {
+			// Start a timer with a new description
+			console.debug('Timer with new description');
+			const project = await this.plugin.userInputHelper.letUserSelectProject();
+			console.debug(`Project selected: ${project}`);
+			const description =
+				await this.plugin.userInputHelper.letUserEnterTimerDescription();
+			console.debug(`Description entered: "${description}"`);
+			const timer = this._createNewTimer(project, description);
+			this.plugin.toggl.startTimer(timer).then((e: TimeEntry) => {
+				console.debug('Restarting a past timer');
+				console.debug(e);
+				this.close();
+			});
+		} else if (item.type === TimerListItemType.PAST_ENTRY) {
+			// Reuse a past timer
+			this.plugin.toggl.startTimer(item.entry).then((e: TimeEntry) => {
+				console.debug('Restarting a past timer');
+				console.debug(e);
+				this.close();
+			});
+		}
 	}
 
-	private _removeRepeatedEntries(items: TimeEntry[]): TimeEntry[] {
+	private _createNewTimer(
+		project: Project,
+		description: string
+	): TimeEntryStart {
+		return {
+			description: description,
+			pid: project != null ? parseInt(project.id) : null
+		};
+	}
+
+	private _generateTimerList(items: TimeEntry[]): TimerListItem[] {
 		// remove repeated entries
 		items = uniqueBy(items, (a: TimeEntry, b: TimeEntry) => {
 			const cond1 = a.description === b.description;
@@ -56,7 +110,27 @@ export default class StartTimerModal extends FuzzySuggestModal<TimeEntry> {
 		items = items.filter(
 			(t: TimeEntry) => t.description != null && t.description != ''
 		);
-		return items;
+
+		let list: TimerListItem[] = items.map(
+			(e: TimeEntry) =>
+				({
+					type: TimerListItemType.PAST_ENTRY,
+					entry: e,
+					textLeft: e.description,
+					textRight: e.project || '(No Project)',
+					itemColor: e.project_hex_color || '#CECECE'
+				} as TimerListItem)
+		);
+
+		const newTimerItem: TimerListItem = {
+			type: TimerListItemType.NEW_TIMER,
+			textLeft: 'New timer...',
+			textRight: ''
+		};
+
+		list = [newTimerItem].concat(list);
+
+		return list;
 	}
 }
 

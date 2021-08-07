@@ -16,6 +16,12 @@
 	max-width: 70%;
 }
 
+.project-search-name {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 .timer-search-project {
 	text-align: right;
 	margin-left: 1em;
@@ -26,6 +32,14 @@
 
 .timer-search-color {
 	margin-left: 0.75em;
+	display: inline-block;
+	width: 0.7em;
+	height: 0.7em;
+	border-radius: 50%;
+}
+
+.project-search-color {
+	margin-right: 0.75em;
 	display: inline-block;
 	width: 0.7em;
 	height: 0.7em;

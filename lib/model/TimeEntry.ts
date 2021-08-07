@@ -1,8 +1,7 @@
-
 /**
  * Object to request start of new timers.
  */
- export interface TimeEntryStart {
+export interface TimeEntryStart {
 	/**
 	 * The description for the new time entry
 	 */
@@ -49,4 +48,3 @@ export interface TimeEntry extends TimeEntryStart {
 	 */
 	project_hex_color?: string;
 }
-

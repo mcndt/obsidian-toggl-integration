@@ -2,11 +2,13 @@ import { Plugin } from 'obsidian';
 import TogglManager from 'lib/toggl/TogglManager';
 import TogglSettingsTab from 'lib/ui/TogglSettingsTab';
 import { PluginSettings } from 'lib/config/PluginSettings';
-import { DEFAULT_SETTINGS } from "lib/config/DefaultSettings";
+import { DEFAULT_SETTINGS } from 'lib/config/DefaultSettings';
+import UserInputHelper from 'lib/util/UserInputHelper';
 
 export default class MyPlugin extends Plugin {
 	settings: PluginSettings;
 	toggl: TogglManager;
+	userInputHelper: UserInputHelper;
 
 	async onload() {
 		console.log('loading plugin');
@@ -19,6 +21,7 @@ export default class MyPlugin extends Plugin {
 		this.toggl = new TogglManager(this);
 		if (this.settings.apiToken != null || this.settings.apiToken != '') {
 			this.toggl.setToken(this.settings.apiToken);
+			this.userInputHelper = new UserInputHelper(this);
 		}
 	}
 

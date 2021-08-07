@@ -1,3 +1,4 @@
+import { Project } from 'lib/model/Project';
 import MyPlugin from 'main';
 import { Notice } from 'obsidian';
 import togglClient from 'toggl-client';
@@ -22,6 +23,7 @@ export default class TogglManager {
 	// UI references
 	private _statusBarItem: HTMLElement;
 
+	private _projects: Project[] = [];
 	private _currentTimerInterval: number = null;
 	private _currentTimeEntry: any = null;
 	private _ApiAvailable = ApiStatus.UNTESTED;
@@ -29,6 +31,7 @@ export default class TogglManager {
 	constructor(plugin: MyPlugin) {
 		this._plugin = plugin;
 		this._statusBarItem = this._plugin.addStatusBarItem();
+		this._statusBarItem.setText('Connecting to Toggl...');
 		this.addCommands();
 	}
 
@@ -44,6 +47,7 @@ export default class TogglManager {
 				await this.testConnection();
 				this.startTimerInterval();
 				this._ApiAvailable = ApiStatus.AVAILABLE;
+				this._preloadWorkspaceData();
 			} catch {
 				this._statusBarItem.setText('Cannot connect to Toggl API');
 				console.error('Cannot connect to toggl API.');
@@ -56,6 +60,15 @@ export default class TogglManager {
 			this._ApiAvailable = ApiStatus.NO_TOKEN;
 			this.noticeAPINotAvailable();
 		}
+	}
+
+	/** Preloads data such as the user's projects. */
+	private async _preloadWorkspaceData() {
+		// preload projects
+		this.getProjects().then((response: Project[]) => {
+			this._projects = response;
+			console.debug('Preloaded projects');
+		});
 	}
 
 	/** Throws an Error when the Toggl Track API cannot be reached. */
@@ -72,6 +85,28 @@ export default class TogglManager {
 		return response.map(
 			(w: any) =>
 				({ id: (w.id as number).toString(), name: w.name } as TogglWorkspace)
+		);
+	}
+
+	/**
+	 * @returns list of the user's projects for the configured Toggl workspace.
+	 * NOTE: this makes an async call to the Toggl API. To get cached projects,
+	 * use the computed property cachedProjects instead.
+	 */
+	public async getProjects(): Promise<Project[]> {
+		const response = await this._api.workspaces.projects(
+			this._plugin.settings.workspace.id
+		);
+		return response.map(
+			(p: any) =>
+				({
+					name: p.name,
+					id: p.id,
+					cid: p.cid,
+					active: p.active,
+					actual_hours: p.actual_hours,
+					hex_color: p.hex_color
+				} as Project)
 		);
 	}
 
@@ -247,5 +282,10 @@ export default class TogglManager {
 			return true;
 		}
 		return false;
+	}
+
+	/** User's projects as preloaded on plugin initialization. */
+	public get cachedProjects(): Project[] {
+		return this._projects;
 	}
 }
