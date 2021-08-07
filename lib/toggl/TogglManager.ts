@@ -1,11 +1,10 @@
-import { Project } from 'lib/model/Project';
-import MyPlugin from 'main';
+import type MyPlugin from 'main';
+import type { Project } from 'lib/model/Project';
+import type { TimeEntry } from 'lib/model/TimeEntry';
+import type { TimeEntryStart } from 'lib/model/TimeEntry';
+import type { TogglWorkspace } from 'lib/model/TogglWorkspace';
 import { Notice } from 'obsidian';
 import togglClient from 'toggl-client';
-import { TimeEntry } from '../model/TimeEntry';
-import { TimeEntryStart } from '../model/TimeEntry';
-import { TogglWorkspace } from '../model/TogglWorkspace';
-import StartTimerModal from '../ui/modals/StartTimerModal';
 
 enum ApiStatus {
 	AVAILABLE,

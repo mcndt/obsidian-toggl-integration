@@ -1,9 +1,9 @@
-import { Project } from 'lib/model/Project';
-import { TimeEntry } from 'lib/model/TimeEntry';
+import type MyPlugin from 'main';
+import type { Project } from 'lib/model/Project';
+import type { TimeEntry } from 'lib/model/TimeEntry';
 import { SelectProjectModal } from 'lib/ui/modals/SelectProjectModal';
 import SelectTimerModal from 'lib/ui/modals/StartTimerModal';
 import { TimerDescriptionModal } from 'lib/ui/modals/TimerDescriptionModal';
-import MyPlugin from 'main';
 import externalizedPromise from './ExternalizedPromise';
 
 export default class UserInputHelper {

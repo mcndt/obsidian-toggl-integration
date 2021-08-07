@@ -1,4 +1,4 @@
-import { TogglWorkspace } from "../model/TogglWorkspace";
+import type { TogglWorkspace } from '../model/TogglWorkspace';
 
 export interface PluginSettings {
 	/**
@@ -19,5 +19,3 @@ export interface PluginSettings {
 	 */
 	activeTimerCheckInterval: number;
 }
-
-

@@ -1,4 +1,6 @@
-import MyPlugin from 'main';
+import type MyPlugin from 'main';
+import type { TogglWorkspace } from '../model/TogglWorkspace';
+import { DEFAULT_SETTINGS } from '../config/DefaultSettings';
 import {
 	App,
 	ButtonComponent,
@@ -7,8 +9,6 @@ import {
 	PluginSettingTab,
 	Setting
 } from 'obsidian';
-import { TogglWorkspace } from "../model/TogglWorkspace";
-import { DEFAULT_SETTINGS } from "../config/DefaultSettings";
 
 export default class TogglSettingsTab extends PluginSettingTab {
 	private plugin: MyPlugin;

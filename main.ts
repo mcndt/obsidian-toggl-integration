@@ -1,7 +1,7 @@
+import type { PluginSettings } from 'lib/config/PluginSettings';
 import { Plugin } from 'obsidian';
 import TogglManager from 'lib/toggl/TogglManager';
 import TogglSettingsTab from 'lib/ui/TogglSettingsTab';
-import { PluginSettings } from 'lib/config/PluginSettings';
 import { DEFAULT_SETTINGS } from 'lib/config/DefaultSettings';
 import UserInputHelper from 'lib/util/UserInputHelper';
 

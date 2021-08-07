@@ -1,7 +1,8 @@
-import { Project } from 'lib/model/Project';
-import TogglManager from 'lib/toggl/TogglManager';
-import MyPlugin from 'main';
+import type { Project } from 'lib/model/Project';
+import type TogglManager from 'lib/toggl/TogglManager';
+import type MyPlugin from 'main';
 import { FuzzyMatch, FuzzySuggestModal } from 'obsidian';
+import SelectProjectModalListItem from './SelectProjectModalListItem.svelte';
 
 enum ProjectItemType {
 	PROJECT,
@@ -11,8 +12,8 @@ enum ProjectItemType {
 interface ProjectItem {
 	type: ProjectItemType;
 	project?: Project;
-	textLeft?: string;
-	itemColor?: string;
+	projectName?: string;
+	color?: string;
 }
 
 export class SelectProjectModal extends FuzzySuggestModal<ProjectItem> {
@@ -52,16 +53,13 @@ export class SelectProjectModal extends FuzzySuggestModal<ProjectItem> {
 	}
 
 	renderSuggestion(item: FuzzyMatch<ProjectItem>, el: HTMLElement): void {
-		super.renderSuggestion(item, el);
-		el.innerHTML =
-			`<div class="">` +
-			`<span class="project-search-color" style="background-color:${
-				item.item.itemColor || 'rgba(0,0,0,0)'
-			}"></span>` +
-			`<span class="project-search-name">` +
-			`${item.item.textLeft}` +
-			`</span>` +
-			`</div>`;
+		new SelectProjectModalListItem({
+			target: el,
+			props: {
+				project: item.item.projectName,
+				color: item.item.color
+			}
+		});
 	}
 
 	onChooseItem(item: ProjectItem, evt: MouseEvent | KeyboardEvent): void {
@@ -76,14 +74,14 @@ export class SelectProjectModal extends FuzzySuggestModal<ProjectItem> {
 				({
 					type: ProjectItemType.PROJECT,
 					project: p,
-					textLeft: p.name,
-					itemColor: p.hex_color
+					projectName: p.name,
+					color: p.hex_color
 				} as ProjectItem)
 		);
 		const noProjectItem: ProjectItem = {
 			type: ProjectItemType.NO_PROJECT,
-			textLeft: `(No Project)`,
-			itemColor: '#CECECE'
+			projectName: `(No Project)`,
+			color: '#CECECE'
 		};
 		return [noProjectItem].concat(list);
 	}

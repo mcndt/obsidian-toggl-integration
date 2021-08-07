@@ -1,7 +1,7 @@
-import { Project } from 'lib/model/Project';
-import MyPlugin from 'main';
+import type MyPlugin from 'main';
+import type { TimeEntry } from '../../model/TimeEntry';
 import { FuzzyMatch, FuzzySuggestModal } from 'obsidian';
-import { TimeEntry, TimeEntryStart } from '../../model/TimeEntry';
+import StartTimerModalListItem from './StartTimerModalListItem.svelte';
 
 enum TimerListItemType {
 	NEW_TIMER,
@@ -11,9 +11,9 @@ enum TimerListItemType {
 interface TimerListItem {
 	type: TimerListItemType;
 	entry?: TimeEntry;
-	textLeft?: string;
-	textRight?: string;
-	itemColor?: string;
+	description?: string;
+	project?: string;
+	color?: string;
 }
 
 export default class StartTimerModal extends FuzzySuggestModal<TimerListItem> {
@@ -42,7 +42,7 @@ export default class StartTimerModal extends FuzzySuggestModal<TimerListItem> {
 
 	getItemText(item: TimerListItem): string {
 		if (item.type === TimerListItemType.PAST_ENTRY) {
-			return `${item.textLeft} (${item.textRight})`;
+			return `${item.description} (${item.project})`;
 		} else if (item.type === TimerListItemType.NEW_TIMER) {
 			return `new timer`;
 		}
@@ -50,17 +50,14 @@ export default class StartTimerModal extends FuzzySuggestModal<TimerListItem> {
 	}
 
 	renderSuggestion(item: FuzzyMatch<TimerListItem>, el: HTMLElement): void {
-		super.renderSuggestion(item, el);
-		el.innerHTML =
-			`<div class="timer-search-item">` +
-			`<span class="timer-search-description">` +
-			`${item.item.textLeft}` +
-			`</span>` +
-			`<span class="timer-search-project">` +
-			`${item.item.textRight}` +
-			`<span class="timer-search-color" style="background-color:${
-				item.item.itemColor || 'rgba(0,0,0,0)'
-			}"></span></div>`;
+		new StartTimerModalListItem({
+			target: el,
+			props: {
+				description: item.item.description,
+				project: item.item.project,
+				color: item.item.color
+			}
+		});
 	}
 
 	updateSuggestionElForMode(item: FuzzyMatch<TimeEntry>, el: HTMLElement) {}
@@ -94,16 +91,16 @@ export default class StartTimerModal extends FuzzySuggestModal<TimerListItem> {
 				({
 					type: TimerListItemType.PAST_ENTRY,
 					entry: e,
-					textLeft: e.description,
-					textRight: e.project || '(No Project)',
-					itemColor: e.project_hex_color || '#CECECE'
+					description: e.description,
+					project: e.project || '(No Project)',
+					color: e.project_hex_color || '#CECECE'
 				} as TimerListItem)
 		);
 
 		const newTimerItem: TimerListItem = {
 			type: TimerListItemType.NEW_TIMER,
-			textLeft: 'New timer...',
-			textRight: ''
+			description: 'New timer...',
+			project: ''
 		};
 
 		list = [newTimerItem].concat(list);
