@@ -28,7 +28,8 @@
     "typescript": "^4.2.4"
   },
   "dependencies": {
+    "moment": "^2.29.1",
     "supports-color": "^9.0.0",
-    "toggl-client": "^1.1.0"
+    "toggl-client": "git://github.com/saintedlama/toggl-client.git#4a40a9d"
   }
 }

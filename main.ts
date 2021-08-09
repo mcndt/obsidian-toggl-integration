@@ -1,14 +1,17 @@
 import type { PluginSettings } from 'lib/config/PluginSettings';
-import { Plugin } from 'obsidian';
+import { Plugin, WorkspaceLeaf } from 'obsidian';
 import TogglManager from 'lib/toggl/TogglManager';
 import TogglSettingsTab from 'lib/ui/TogglSettingsTab';
 import { DEFAULT_SETTINGS } from 'lib/config/DefaultSettings';
 import UserInputHelper from 'lib/util/UserInputHelper';
+import TogglReportView from 'lib/ui/views/TogglReportView';
+import { VIEW_TYPE_REPORT } from 'lib/ui/views/TogglReportView';
 
 export default class MyPlugin extends Plugin {
-	settings: PluginSettings;
-	toggl: TogglManager;
-	input: UserInputHelper;
+	public settings: PluginSettings;
+	public toggl: TogglManager;
+	public input: UserInputHelper;
+	public reportView: TogglReportView;
 
 	async onload() {
 		console.log('loading plugin');
@@ -23,11 +26,32 @@ export default class MyPlugin extends Plugin {
 			this.toggl.setToken(this.settings.apiToken);
 			this.input = new UserInputHelper(this);
 		}
+
+		// Register the timer report view
+		this.registerView(
+			VIEW_TYPE_REPORT,
+			(leaf: WorkspaceLeaf) =>
+				(this.reportView = new TogglReportView(leaf, this))
+		);
+
+		// Add the view to the right sidebar
+		if (this.app.workspace.layoutReady) {
+			this.initLeaf();
+		} else {
+			this.app.workspace.onLayoutReady(this.initLeaf.bind(this));
+		}
 	}
 
-	onunload() {
-		console.log('unloading plugin');
+	initLeaf(): void {
+		if (this.app.workspace.getLeavesOfType(VIEW_TYPE_REPORT).length) {
+			return;
+		}
+		this.app.workspace.getRightLeaf(false).setViewState({
+			type: VIEW_TYPE_REPORT
+		});
 	}
+
+	onunload() {}
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
