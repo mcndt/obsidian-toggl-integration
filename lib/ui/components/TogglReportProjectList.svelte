@@ -8,9 +8,9 @@
 			return [];
 		}
 		return r.data.map((d) => ({
-			color: d.title.hex_color,
+			color: d.id != null ? d.title.hex_color : 'var(--text-muted)',
 			duration: millisecondsToTimeString(d.time),
-			name: d.title.project
+			name: d.id != null ? d.title.project : '(No project)'
 		}));
 	};
 

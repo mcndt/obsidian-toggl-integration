@@ -10,7 +10,7 @@
 		const total = r.total_grand;
 
 		let tmp_list = r.data.map((d) => ({
-			color: d.title.hex_color,
+			color: d.id != null ? d.title.hex_color : 'var(--text-muted)',
 			// min width = 5% (before rescaling)
 			percentage: Math.max((d.time / total) * 100, 5)
 		}));

@@ -255,7 +255,11 @@ export default class TogglManager {
 
 			// TODO properly handle multiple workspaces
 			// Drop timers from different workspaces
-			if (curr != null && curr.wid != this._plugin.settings.workspace.id) {
+			if (
+				curr != null &&
+				curr.wid != this.workspaceId &&
+				curr.pid != undefined
+			) {
 				curr = null;
 			}
 
@@ -395,7 +399,12 @@ export default class TogglManager {
 			duration: response.duration,
 			start: response.start,
 			end: response.end,
-			project: project ? project.name : '(Unknown)',
+			project:
+				response.pid != undefined
+					? project
+						? project.name
+						: '(Unknown)'
+					: '(No project)',
 			project_hex_color: project ? project.hex_color : 'var(--text-muted)'
 		};
 	}

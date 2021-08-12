@@ -49,7 +49,7 @@
 
 <style>
 	.container {
-		padding: 0px 16px 0px 16px;
+		padding: 0px 8px 0px 8px;
 	}
 
 	.timer {
