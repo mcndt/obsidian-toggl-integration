@@ -2,6 +2,9 @@
 	import type Report from 'lib/model/Report';
 	import millisecondsToTimeString from 'lib/util/millisecondsToTimeString';
 	import { dailySummary } from 'lib/util/stores';
+	import { onDestroy } from 'svelte';
+
+	let list: { color: string; duration: string; name: string }[];
 
 	const computeList = (r: Report) => {
 		if (r == null) {
@@ -14,12 +17,15 @@
 		}));
 	};
 
-	let entries: { color: string; duration: string; name: string }[] =
-		computeList($dailySummary);
+	const unsubscribe = dailySummary.subscribe((val) => {
+		list = computeList(val);
+	});
+
+	onDestroy(unsubscribe);
 </script>
 
 <div>
-	{#each entries as e, i}
+	{#each list as e, i}
 		<div class="project-row is-flex is-justify-content-space-between">
 			<div class="is-flex is-align-items-center">
 				<span class="project-circle" style="background-color: {e.color};" />

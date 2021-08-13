@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1]
+
+### 🐛 Fixes
+
+- Fix summary sidebar panel showing `undefined` when running a time entry with no description.
+- Fix project summary list not updating after stopping a timer
+
 ## [0.2.0]
 
 Hello! This release features a basic implementation of the Toggl Track summary view for the sidebar.

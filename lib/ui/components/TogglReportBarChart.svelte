@@ -1,6 +1,9 @@
 <script lang="ts">
 	import type Report from 'lib/model/Report';
 	import { dailySummary } from 'lib/util/stores';
+	import { onDestroy } from 'svelte';
+
+	let list: { color: string; percentage: number }[];
 
 	const computeList = (r: Report) => {
 		if (r == null) {
@@ -24,8 +27,11 @@
 		return tmp_list;
 	};
 
-	let list: { color: string; percentage: number }[] =
-		computeList($dailySummary);
+	const unsubscribe = dailySummary.subscribe((val) => {
+		list = computeList(val);
+	});
+
+	onDestroy(unsubscribe);
 </script>
 
 <div>

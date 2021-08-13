@@ -40,7 +40,13 @@
 >
 	<div>
 		{#if timer}
-			<div class="timer-description">{timer.description}</div>
+			<div>
+				{#if timer.description}
+					<span class="timer-description">{timer.description}</span>
+				{:else}
+					<span class="timer-no-description">No description</span>
+				{/if}
+			</div>
 			<div class="timer-details is-flex is-align-items-center">
 				<div
 					class="timer-project-circle mr-2"
@@ -79,6 +85,12 @@
 	.timer-description {
 		font-size: 1.1em;
 		font-weight: 600;
+	}
+
+	.timer-no-description {
+		font-weight: 400;
+		color: var(--text-muted);
+		font-size: 1em;
 	}
 
 	.timer-details {
