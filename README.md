@@ -4,6 +4,7 @@ Add integration with the Toggl Track API to manage your timers inside Obsidian.
 
 ## Functionality
 - See your current timer and how long it has been running  in the status bar
+- Get a summary of your day in the side panel
 - Create and start a new timer using the command palette, or restart an recent one
 - Stop your timer using the command palette
 
@@ -16,11 +17,13 @@ To set up this plugin, simply enter your API token in the settings tab, click co
 
 ![settings](https://raw.githubusercontent.com/mcndt/obsidian-toggl-integration/master/settings.png)
 
+## Use with other plugins:
+
+### QuickAdd
+
+The developer of the QuickAdd plugin has created a preset menu for timers using QuickAdd. You can find out how he did it on the Obsidian Discord server ([link to message](https://discord.com/channels/686053708261228577/707816848615407697/876069796553293835)).
+
 ## Roadmap
-- [ ] Sidebar panel: overview of day/week
-- [ ] Mobile support
-- [ ] Localization
-- [ ] More preloading of API data to make UI snappy
 
 You can see my more detailed roadmap for this plugin on this page: [Development Roadmap](https://github.com/mcndt/obsidian-toggl-integration/projects/1). I try to keep the cards in each column sorted by priority.
 
