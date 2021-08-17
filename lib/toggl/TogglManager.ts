@@ -204,7 +204,7 @@ export default class TogglManager {
 			icon: 'clock',
 			checkCallback: (checking: boolean) => {
 				if (!checking) {
-					this.commandTimerStart();
+					this.commandTimerStop();
 				} else {
 					return this._currentTimeEntry != null;
 				}

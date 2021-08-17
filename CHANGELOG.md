@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.2]
+
+### 🐛 Fixes
+
+- Fix stop timer command actually opening the start timer modal (thanks @ljantzen for the bug report!)
+
 ## [0.2.1]
 
 ### 🐛 Fixes
