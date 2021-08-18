@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.3]
+
+### 🐛 Fixes
+
+- Fix tags not being added on repeat time entries when starting a new time entry (thanks @AetheresMMI for the bug report!).
+
 ## [0.2.2]
 
 ### 🐛 Fixes

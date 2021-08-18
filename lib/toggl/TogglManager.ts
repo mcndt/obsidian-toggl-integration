@@ -138,7 +138,8 @@ export default class TogglManager {
 					end: e.end,
 					pid: e.pid,
 					project: e.project,
-					project_hex_color: e.project_hex_color
+					project_hex_color: e.project_hex_color,
+					tags: e.tags
 				} as TimeEntry)
 		);
 	}
@@ -216,6 +217,7 @@ export default class TogglManager {
 		this.executeIfAPIAvailable(async () => {
 			let new_timer: TimeEntryStart;
 			const timers = await this.getRecentTimeEntries();
+			console.dir(timers);
 			new_timer = await this._plugin.input.selectTimer(timers);
 
 			// user wants to start a new timer
