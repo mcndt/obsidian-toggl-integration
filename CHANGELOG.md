@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.4]
+
+### HOTFIX
+
+Toggl started responding with error status 418 on all requests with the default user-agent of the npm got package, so I set a custom user agent to identify calls made by this plugin.
+
+Hopefully this won't happen again!
+
 ## [0.2.3]
 
 ### 🐛 Fixes

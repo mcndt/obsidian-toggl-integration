@@ -1,7 +1,7 @@
 {
 	"id": "obsidian-toggl-integration",
 	"name": "Toggl Track",
-	"version": "0.2.3",
+	"version": "0.2.4",
 	"minAppVersion": "0.11.13",
 	"description": "This plugin provides features for starting, stopping, and managing timers using Toggl Track.",
 	"author": "Maxime Cannoodt (@mcndt)",

@@ -30,6 +30,6 @@
   "dependencies": {
     "moment": "^2.29.1",
     "supports-color": "^9.0.0",
-    "toggl-client": "git://github.com/saintedlama/toggl-client.git#4a40a9d"
+    "toggl-client": "git://github.com/mcndt/toggl-client.git"
   }
 }

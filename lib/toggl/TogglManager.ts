@@ -54,7 +54,13 @@ export default class TogglManager {
 		window.clearInterval(this._currentTimerInterval);
 		if (token != null && token != '') {
 			try {
-				this._api = togglClient({ apiToken: token });
+				this._api = togglClient({
+					apiToken: token,
+					headers: {
+						'user-agent':
+							'Toggl Integration for Obsidian (https://github.com/mcndt/obsidian-toggl-integration)'
+					}
+				});
 				await this.testConnection();
 				this.startTimerInterval();
 				this._ApiAvailable = ApiStatus.AVAILABLE;
