@@ -14,8 +14,4 @@ export interface PluginSettings {
 	 * the status bar.
 	 */
 	charLimitStatusBar: number;
-	/**
-	 * The interval in ms at which the active timer is polled
-	 */
-	activeTimerCheckInterval: number;
 }

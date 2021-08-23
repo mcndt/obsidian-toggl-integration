@@ -13,6 +13,7 @@ import {
 	togglStore
 } from 'lib/util/stores';
 import moment from 'moment';
+import { ACTIVE_TIMER_POLLING_INTERVAL } from 'lib/constants';
 
 export enum ApiStatus {
 	AVAILABLE,
@@ -312,7 +313,7 @@ export default class TogglManager {
 
 			this._currentTimeEntry = curr;
 			this.updateStatusBarText();
-		}, this._plugin.settings.activeTimerCheckInterval);
+		}, ACTIVE_TIMER_POLLING_INTERVAL);
 		this._plugin.registerInterval(this._currentTimerInterval);
 	}
 

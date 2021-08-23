@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.5]
+
+### HOTFIX
+
+- Reduced the active timer polling rate to once every 6 seconds by request by from the Toggl Track API team.
+
 ## [0.2.4]
 
 ### HOTFIX
