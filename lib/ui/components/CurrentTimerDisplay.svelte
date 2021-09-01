@@ -6,6 +6,8 @@
 	import CurrentTimerStopButton from './CurrentTimerStopButton.svelte';
 	import CurrentTimerStartButton from './CurrentTimerStartButton.svelte';
 	import millisecondsToTimeString from 'lib/util/millisecondsToTimeString';
+	import { time_ranges_to_array } from 'svelte/internal';
+	import TimerTag from './TimerTag.svelte';
 
 	let timer: TimeEntry;
 
@@ -40,14 +42,14 @@
 >
 	<div>
 		{#if timer}
-			<div>
+			<div id="description">
 				{#if timer.description}
 					<span class="timer-description">{timer.description}</span>
 				{:else}
 					<span class="timer-no-description">No description</span>
 				{/if}
 			</div>
-			<div class="timer-details is-flex is-align-items-center">
+			<div id="details" class="timer-details is-flex is-align-items-center">
 				<div
 					class="timer-project-circle mr-2"
 					style="background-color:{timer.project_hex_color}"
@@ -58,6 +60,16 @@
 				>
 				<span class="divider-bullet mx-1">•</span>
 				<span class="timer-duration">{durationString}</span>
+			</div>
+			<!-- is-flex is-flex-wrap-wrap -->
+			<div id="tags" class="">
+				{#if timer.tags && timer.tags.length > 0}
+					{#each timer.tags as tag}
+						<div class="tag mr-1">
+							<TimerTag name={tag} />
+						</div>
+					{/each}
+				{/if}
 			</div>
 		{:else}
 			<div class="timer-description no-timer-main">No active time entry</div>
@@ -76,6 +88,10 @@
 </div>
 
 <style>
+	.tag {
+		float: left;
+	}
+
 	.timer-project-circle {
 		width: 0.7em;
 		height: 0.7em;

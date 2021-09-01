@@ -249,72 +249,73 @@ export default class TogglManager {
 		});
 	}
 
-	// TODO map API response to TimeEntry
 	/**
 	 * Start polling the Toggl Track API periodically to get the
 	 * currently running timer.
 	 */
 	private startTimerInterval() {
-		this._currentTimerInterval = window.setInterval(async () => {
-			if (this._api == null) {
-				return;
-			}
-			const prev = this._currentTimeEntry;
-			let curr = await this._api.timeEntries.current();
+		this.updateCurrentTimer();
+		this._currentTimerInterval = window.setInterval(
+			this.updateCurrentTimer,
+			ACTIVE_TIMER_POLLING_INTERVAL
+		);
+		this._plugin.registerInterval(this._currentTimerInterval);
+	}
 
-			// TODO properly handle multiple workspaces
-			// Drop timers from different workspaces
-			if (
-				curr != null &&
-				curr.wid != this.workspaceId &&
-				curr.pid != undefined
-			) {
-				curr = null;
-			}
+	private async updateCurrentTimer() {
+		if (this._api == null) {
+			return;
+		}
+		const prev = this._currentTimeEntry;
+		let curr = await this._api.timeEntries.current();
 
-			let changed = false;
+		// TODO properly handle multiple workspaces
+		// Drop timers from different workspaces
+		if (curr != null && curr.wid != this.workspaceId && curr.pid != undefined) {
+			curr = null;
+		}
 
-			if (curr != null) {
-				if (prev == null) {
-					// Case 1: no timer -> active timer
+		let changed = false;
+
+		if (curr != null) {
+			if (prev == null) {
+				// Case 1: no timer -> active timer
+				changed = true;
+				console.debug('Case 1: no timer -> active timer');
+			} else {
+				if (prev.id != curr.id) {
+					// Case 2: old timer -> new timer (new ID)
 					changed = true;
-					console.debug('Case 1: no timer -> active timer');
+					console.debug('Case 2: old timer -> new timer (new ID)');
 				} else {
-					if (prev.id != curr.id) {
-						// Case 2: old timer -> new timer (new ID)
+					if (
+						prev.description != curr.description ||
+						prev.pid != curr.pid ||
+						prev.start != curr.start
+					) {
+						// Case 3: timer details update (same ID)
 						changed = true;
-						console.debug('Case 2: old timer -> new timer (new ID)');
-					} else {
-						if (
-							prev.description != curr.description ||
-							prev.pid != curr.pid ||
-							prev.start != curr.start
-						) {
-							// Case 3: timer details update (same ID)
-							changed = true;
-							console.debug('Case 3: timer details update (same ID)');
-						}
+						console.debug('Case 3: timer details update (same ID)');
 					}
 				}
-			} else if (prev != null) {
-				// Case 4: active timer -> no timer
-				changed = true;
-				console.debug('Case 4: active timer -> no timer');
 			}
+		} else if (prev != null) {
+			// Case 4: active timer -> no timer
+			changed = true;
+			console.debug('Case 4: active timer -> no timer');
+		}
 
-			if (changed) {
-				const val = curr != null ? this.responseToTimeEntry(curr) : null;
-				currentTimer.set(val);
-				// fetch updated daily summary report
-				this.getDailySummary().then((response: Report) =>
-					dailySummary.set(response)
-				);
-			}
+		if (changed) {
+			const val = curr != null ? this.responseToTimeEntry(curr) : null;
+			currentTimer.set(val);
+			// fetch updated daily summary report
+			this.getDailySummary().then((response: Report) =>
+				dailySummary.set(response)
+			);
+		}
 
-			this._currentTimeEntry = curr;
-			this.updateStatusBarText();
-		}, ACTIVE_TIMER_POLLING_INTERVAL);
-		this._plugin.registerInterval(this._currentTimerInterval);
+		this._currentTimeEntry = curr;
+		this.updateStatusBarText();
 	}
 
 	/**
@@ -414,7 +415,8 @@ export default class TogglManager {
 						? project.name
 						: '(Unknown)'
 					: '(No project)',
-			project_hex_color: project ? project.hex_color : 'var(--text-muted)'
+			project_hex_color: project ? project.hex_color : 'var(--text-muted)',
+			tags: response.tags
 		};
 	}
 }
