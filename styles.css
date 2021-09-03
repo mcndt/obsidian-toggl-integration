@@ -55,6 +55,8 @@ The following helper classes have been taken from
 https://github.com/jgthms/bulma/ under MIT License	 
 */
 
+@import url('bulma.min.css');
+
 /* MISC */
 
 .is-clickable {

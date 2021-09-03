@@ -1,6 +1,15 @@
 <script lang="ts">
+	import AutoComplete from 'simple-svelte-autocomplete';
+	import { onMount } from 'svelte';
+
 	export let value = '';
+	export let existingTags: string[];
+	export let selectedTags: string[];
 	export let onSubmit: (value: string) => void;
+
+	onMount(() => {
+		console.log(existingTags);
+	});
 
 	const submit = (e: KeyboardEvent) => {
 		if (e.key === 'Enter') {
@@ -20,6 +29,19 @@
 		style="width: 100%;"
 	/>
 
+	<p>
+		Selected tags: {selectedTags}
+	</p>
+
+	<AutoComplete
+		multiple="true"
+		items={existingTags}
+		bind:selectedItem={selectedTags}
+		hideArrow={true}
+		placeholder="(No tags)"
+		className="autocomplete"
+	/>
+
 	<div class="prompt-instructions">
 		<div class="prompt-instruction">
 			<span class="prompt-instruction-command">⏎</span>
@@ -31,3 +53,9 @@
 		</div>
 	</div>
 </div>
+
+<style>
+	.autocomplete {
+		background-color: red;
+	}
+</style>

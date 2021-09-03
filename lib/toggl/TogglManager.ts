@@ -14,6 +14,7 @@ import {
 } from 'lib/util/stores';
 import moment from 'moment';
 import { ACTIVE_TIMER_POLLING_INTERVAL } from 'lib/constants';
+import type { Tag } from 'lib/model/Tag';
 
 export enum ApiStatus {
 	AVAILABLE,
@@ -32,6 +33,7 @@ export default class TogglManager {
 	private _statusBarItem: HTMLElement;
 
 	private _projects: Project[] = [];
+	private _tags: Tag[] = [];
 	private _currentTimerInterval: number = null;
 	private _currentTimeEntry: TimeEntry = null;
 	private _ApiAvailable = ApiStatus.UNTESTED;
@@ -83,12 +85,12 @@ export default class TogglManager {
 
 	/** Preloads data such as the user's projects. */
 	private async _preloadWorkspaceData() {
-		// preload projects
 		this.getProjects().then((response: Project[]) => {
 			this._projects = response;
-			console.debug('Preloaded projects');
 		});
-		// fetch daily summary report
+		this.getTags().then((response: Tag[]) => {
+			this._tags = response;
+		});
 		this.getDailySummary().then((response: Report) =>
 			dailySummary.set(response)
 		);
@@ -129,6 +131,16 @@ export default class TogglManager {
 					hex_color: p.hex_color
 				} as Project)
 		);
+	}
+
+	/**
+	 * @returns list of the user's tags for the configured Toggl workspace.
+	 * NOTE: this makes an async call to the Toggl API. To get cached tags,
+	 * use the computed property cachedTags instead.
+	 */
+	public async getTags(): Promise<Tag[]> {
+		const response = await this._api.workspaces.tags(this.workspaceId);
+		return response as Tag[];
 	}
 
 	/** @returns list of recent time entries for the user's workspace. */
@@ -230,11 +242,8 @@ export default class TogglManager {
 			// user wants to start a new timer
 			if (new_timer == null) {
 				const project = await this._plugin.input.selectProject();
-				const description = await this._plugin.input.enterTimerDescription();
-				new_timer = {
-					description: description,
-					pid: project != null ? parseInt(project.id) : null
-				};
+				new_timer = await this._plugin.input.enterTimerDetails();
+				new_timer.pid = project != null ? parseInt(project.id) : null;
 			}
 
 			this.startTimer(new_timer).then((t: TimeEntry) => {
@@ -393,9 +402,14 @@ export default class TogglManager {
 		return false;
 	}
 
-	/** User's projects as preloaded on plugin initialization. */
+	/** User's projects as preloaded on plugin init. */
 	public get cachedProjects(): Project[] {
 		return this._projects;
+	}
+
+	/** User's workspace tags as preloaded on plugin init */
+	public get cachedTags(): Tag[] {
+		return this._tags;
 	}
 
 	private get workspaceId(): string {
