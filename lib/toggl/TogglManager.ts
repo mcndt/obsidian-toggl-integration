@@ -239,13 +239,16 @@ export default class TogglManager {
 
 			this.startTimer(new_timer).then((t: TimeEntry) => {
 				console.debug(`Started timer: ${t}`);
+				this.updateCurrentTimer();
 			});
 		});
 	}
 
 	public async commandTimerStop() {
 		this.executeIfAPIAvailable(() => {
-			this.stopTimer();
+			this.stopTimer().then(() => {
+				this.updateCurrentTimer();
+			});
 		});
 	}
 
