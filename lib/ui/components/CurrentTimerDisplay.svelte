@@ -61,10 +61,10 @@
 				<span class="timer-duration">{durationString}</span>
 			</div>
 			<!-- is-flex is-flex-wrap-wrap -->
-			<div id="tags" class="">
+			<div id="toggl-tags" class="">
 				{#if timer.tags && timer.tags.length > 0}
 					{#each timer.tags as tag}
-						<div class="tag mr-1">
+						<div class="toggl-tag mr-1">
 							<TimerTag name={tag} />
 						</div>
 					{/each}
@@ -87,15 +87,15 @@
 </div>
 
 <style>
-	#tags {
+	#toggl-tags {
 		margin-top: -0.1em;
 	}
 
-	.tag {
+	.toggl-tag {
 		float: left;
 	}
 
-	.tag:first-child {
+	.toggl-tag:first-child {
 		margin-left: -0.1em;
 	}
 
