@@ -1,20 +1,40 @@
 <script lang="ts">
-	import AutoComplete from 'simple-svelte-autocomplete';
 	import { onMount } from 'svelte';
+	import Select from 'svelte-select/src/Select.svelte';
 
-	export let value = '';
 	export let existingTags: string[];
-	export let selectedTags: string[];
-	export let onSubmit: (value: string) => void;
+	export let onSubmit: (value: { description: string; tags: string[] }) => void;
+
+	let value = '';
+	let selectedTags: string[];
+
+	let tagSelect: HTMLElement;
 
 	onMount(() => {
-		console.log(existingTags);
+		const selectContainer = tagSelect.getElementsByClassName('multiSelect')[0];
+		const input = selectContainer.getElementsByTagName('input')[0];
+
+		input.onkeydown = (ev: KeyboardEvent) => {
+			if (input.value == '') {
+				submit(ev);
+			}
+		};
 	});
+
+	const handleSelect = (event: any) => {
+		if (event.detail) {
+			selectedTags = event.detail.map((o: any) => o.value);
+		}
+	};
+
+	const handleClear = () => {
+		selectedTags = [];
+	};
 
 	const submit = (e: KeyboardEvent) => {
 		if (e.key === 'Enter') {
 			e.preventDefault();
-			onSubmit(value);
+			onSubmit({ description: value, tags: selectedTags });
 		}
 	};
 </script>
@@ -29,18 +49,20 @@
 		style="width: 100%;"
 	/>
 
-	<p>
-		Selected tags: {selectedTags}
-	</p>
-
-	<AutoComplete
-		multiple="true"
-		items={existingTags}
-		bind:selectedItem={selectedTags}
-		hideArrow={true}
-		placeholder="(No tags)"
-		className="autocomplete"
-	/>
+	<div id="tagSelect" class="mt-4" bind:this={tagSelect}>
+		<Select
+			items={existingTags}
+			on:select={handleSelect}
+			on:clear={handleClear}
+			isMulti={true}
+			placeholder="(No tags)"
+			containerClasses="select-container"
+			isClearable={false}
+			hideEmptyState={false}
+			isCreatable={true}
+			showIndicator={true}
+		/>
+	</div>
 
 	<div class="prompt-instructions">
 		<div class="prompt-instruction">
@@ -55,7 +77,4 @@
 </div>
 
 <style>
-	.autocomplete {
-		background-color: red;
-	}
 </style>

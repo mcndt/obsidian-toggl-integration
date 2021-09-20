@@ -17,17 +17,18 @@ export class TimerDescriptionModal extends Modal {
 		super(plugin.app);
 		this.resolve = resolve;
 		this.titleEl.setText('Timer description');
+		this.contentEl.style.overflow = 'visible';
 		this.content = new TimerDescriptionModalContent({
 			target: this.contentEl,
 			props: {
 				value: '',
 				existingTags: plugin.toggl.cachedTags.map((tag) => tag.name),
-				onSubmit: (input: string) => {
+				onSubmit: (input: { description: string; tags: string[] }) => {
 					console.log(input);
 					this.resolve({
-						description: input,
+						description: input.description,
 						pid: null,
-						tags: []
+						tags: input.tags != null ? input.tags : []
 					});
 					this.close();
 				}

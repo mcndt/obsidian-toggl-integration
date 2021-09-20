@@ -6,7 +6,6 @@
 	import CurrentTimerStopButton from './CurrentTimerStopButton.svelte';
 	import CurrentTimerStartButton from './CurrentTimerStartButton.svelte';
 	import millisecondsToTimeString from 'lib/util/millisecondsToTimeString';
-	import { time_ranges_to_array } from 'svelte/internal';
 	import TimerTag from './TimerTag.svelte';
 
 	let timer: TimeEntry;
@@ -88,8 +87,16 @@
 </div>
 
 <style>
+	#tags {
+		margin-top: -0.1em;
+	}
+
 	.tag {
 		float: left;
+	}
+
+	.tag:first-child {
+		margin-left: -0.1em;
 	}
 
 	.timer-project-circle {

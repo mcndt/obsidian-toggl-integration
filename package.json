@@ -21,7 +21,6 @@
     "prettier": "^2.3.0",
     "rollup": "^2.32.1",
     "rollup-plugin-svelte": "^7.1.0",
-    "simple-svelte-autocomplete": "^2.2.3",
     "svelte": "^3.42.1",
     "svelte-check": "^2.2.4",
     "svelte-preprocess": "^4.7.4",
@@ -31,6 +30,7 @@
   "dependencies": {
     "moment": "^2.29.1",
     "supports-color": "^9.0.0",
+    "svelte-select": "^4.4.3",
     "toggl-client": "git://github.com/mcndt/toggl-client.git"
   }
 }
