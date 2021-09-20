@@ -55,6 +55,8 @@ The following helper classes have been taken from
 https://github.com/jgthms/bulma/ under MIT License	 
 */
 
+/* @import url('bulma.min.css'); */
+
 /* MISC */
 
 .is-clickable {
@@ -754,4 +756,50 @@ https://github.com/jgthms/bulma/ under MIT License
 .py-auto {
 	padding-top: auto !important;
 	padding-bottom: auto !important;
+}
+
+/* Autocomplete Svelte component */
+
+.select-container {
+	--height: 30px !important;
+	--background: var(--background-modifier-form-field);
+	--clearSelectTop: 5px;
+	--indicatorTop: 6px;
+
+	--border: 1px solid var(--background-modifier-border);
+	--borderHoverColor: var(--background-modifier-border);
+	--borderFocusColor: var(--interactive-accent);
+
+	--inputFontSize: 16px;
+	--inputColor: var(--text-normal) !important;
+	--placeholderColor: var(--text-faint);
+
+	--listBackground: var(--interactive-normal);
+	--itemHoverBG: var(--interactive-hover);
+
+	--multiSelectPadding: 0 14px 0 14px !important;
+
+	--multiItemHeight: 20px !important;
+	--multiItemMargin: 5px 5px 0 0;
+	--multiItemPadding: 0 10px 0 10px;
+	--multiItemBG: var(--interactive-accent);
+	--multiItemActiveBG: var(--interactive-accent-hover);
+
+	--multiLabelMargin: 0px;
+
+	--multiClearWidth: 0px;
+	--multiClearHeight: 0px;
+	--multiClearTop: 5px;
+	--multiClearBG: var(--interactive-normal);
+	--multiClearFill: var(--text-faint);
+	--multiClearHoverFill: var(--text-accent-hover);
+}
+
+.select-container .multiSelectItem {
+	font-size: 14px;
+	color: var(--text-on-accent) !important;
+}
+
+.select-container .multiSelectItem_clear {
+	display: none;
 }

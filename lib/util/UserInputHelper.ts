@@ -1,6 +1,6 @@
 import type MyPlugin from 'main';
 import type { Project } from 'lib/model/Project';
-import type { TimeEntry } from 'lib/model/TimeEntry';
+import type { TimeEntry, TimeEntryStart } from 'lib/model/TimeEntry';
 import { SelectProjectModal } from 'lib/ui/modals/SelectProjectModal';
 import SelectTimerModal from 'lib/ui/modals/StartTimerModal';
 import { TimerDescriptionModal } from 'lib/ui/modals/TimerDescriptionModal';
@@ -42,8 +42,8 @@ export default class UserInputHelper {
 	 * Opens a modal to let the user type a timer description.
 	 * @returns The user input.
 	 */
-	public async enterTimerDescription(): Promise<string> {
-		let [promise, resolve, reject] = externalizedPromise<string>();
+	public async enterTimerDetails(): Promise<TimeEntryStart> {
+		let [promise, resolve, reject] = externalizedPromise<TimeEntryStart>();
 		new TimerDescriptionModal(this.plugin, resolve).open();
 		return promise;
 	}

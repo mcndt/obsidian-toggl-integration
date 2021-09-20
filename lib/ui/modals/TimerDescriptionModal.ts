@@ -1,9 +1,10 @@
 import type MyPlugin from 'main';
 import TimerDescriptionModalContent from './TimerDescriptionModalContent.svelte';
 import { Modal } from 'obsidian';
+import type { TimeEntryStart } from 'lib/model/TimeEntry';
 
 export class TimerDescriptionModal extends Modal {
-	private readonly resolve: (value: string) => void;
+	private readonly resolve: (value: TimeEntryStart) => void;
 
 	// private input: AbstractTextComponent<HTMLInputElement>;
 	private readonly content: TimerDescriptionModalContent;
@@ -12,17 +13,23 @@ export class TimerDescriptionModal extends Modal {
 	 * @param plugin Reference to the plugin
 	 * @param resolve Function to call when the user submits their input
 	 */
-	constructor(plugin: MyPlugin, resolve: (value: string) => void) {
+	constructor(plugin: MyPlugin, resolve: (value: TimeEntryStart) => void) {
 		super(plugin.app);
 		this.resolve = resolve;
 		this.titleEl.setText('Timer description');
+		this.contentEl.style.overflow = 'visible';
 		this.content = new TimerDescriptionModalContent({
 			target: this.contentEl,
 			props: {
 				value: '',
-				onSubmit: (input: string) => {
+				existingTags: plugin.toggl.cachedTags.map((tag) => tag.name),
+				onSubmit: (input: { description: string; tags: string[] }) => {
 					console.log(input);
-					this.resolve(input);
+					this.resolve({
+						description: input.description,
+						pid: null,
+						tags: input.tags != null ? input.tags : []
+					});
 					this.close();
 				}
 			}

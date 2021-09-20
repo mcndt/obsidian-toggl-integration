@@ -14,6 +14,7 @@ import {
 } from 'lib/util/stores';
 import moment from 'moment';
 import { ACTIVE_TIMER_POLLING_INTERVAL } from 'lib/constants';
+import type { Tag } from 'lib/model/Tag';
 
 export enum ApiStatus {
 	AVAILABLE,
@@ -32,6 +33,7 @@ export default class TogglManager {
 	private _statusBarItem: HTMLElement;
 
 	private _projects: Project[] = [];
+	private _tags: Tag[] = [];
 	private _currentTimerInterval: number = null;
 	private _currentTimeEntry: TimeEntry = null;
 	private _ApiAvailable = ApiStatus.UNTESTED;
@@ -83,12 +85,12 @@ export default class TogglManager {
 
 	/** Preloads data such as the user's projects. */
 	private async _preloadWorkspaceData() {
-		// preload projects
 		this.getProjects().then((response: Project[]) => {
 			this._projects = response;
-			console.debug('Preloaded projects');
 		});
-		// fetch daily summary report
+		this.getTags().then((response: Tag[]) => {
+			this._tags = response;
+		});
 		this.getDailySummary().then((response: Report) =>
 			dailySummary.set(response)
 		);
@@ -129,6 +131,16 @@ export default class TogglManager {
 					hex_color: p.hex_color
 				} as Project)
 		);
+	}
+
+	/**
+	 * @returns list of the user's tags for the configured Toggl workspace.
+	 * NOTE: this makes an async call to the Toggl API. To get cached tags,
+	 * use the computed property cachedTags instead.
+	 */
+	public async getTags(): Promise<Tag[]> {
+		const response = await this._api.workspaces.tags(this.workspaceId);
+		return response as Tag[];
 	}
 
 	/** @returns list of recent time entries for the user's workspace. */
@@ -230,91 +242,92 @@ export default class TogglManager {
 			// user wants to start a new timer
 			if (new_timer == null) {
 				const project = await this._plugin.input.selectProject();
-				const description = await this._plugin.input.enterTimerDescription();
-				new_timer = {
-					description: description,
-					pid: project != null ? parseInt(project.id) : null
-				};
+				new_timer = await this._plugin.input.enterTimerDetails();
+				new_timer.pid = project != null ? parseInt(project.id) : null;
 			}
 
 			this.startTimer(new_timer).then((t: TimeEntry) => {
 				console.debug(`Started timer: ${t}`);
+				this.updateCurrentTimer();
 			});
 		});
 	}
 
 	public async commandTimerStop() {
 		this.executeIfAPIAvailable(() => {
-			this.stopTimer();
+			this.stopTimer().then(() => {
+				this.updateCurrentTimer();
+			});
 		});
 	}
 
-	// TODO map API response to TimeEntry
 	/**
 	 * Start polling the Toggl Track API periodically to get the
 	 * currently running timer.
 	 */
 	private startTimerInterval() {
-		this._currentTimerInterval = window.setInterval(async () => {
-			if (this._api == null) {
-				return;
-			}
-			const prev = this._currentTimeEntry;
-			let curr = await this._api.timeEntries.current();
+		this.updateCurrentTimer();
+		this._currentTimerInterval = window.setInterval(
+			this.updateCurrentTimer,
+			ACTIVE_TIMER_POLLING_INTERVAL
+		);
+		this._plugin.registerInterval(this._currentTimerInterval);
+	}
 
-			// TODO properly handle multiple workspaces
-			// Drop timers from different workspaces
-			if (
-				curr != null &&
-				curr.wid != this.workspaceId &&
-				curr.pid != undefined
-			) {
-				curr = null;
-			}
+	private async updateCurrentTimer() {
+		if (this._api == null) {
+			return;
+		}
+		const prev = this._currentTimeEntry;
+		let curr = await this._api.timeEntries.current();
 
-			let changed = false;
+		// TODO properly handle multiple workspaces
+		// Drop timers from different workspaces
+		if (curr != null && curr.wid != this.workspaceId && curr.pid != undefined) {
+			curr = null;
+		}
 
-			if (curr != null) {
-				if (prev == null) {
-					// Case 1: no timer -> active timer
+		let changed = false;
+
+		if (curr != null) {
+			if (prev == null) {
+				// Case 1: no timer -> active timer
+				changed = true;
+				console.debug('Case 1: no timer -> active timer');
+			} else {
+				if (prev.id != curr.id) {
+					// Case 2: old timer -> new timer (new ID)
 					changed = true;
-					console.debug('Case 1: no timer -> active timer');
+					console.debug('Case 2: old timer -> new timer (new ID)');
 				} else {
-					if (prev.id != curr.id) {
-						// Case 2: old timer -> new timer (new ID)
+					if (
+						prev.description != curr.description ||
+						prev.pid != curr.pid ||
+						prev.start != curr.start
+					) {
+						// Case 3: timer details update (same ID)
 						changed = true;
-						console.debug('Case 2: old timer -> new timer (new ID)');
-					} else {
-						if (
-							prev.description != curr.description ||
-							prev.pid != curr.pid ||
-							prev.start != curr.start
-						) {
-							// Case 3: timer details update (same ID)
-							changed = true;
-							console.debug('Case 3: timer details update (same ID)');
-						}
+						console.debug('Case 3: timer details update (same ID)');
 					}
 				}
-			} else if (prev != null) {
-				// Case 4: active timer -> no timer
-				changed = true;
-				console.debug('Case 4: active timer -> no timer');
 			}
+		} else if (prev != null) {
+			// Case 4: active timer -> no timer
+			changed = true;
+			console.debug('Case 4: active timer -> no timer');
+		}
 
-			if (changed) {
-				const val = curr != null ? this.responseToTimeEntry(curr) : null;
-				currentTimer.set(val);
-				// fetch updated daily summary report
-				this.getDailySummary().then((response: Report) =>
-					dailySummary.set(response)
-				);
-			}
+		if (changed) {
+			const val = curr != null ? this.responseToTimeEntry(curr) : null;
+			currentTimer.set(val);
+			// fetch updated daily summary report
+			this.getDailySummary().then((response: Report) =>
+				dailySummary.set(response)
+			);
+		}
 
-			this._currentTimeEntry = curr;
-			this.updateStatusBarText();
-		}, ACTIVE_TIMER_POLLING_INTERVAL);
-		this._plugin.registerInterval(this._currentTimerInterval);
+		this._currentTimeEntry = curr;
+		this.updateStatusBarText();
 	}
 
 	/**
@@ -389,9 +402,14 @@ export default class TogglManager {
 		return false;
 	}
 
-	/** User's projects as preloaded on plugin initialization. */
+	/** User's projects as preloaded on plugin init. */
 	public get cachedProjects(): Project[] {
 		return this._projects;
+	}
+
+	/** User's workspace tags as preloaded on plugin init */
+	public get cachedTags(): Tag[] {
+		return this._tags;
 	}
 
 	private get workspaceId(): string {
@@ -414,7 +432,8 @@ export default class TogglManager {
 						? project.name
 						: '(Unknown)'
 					: '(No project)',
-			project_hex_color: project ? project.hex_color : 'var(--text-muted)'
+			project_hex_color: project ? project.hex_color : 'var(--text-muted)',
+			tags: response.tags
 		};
 	}
 }

@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0]
+
+### ✨ Features
+
+- Sidebar view now shows tags on active time entry.
+- You can now add tags to a new time entry when entering the description.
+- Adding tags to a time entry uses autocompletion using the Toggl workspace's existing tags.
+
+### ⚙️ Internal
+
+- Plugin now immediately refreshes current timer status when starting/stopping a time entry and on plugin load.
+
 ## [0.2.5]
 
 ### HOTFIX
