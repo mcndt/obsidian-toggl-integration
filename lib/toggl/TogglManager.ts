@@ -64,6 +64,7 @@ export default class TogglManager {
 							'Toggl Integration for Obsidian (https://github.com/mcndt/obsidian-toggl-integration)'
 					}
 				});
+				console.debug('set api');
 				await this.testConnection();
 				this.startTimerInterval();
 				this._ApiAvailable = ApiStatus.AVAILABLE;
@@ -267,10 +268,9 @@ export default class TogglManager {
 	 */
 	private startTimerInterval() {
 		this.updateCurrentTimer();
-		this._currentTimerInterval = window.setInterval(
-			this.updateCurrentTimer,
-			ACTIVE_TIMER_POLLING_INTERVAL
-		);
+		this._currentTimerInterval = window.setInterval(() => {
+			this.updateCurrentTimer();
+		}, ACTIVE_TIMER_POLLING_INTERVAL);
 		this._plugin.registerInterval(this._currentTimerInterval);
 	}
 
@@ -303,7 +303,8 @@ export default class TogglManager {
 					if (
 						prev.description != curr.description ||
 						prev.pid != curr.pid ||
-						prev.start != curr.start
+						prev.start != curr.start ||
+						isTagsChanged(prev.tags, curr.tags)
 					) {
 						// Case 3: timer details update (same ID)
 						changed = true;
@@ -436,4 +437,19 @@ export default class TogglManager {
 			tags: response.tags
 		};
 	}
+}
+
+function isTagsChanged(old_tags: string[], new_tags: string[]) {
+	old_tags = old_tags || [];
+	new_tags = new_tags || [];
+
+	if (old_tags.length != new_tags.length) {
+		return true;
+	}
+	for (const tag of old_tags) {
+		if (new_tags.indexOf(tag) < 0) {
+			return true;
+		}
+	}
+	return false;
 }
