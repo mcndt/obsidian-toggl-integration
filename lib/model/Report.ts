@@ -23,6 +23,7 @@ export default interface Report {
 	 * an array with detailed information of the requested report.
 	 * The structure of the data in the array depends on the report.
 	 */
+	// TODO: this should be typed by adding generics: e.g. Report<Summary>, Report<Weekly>, etc.
 	data?: any[];
 
 	/**

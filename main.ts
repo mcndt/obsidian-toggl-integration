@@ -1,11 +1,13 @@
 import type { PluginSettings } from 'lib/config/PluginSettings';
-import { Plugin, WorkspaceLeaf } from 'obsidian';
+import { MarkdownPostProcessorContext, Plugin, WorkspaceLeaf } from 'obsidian';
 import TogglManager from 'lib/toggl/TogglManager';
 import TogglSettingsTab from 'lib/ui/TogglSettingsTab';
 import { DEFAULT_SETTINGS } from 'lib/config/DefaultSettings';
 import UserInputHelper from 'lib/util/UserInputHelper';
 import TogglReportView from 'lib/ui/views/TogglReportView';
 import { VIEW_TYPE_REPORT } from 'lib/ui/views/TogglReportView';
+import { CODEBLOCK_LANG } from 'lib/constants';
+import codeBlockHandler from 'lib/reports/CodeBlockHandler';
 
 export default class MyPlugin extends Plugin {
 	public settings: PluginSettings;
@@ -40,6 +42,9 @@ export default class MyPlugin extends Plugin {
 		} else {
 			this.app.workspace.onLayoutReady(this.initLeaf.bind(this));
 		}
+
+		// Enable processing codeblocks for rendering in-note reports
+		this.registerCodeBlockProcessor();
 	}
 
 	initLeaf(): void {
@@ -49,6 +54,14 @@ export default class MyPlugin extends Plugin {
 		this.app.workspace.getRightLeaf(false).setViewState({
 			type: VIEW_TYPE_REPORT
 		});
+	}
+
+	/**
+	 * Registeres the MarkdownPostProcessor for rendering reports from
+	 * codeblock queries.
+	 */
+	registerCodeBlockProcessor() {
+		this.registerMarkdownCodeBlockProcessor(CODEBLOCK_LANG, codeBlockHandler);
 	}
 
 	onunload() {}

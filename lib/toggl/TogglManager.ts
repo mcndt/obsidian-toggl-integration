@@ -175,7 +175,7 @@ export default class TogglManager {
 	 */
 	private async getDailySummary(): Promise<Report> {
 		const response: Report = await this._api.reports.summary(this.workspaceId, {
-			since: moment().toISOString().format('YYYY-MM-DD'),
+			since: moment().format('YYYY-MM-DD'),
 			order_field: 'duration',
 			order_desc: 'on'
 		});

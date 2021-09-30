@@ -6,7 +6,7 @@
   ],
   "compilerOptions": {
     "baseUrl": ".",
-    "types": ["node", "svelte"],
+    "types": ["node", "svelte", "jest"],
     // "inlineSourceMap": true,
     "inlineSources": true,
     "module": "ESNext",
