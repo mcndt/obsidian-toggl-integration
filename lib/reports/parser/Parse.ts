@@ -1,7 +1,8 @@
 import type { ListQuery, Query, SummaryQuery } from '../ReportQuery';
+import { SelectionMode } from '../ReportQuery';
 
 import moment from 'moment';
-import { Keyword, Token } from './Tokenize';
+import { Keyword, Token, tokenize, UserInput } from './Tokenize';
 
 /** Date string formatted as YYYY-MM-DD */
 export type ISODate = string;
@@ -12,41 +13,48 @@ export const ISODateFormat = 'YYYY-MM-DD';
  * @returns a query object containing required information for fullfilling
  *          the request.
  */
-export function parse(tokens: Token[]): Query {
-	const type = tokens[0];
+export function parse(queryString: string): Query {
+	let query: Query;
+	let tokens = tokenize(queryString);
+
+	// Parse query type
+	const type = tokens.splice(0, 1)[0];
 	const accepted_types: Token[] = [Keyword.SUMMARY, Keyword.LIST];
 
 	if (!accepted_types.includes(type)) {
 		throw new InvalidTokenError(type, accepted_types);
 	}
 
-	// // First expect report type keyword
-	// switch (tokens[0]) {
-	// 	case Keyword.SUMMARY:
-	// 	// query = parseSummaryQuery(tokens.slice(1));
-	// 	case Keyword.LIST:
-	// 	// query = parseListQuery(tokens.slice(1));
-	// 	default:
-	// 		throw new InvalidTokenError(tokens[0], [Keyword.SUMMARY, Keyword.LIMIT]);
-	// }
-
-	return null;
-}
-
-/**
- * Parses a summaryQuery object from the given array of tokens.
- */
-function parseSummaryQuery(tokens: Token[]): SummaryQuery {
+	// Parse time interval expression
 	let since, until: ISODate;
 	[since, until, tokens] = parseQueryInterval(tokens);
-	return null;
-}
 
-/**
- * Parses a listQuery object from the given array of tokens.
- */
-function parseListQuery(tokens: Token[]): ListQuery {
-	return null;
+	if (since == null && until == null) {
+		throw new NoTimeIntervalExpression();
+	}
+	query = { from: since, to: until };
+
+	// Parse inclusion/exclusion statements
+
+	const selection_keywords: Token[] = [Keyword.INCLUDE, Keyword.EXCLUDE];
+	let parsedAllSelections = false;
+
+	while (!parsedAllSelections) {
+		if (selection_keywords.includes(tokens[0])) {
+			if (
+				selection_keywords.includes(tokens[0]) &&
+				tokens[1] == Keyword.PROJECTS &&
+				query.projectSelection
+			) {
+				throw new DuplicateSelectionExpression(tokens[1]);
+			}
+			tokens = parseSelection(tokens, query);
+		} else {
+			parsedAllSelections = true;
+		}
+	}
+
+	return query;
 }
 
 /**
@@ -150,7 +158,85 @@ export function parseQueryInterval(
 	return [since, until, tokens];
 }
 
-export class QueryParseError extends Error {}
+/**
+ * Parses a selection statement from the tokens array and consumes tokens.
+ * Results are added into the passed query object.
+ *  @returns remaining tokens.
+ *  @throws EvalError when parsing fails.
+ */
+export function parseSelection(tokens: Token[], query: Query): Token[] {
+	// Get selection mode
+	let mode: SelectionMode;
+	switch (tokens[0]) {
+		case Keyword.INCLUDE:
+			mode = SelectionMode.INCLUDE;
+			break;
+		case Keyword.EXCLUDE:
+			mode = SelectionMode.EXCLUDE;
+			break;
+		default:
+			throw new InvalidTokenError(tokens[0], [
+				Keyword.INCLUDE,
+				Keyword.EXCLUDE
+			]);
+	}
+	tokens.splice(0, 1);
+
+	// Get qualifier
+	const qualifier: Token = tokens[0];
+	const accepted_qualifiers = [Keyword.PROJECTS] as Token[];
+	if (!accepted_qualifiers.includes(qualifier)) {
+		throw new InvalidTokenError(qualifier, accepted_qualifiers);
+	}
+	tokens.splice(0, 1);
+
+	// Get selection list
+	let list: UserInput[];
+	try {
+		[list, tokens] = parseList(tokens);
+	} catch {
+		throw new NoUserInputTokensError(mode, qualifier as Keyword);
+	}
+
+	// Add to query object
+	switch (qualifier) {
+		case Keyword.PROJECTS:
+			query.projectSelection = { mode, list };
+	}
+
+	return tokens;
+}
+
+/**
+ * Parses a list of subsequent UserInput tokens from the passed
+ * tokens array and returns the remaining tokens sequence. Parsed
+ * tokens are consumed in the process.
+ * @returns List of parsed UserInput tokens and remaining tokens.
+ * @throws EvalError when no UserInput tokens are present at the head
+ * of the tokens array.
+ */
+export function parseList(
+	tokens: Token[]
+): [list: UserInput[], remaining: Token[]] {
+	const list: UserInput[] = [];
+
+	while (tokens.length > 0) {
+		if (tokens[0] in Keyword) break;
+		if (typeof tokens[0] == 'string' && tokens[0][0] == '"') {
+			list.push(tokens[0].slice(1, -1));
+		} else {
+			list.push(tokens[0]);
+		}
+		tokens.splice(0, 1);
+	}
+
+	if (list.length == 0) {
+		throw new EvalError('No UserInput tokens at head of tokens array.');
+	}
+	return [list, tokens];
+}
+
+export class QueryParseError extends EvalError {}
 
 export class InvalidTokenError extends QueryParseError {
 	constructor(token: Token, accepted: Token[]) {
@@ -179,5 +265,34 @@ export class InvalidIntervalError extends QueryParseError {
 export class IntervalTooLargeError extends QueryParseError {
 	constructor() {
 		super('Toggl only provides reports over time spans less than 1 year.');
+	}
+}
+
+export class NoUserInputTokensError extends QueryParseError {
+	constructor(mode: SelectionMode, qualifier: Keyword) {
+		super(
+			`"${mode} ${qualifier}" must be followed by at least one item. For example: 'INCLUDE PROJECTS "project A", 12345678, "Project C"'`
+		);
+		// Set the prototype explicitly.
+		Object.setPrototypeOf(this, NoUserInputTokensError.prototype);
+	}
+}
+
+export class NoTimeIntervalExpression extends QueryParseError {
+	constructor() {
+		super(`Query must include a time interval expression. Available expressions: 
+		"${Keyword.TODAY}", 
+		"${Keyword.WEEK}", 
+		"${Keyword.MONTH}", 
+		"${Keyword.PREVIOUS} ... ${Keyword.DAYS}/${Keyword.WEEKS}/${Keyword.MONTHS}", 
+		"${Keyword.FROM} ... ${Keyword.TO} ..."`);
+	}
+}
+
+export class DuplicateSelectionExpression extends QueryParseError {
+	constructor(qualifier: Keyword) {
+		super(
+			`A query can only contain a single selection expression for keyword "${qualifier}"`
+		);
 	}
 }

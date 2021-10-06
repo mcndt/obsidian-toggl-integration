@@ -1,15 +1,26 @@
+import type { ISODate } from './parser/Parse';
+
 /**
  * Data required to fullfill a Toggl Report query.
  */
 export interface Query {
 	/** Start of query time interval. */
-	from: moment.Moment;
+	from: ISODate;
 	/** End of query time interval. */
-	to: moment.Moment;
+	to: ISODate;
 	/** Optional, list of Toggl project IDs to include/exclude. */
-	subset?: number[];
-	/** Optional, operation to execute using subset field. */
-	subsetMode?: SubsetMode;
+	projectSelection?: Selection;
+}
+
+/**
+ * Subset to select when fullfilling the Toggl report query.
+ * e.g. to exclude certain projects
+ */
+export interface Selection {
+	/** Whether to include or exclude the items in the list property. */
+	mode: SelectionMode;
+	/** list of Toggl project IDs or names to include/exclude. */
+	list: (string | number)[];
 }
 
 /**
@@ -17,11 +28,11 @@ export interface Query {
  */
 export interface SummaryQuery extends Query {
 	/** Hide the project breakdown chart UI element from the report. */
-	hidePie: boolean;
+	// hidePie: boolean;
 	/** Hide the time breakdown chart UI element from the report. */
-	hideBar: boolean;
+	// hideBar: boolean;
 	/** Hide the project list UI element from the report. */
-	hideList: boolean;
+	// hideList: boolean;
 }
 
 /**
@@ -36,7 +47,7 @@ export interface ListQuery extends Query {
 	limit?: number;
 }
 
-export enum SubsetMode {
+export enum SelectionMode {
 	/** Only include the projects in the subset in the query results. */
 	INCLUDE,
 	/** Exclude the projects in the subset from the query results. */

@@ -36,7 +36,8 @@ export enum Keyword {
 	LIMIT = 'LIMIT'
 }
 
-export type Token = Keyword | string | number;
+export type UserInput = string | number;
+export type Token = Keyword | UserInput;
 
 /**
  * @param query query string
