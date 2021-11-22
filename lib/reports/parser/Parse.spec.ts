@@ -406,7 +406,17 @@ describe('parse', () => {
 		);
 	});
 
-	test('TC-03a (Relative time interval, include projects)', () => {
+	test('TC-02f (Relative time interval)', () => {
+		testParse({
+			queryString: `SUMMARY PREVIOUS 10 DAYS`,
+			expected: {
+				from: '2020-01-22',
+				to: '2020-01-31',
+			} as SummaryQuery
+		});
+	});
+
+	test('TC-03a (include projects (string or integer id))', () => {
 		testParse({
 			queryString: `SUMMARY PREVIOUS 10 DAYS INCLUDE PROJECTS 'project A', 123456789`,
 			expected: {
