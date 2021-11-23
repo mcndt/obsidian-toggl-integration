@@ -15,6 +15,7 @@ import {
 import moment from 'moment';
 import { ACTIVE_TIMER_POLLING_INTERVAL } from 'lib/constants';
 import type { Tag } from 'lib/model/Tag';
+import ApiManager from './ApiManager';
 
 export enum ApiStatus {
 	AVAILABLE,
@@ -27,7 +28,8 @@ export default class TogglManager {
 	private _plugin: MyPlugin;
 
 	// TODO: rewrite toggl API client with Obsidian Request API
-	private _api: any;
+	// private _api: any;
+	private _apiManager: ApiManager;
 
 	// UI references
 	private _statusBarItem: HTMLElement;
@@ -57,23 +59,15 @@ export default class TogglManager {
 		window.clearInterval(this._currentTimerInterval);
 		if (token != null && token != '') {
 			try {
-				this._api = togglClient({
-					apiToken: token,
-					headers: {
-						'user-agent':
-							'Toggl Integration for Obsidian (https://github.com/mcndt/obsidian-toggl-integration)'
-					}
-				});
-				console.debug('set api');
-				await this.testConnection();
-				this.startTimerInterval();
+				this._apiManager = new ApiManager();
+				this._apiManager.initialize(token);
 				this._ApiAvailable = ApiStatus.AVAILABLE;
+				this.startTimerInterval();
 				this._preloadWorkspaceData();
 			} catch {
-				this._statusBarItem.setText('Cannot connect to Toggl API');
 				console.error('Cannot connect to toggl API.');
+				this._statusBarItem.setText('Cannot connect to Toggl API');
 				this._ApiAvailable = ApiStatus.UNREACHABLE;
-				console.debug('unreachable');
 				this.noticeAPINotAvailable();
 			}
 		} else {
@@ -84,122 +78,27 @@ export default class TogglManager {
 		apiStatusStore.set(this._ApiAvailable);
 	}
 
-	/** Preloads data such as the user's projects. */
-	private async _preloadWorkspaceData() {
-		this.getProjects().then((response: Project[]) => {
-			this._projects = response;
-		});
-		this.getTags().then((response: Tag[]) => {
-			this._tags = response;
-		});
-		this.getDailySummary().then((response: Report) =>
-			dailySummary.set(response)
-		);
-	}
-
 	/** Throws an Error when the Toggl Track API cannot be reached. */
 	public async testConnection() {
-		// test by just making a small request to the API.
-		// The method will throw an Error when we get a negative
-		// response code.
-		await this._api.workspaces.list();
+		await this._apiManager.testConnection();
 	}
 
 	/** @returns list of the user's workspaces. */
 	public async getWorkspaces(): Promise<TogglWorkspace[]> {
-		const response = await this._api.workspaces.list();
-		return response.map(
-			(w: any) =>
-				({ id: (w.id as number).toString(), name: w.name } as TogglWorkspace)
-		);
+		return this._apiManager.getWorkspaces();
 	}
 
-	/**
-	 * @returns list of the user's projects for the configured Toggl workspace.
-	 * NOTE: this makes an async call to the Toggl API. To get cached projects,
-	 * use the computed property cachedProjects instead.
-	 */
-	public async getProjects(): Promise<Project[]> {
-		const response = await this._api.workspaces.projects(this.workspaceId);
-		return response.map(
-			(p: any) =>
-				({
-					name: p.name,
-					id: p.id,
-					cid: p.cid,
-					active: p.active,
-					actual_hours: p.actual_hours,
-					hex_color: p.hex_color
-				} as Project)
-		);
-	}
-
-	/**
-	 * @returns list of the user's tags for the configured Toggl workspace.
-	 * NOTE: this makes an async call to the Toggl API. To get cached tags,
-	 * use the computed property cachedTags instead.
-	 */
-	public async getTags(): Promise<Tag[]> {
-		const response = await this._api.workspaces.tags(this.workspaceId);
-		return response as Tag[];
-	}
-
-	/** @returns list of recent time entries for the user's workspace. */
-	public async getRecentTimeEntries(): Promise<TimeEntry[]> {
-		const response = await this._api.reports.details(this.workspaceId);
-		console.debug('Toggl API response: recent time entries');
-		return response.data.map(
-			(e: any) =>
-				({
-					id: e.id,
-					description: e.description,
-					duration: e.dur,
-					start: e.start,
-					end: e.end,
-					pid: e.pid,
-					project: e.project,
-					project_hex_color: e.project_hex_color,
-					tags: e.tags
-				} as TimeEntry)
-		);
-	}
-
-	/**
-	 * Fetches a report for the current day according to the Toggl Track Report API.
-	 * @returns a {@link Report} object containing the report data as defined by
-	 * the track report API
-	 * (see https://github.com/toggl/toggl_api_docs/blob/master/reports.md).
-	 *
-	 * NOTE: this method is used to fetch the latest summary at key events. To
-	 *       access the latest report, subscribe to the store {@link dailyReport}
-	 */
-	private async getDailySummary(): Promise<Report> {
-		const response: Report = await this._api.reports.summary(this.workspaceId, {
-			since: moment().format('YYYY-MM-DD'),
-			order_field: 'duration',
-			order_desc: 'on'
+	/** Preloads data such as the user's projects. */
+	private async _preloadWorkspaceData() {
+		this._apiManager.getProjects().then((response: Project[]) => {
+			this._projects = response;
 		});
-		return response;
-	}
-
-	/**
-	 * Starts a new timer on Toggl Track with the given
-	 * description and project.
-	 * @param entry the description and project to start a timer on.
-	 */
-	public async startTimer(entry: TimeEntryStart): Promise<TimeEntry> {
-		return this._api.timeEntries.start(entry);
-	}
-
-	/**
-	 * Stops the currently running timer. If no timer is running,
-	 * the promise will reject.
-	 */
-	public async stopTimer(): Promise<TimeEntry> {
-		if (this._currentTimeEntry != null) {
-			return this._api.timeEntries.stop(this._currentTimeEntry.id);
-		}
-		return Promise.reject('No timer is running.');
+		this._apiManager.getTags().then((response: Tag[]) => {
+			this._tags = response;
+		});
+		this._apiManager
+			.getDailySummary()
+			.then((response: Report) => dailySummary.set(response));
 	}
 
 	/** Register Toggl commands for the Obsidian command palette. */
@@ -236,7 +135,7 @@ export default class TogglManager {
 	public async commandTimerStart() {
 		this.executeIfAPIAvailable(async () => {
 			let new_timer: TimeEntryStart;
-			const timers = await this.getRecentTimeEntries();
+			const timers = await this._apiManager.getRecentTimeEntries();
 			console.dir(timers);
 			new_timer = await this._plugin.input.selectTimer(timers);
 
@@ -247,7 +146,7 @@ export default class TogglManager {
 				new_timer.pid = project != null ? parseInt(project.id) : null;
 			}
 
-			this.startTimer(new_timer).then((t: TimeEntry) => {
+			this._apiManager.startTimer(new_timer).then((t: TimeEntry) => {
 				console.debug(`Started timer: ${t}`);
 				this.updateCurrentTimer();
 			});
@@ -256,9 +155,11 @@ export default class TogglManager {
 
 	public async commandTimerStop() {
 		this.executeIfAPIAvailable(() => {
-			this.stopTimer().then(() => {
-				this.updateCurrentTimer();
-			});
+			if (this._currentTimeEntry != null) {
+				this._apiManager.stopTimer(this._currentTimeEntry.id).then(() => {
+					this.updateCurrentTimer();
+				});
+			}
 		});
 	}
 
@@ -275,11 +176,11 @@ export default class TogglManager {
 	}
 
 	private async updateCurrentTimer() {
-		if (this._api == null) {
+		if (!this.isApiAvailable) {
 			return;
 		}
 		const prev = this._currentTimeEntry;
-		let curr = await this._api.timeEntries.current();
+		let curr = await this._apiManager.getCurrentTimer();
 
 		// TODO properly handle multiple workspaces
 		// Drop timers from different workspaces
@@ -322,9 +223,9 @@ export default class TogglManager {
 			const val = curr != null ? this.responseToTimeEntry(curr) : null;
 			currentTimer.set(val);
 			// fetch updated daily summary report
-			this.getDailySummary().then((response: Report) =>
-				dailySummary.set(response)
-			);
+			this._apiManager
+				.getDailySummary()
+				.then((response: Report) => dailySummary.set(response));
 		}
 
 		this._currentTimeEntry = curr;

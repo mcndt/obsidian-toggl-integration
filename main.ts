@@ -8,6 +8,7 @@ import TogglReportView from 'lib/ui/views/TogglReportView';
 import { VIEW_TYPE_REPORT } from 'lib/ui/views/TogglReportView';
 import { CODEBLOCK_LANG } from 'lib/constants';
 import codeBlockHandler from 'lib/reports/CodeBlockHandler';
+import { settingsStore } from 'lib/util/stores';
 
 export default class MyPlugin extends Plugin {
 	public settings: PluginSettings;
@@ -68,9 +69,11 @@ export default class MyPlugin extends Plugin {
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		settingsStore.set(this.settings);
 	}
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		settingsStore.set(this.settings);
 	}
 }

@@ -12,5 +12,5 @@ export default function codeBlockHandler(
 ) {
 	const tokens = tokenize(source);
 	el.setText(`${tokens.map((t) => t).join(', ')}`);
-	const query = parse(tokens);
+	const query = parse(source);
 }
