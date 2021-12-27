@@ -7,7 +7,7 @@ import UserInputHelper from 'lib/util/UserInputHelper';
 import TogglReportView from 'lib/ui/views/TogglReportView';
 import { VIEW_TYPE_REPORT } from 'lib/ui/views/TogglReportView';
 import { CODEBLOCK_LANG } from 'lib/constants';
-import codeBlockHandler from 'lib/reports/CodeBlockHandler';
+import reportBlockHandler from 'lib/reports/reportBlockHandler';
 import { settingsStore } from 'lib/util/stores';
 
 export default class MyPlugin extends Plugin {
@@ -62,7 +62,7 @@ export default class MyPlugin extends Plugin {
 	 * codeblock queries.
 	 */
 	registerCodeBlockProcessor() {
-		this.registerMarkdownCodeBlockProcessor(CODEBLOCK_LANG, codeBlockHandler);
+		this.registerMarkdownCodeBlockProcessor(CODEBLOCK_LANG, reportBlockHandler);
 	}
 
 	onunload() {}
