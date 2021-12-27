@@ -1,55 +1,84 @@
 /*
 Definitions of fields taken from
 https://github.com/toggl/toggl_api_docs/blob/master/reports.md#successful-response
+https://github.com/toggl/toggl_api_docs/blob/master/reports/detailed.md#response
 */
 
-export default interface Report {
-	/**
-	 * total time in milliseconds for the selected report
-	 */
+export interface Report<T> {
+	/** total time in milliseconds for the selected report. */
 	total_grand?: number;
 
-	/**
-	 * total billable time in milliseconds for the selected report
-	 */
+	/** total billable time in milliseconds for the selected report. */
 	total_billable?: number;
 
-	/**
-	 * an array with amounts and currencies for the selected report
-	 */
-	total_currencies?: Totalcurrency[];
+	/** an array with amounts and currencies for the selected report. */
+	total_currencies?: TotalCurrency[];
+
+	/** total number of time entries that were found for the request. */
+	total_count?: number;
+
+	/** how many time entries are displayed in one request. */
+	per_page?: number;
 
 	/**
 	 * an array with detailed information of the requested report.
 	 * The structure of the data in the array depends on the report.
 	 */
-	// TODO: this should be typed by adding generics: e.g. Report<Summary>, Report<Weekly>, etc.
-	data?: any[];
+	data?: T[];
 
-	/**
-	 * Is defined when the report API request failed.
-	 */
+	/** This field is defined when the report API request failed. */
 	error?: Error;
 }
 
-export interface Totalcurrency {
-	currency?: any;
-	amount?: any;
+/**
+ * Object returned by the /reports/api/v2/details endpoint.
+ */
+export interface Detailed {
+	id: any;
+	pid: number;
+	tid?: any;
+	uid: number;
+	description: string;
+	start: Date;
+	end: Date;
+	updated: Date;
+	dur: number;
+	user: string;
+	use_stop: boolean;
+	client: string;
+	project: string;
+	project_color: string;
+	project_hex_color: string;
+	task?: any;
+	billable?: any;
+	is_billable: boolean;
+	cur?: any;
+	tags: string[];
+}
+
+/**
+ * Object returned by the /reports/api/v2/summary endpoint
+ */
+export interface Summary {
+	id?: number;
+	title: object;
+	time: number;
+	total_currencies: TotalCurrency[];
+	items: object[];
+}
+
+export interface TotalCurrency {
+	currency?: string;
+	amount?: number;
 }
 
 export interface Error {
-	/**
-	 * the general message of the occurred error
-	 */
+	/** the general message of the occurred error */
 	message: string;
 
-	/**
-	 * what to do in case of this error
-	 */
+	/** what to do in case of this error*/
 	tip: string;
 
-	/**
-	 * status code of the response
-	 */
+	/** status code of the response */
 	code: number;
 }

@@ -1,6 +1,6 @@
 import type { PluginSettings } from 'lib/config/PluginSettings';
 import type { Project } from 'lib/model/Project';
-import type Report from 'lib/model/Report';
+import type { Report, Summary } from 'lib/model/Report';
 import type { Tag } from 'lib/model/Tag';
 import type { TimeEntry, TimeEntryStart } from 'lib/model/TimeEntry';
 import type { TogglWorkspace } from 'lib/model/TogglWorkspace';
@@ -112,8 +112,8 @@ export default class ApiManager {
 	 * NOTE: this method is used to fetch the latest summary at key events. To
 	 *       access the latest report, subscribe to the store {@link dailyReport}
 	 */
-	public async getDailySummary(): Promise<Report> {
-		const response: Report = await this._api.reports.summary(
+	public async getDailySummary(): Promise<Report<Summary>> {
+		const response: Report<any> = await this._api.reports.summary(
 			this._settings.workspace.id,
 			{
 				since: moment().format('YYYY-MM-DD'),

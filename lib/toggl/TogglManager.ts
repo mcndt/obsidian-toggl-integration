@@ -3,16 +3,15 @@ import type { Project } from 'lib/model/Project';
 import type { TimeEntry } from 'lib/model/TimeEntry';
 import type { TimeEntryStart } from 'lib/model/TimeEntry';
 import type { TogglWorkspace } from 'lib/model/TogglWorkspace';
-import type Report from 'lib/model/Report';
+import type { Report, Summary } from 'lib/model/Report';
 import { Notice } from 'obsidian';
-import togglClient from 'toggl-client';
+
 import {
 	currentTimer,
 	dailySummary,
 	apiStatusStore,
 	togglStore
 } from 'lib/util/stores';
-import moment from 'moment';
 import { ACTIVE_TIMER_POLLING_INTERVAL } from 'lib/constants';
 import type { Tag } from 'lib/model/Tag';
 import ApiManager from './ApiManager';
@@ -98,7 +97,7 @@ export default class TogglManager {
 		});
 		this._apiManager
 			.getDailySummary()
-			.then((response: Report) => dailySummary.set(response));
+			.then((response: Report<Summary>) => dailySummary.set(response));
 	}
 
 	/** Register Toggl commands for the Obsidian command palette. */
@@ -225,7 +224,7 @@ export default class TogglManager {
 			// fetch updated daily summary report
 			this._apiManager
 				.getDailySummary()
-				.then((response: Report) => dailySummary.set(response));
+				.then((response: Report<Summary>) => dailySummary.set(response));
 		}
 
 		this._currentTimeEntry = curr;
