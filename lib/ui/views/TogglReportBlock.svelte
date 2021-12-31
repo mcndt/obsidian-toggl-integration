@@ -3,6 +3,11 @@
 	import ReportBlockList from '../components/report_blocks/list/ReportBlockList.svelte';
 	import type { ReportListGroupData } from '../components/report_blocks/list/types';
 	import BarChart from '../components/report_blocks/summary/BarChart.svelte';
+	import DonutChart from '../components/report_blocks/summary/DonutChart.svelte';
+
+	const DONUT_WIDTH = 190;
+
+	let _width: number;
 
 	const list_by_group: ReportListGroupData[] = [
 		{
@@ -64,12 +69,16 @@
 	];
 </script>
 
-<main>
+<main bind:clientWidth={_width}>
 	<ReportBlockHeader totalTime="26:21:04" />
-	<!-- <ReportBlockList data={list_by_group} />
-	<ReportBlockList data={list_by_date} /> -->
+	<div class="is-flex is-justify-content-space-between is-align-items-center">
+		{#if _width}
+			<BarChart width={Math.max(0, _width - DONUT_WIDTH)} />
+			<DonutChart width={DONUT_WIDTH} />
+		{/if}
+	</div>
 
-	<BarChart />
+	<ReportBlockList data={list_by_group} />
 </main>
 
 <style>
