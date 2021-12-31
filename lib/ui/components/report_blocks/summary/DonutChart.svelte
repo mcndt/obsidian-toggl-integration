@@ -7,27 +7,8 @@
 
 	let _el: HTMLElement;
 
-	const data: ChartData[] = [
-		{
-			name: 'Programming',
-			value: 9.2,
-			hex: '#9E5BD9'
-		},
-		{
-			name: 'Reading',
-			value: 4.1,
-			hex: '#06A893'
-		},
-		{
-			name: 'Writing',
-			value: 2.0,
-			hex: '#E36A00'
-		},
-		{
-			name: 'Commuting',
-			value: 1.3,
-			hex: '#0B83D9'
-		}
+	export let data: ChartData[] = [
+		{ name: 'unset', value: 1, hex: 'var(--text-faint)' }
 	];
 
 	onMount(() => {
@@ -91,6 +72,12 @@
 			const currentBar = d3.select(this);
 			currentBar.style('opacity', '1');
 		});
+
+		// Add tooltips
+
+		if (data[0].displayValue) {
+			pieChart.append('svg:title').text((d, index) => data[index].displayValue);
+		}
 	};
 </script>
 

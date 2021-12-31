@@ -2,43 +2,44 @@
 	import { onMount } from 'svelte';
 	import type { ChartData } from './types';
 	import * as d3 from 'd3';
-	import { setTimeout } from 'timers';
 
 	export let width: number;
 
 	let _el: HTMLElement;
 	let _chart: d3.Selection<SVGSVGElement, unknown, undefined, null>;
 
-	const data: ChartData[] = [
-		{
-			name: 'Mon\n20-12',
-			value: 9.2
-		},
-		{
-			name: 'Tue\n21-12',
-			value: 7.1
-		},
-		{
-			name: 'Wed\n22-12',
-			value: 6.0
-		},
-		{
-			name: 'Thu\n23-12',
-			value: 8.0
-		},
-		{
-			name: 'Fri\n24-12',
-			value: 4.25
-		},
-		{
-			name: 'Sat\n25-12',
-			value: 4.9
-		},
-		{
-			name: 'Sun\n26-12',
-			value: 5.7
-		}
-	];
+	export let data: ChartData[];
+
+	// const data: ChartData[] = [
+	// 	{
+	// 		name: 'Mon\n20-12',
+	// 		value: 9.2
+	// 	},
+	// 	{
+	// 		name: 'Tue\n21-12',
+	// 		value: 7.1
+	// 	},
+	// 	{
+	// 		name: 'Wed\n22-12',
+	// 		value: 6.0
+	// 	},
+	// 	{
+	// 		name: 'Thu\n23-12',
+	// 		value: 8.0
+	// 	},
+	// 	{
+	// 		name: 'Fri\n24-12',
+	// 		value: 4.25
+	// 	},
+	// 	{
+	// 		name: 'Sat\n25-12',
+	// 		value: 4.9
+	// 	},
+	// 	{
+	// 		name: 'Sun\n26-12',
+	// 		value: 5.7
+	// 	}
+	// ];
 
 	onMount(() => {
 		render(data, width, 250);
@@ -53,7 +54,7 @@
 
 	const render = (data: ChartData[], width: number, height: number): void => {
 		const margin = {
-			top: 0,
+			top: 8,
 			right: 24,
 			bottom: 48,
 			left: 16
@@ -146,11 +147,40 @@
 			currentBar.style('fill', 'var(--interactive-accent');
 		});
 
+		// Add tooltips
+
+		if (data[0].displayValue) {
+			rects.append('svg:title').text((d) => d.displayValue);
+		}
+
 		// Render xtick labels
+
+		const show_label = (index: number, length: number) => {
+			let show_label = true;
+			if (length > 10) {
+				show_label = index % 2 == 0;
+			}
+			if (length > 21) {
+				show_label = index % 3 == 0;
+			}
+			return show_label;
+		};
+
+		const get_label_top = (data: any, index: number, series: any[]) => {
+			return show_label(index, series.length) ? data.name.split('\n')[0] : '';
+		};
+
+		const get_label_bottom = (data: any, index: number, series: any[]) => {
+			return show_label(index, series.length)
+				? data.name.includes('\n')
+					? data.name.split('\n')[1]
+					: ''
+				: '';
+		};
 
 		const xtick_labels_line0 = bars
 			.append('text')
-			.text((d) => d.name.split('\n')[0])
+			.text(get_label_top)
 			.attr('x', (d) => xScale(d.name) + xScale.bandwidth() / 2)
 			.attr('y', (d) => height - ticks.textHeight)
 			.attr('dy', '0em')
@@ -162,7 +192,7 @@
 
 		const xtick_labels_line1 = bars
 			.append('text')
-			.text((d) => (d.name.includes('\n') ? d.name.split('\n')[1] : ''))
+			.text(get_label_bottom)
 			.attr('x', (d) => xScale(d.name) + xScale.bandwidth() / 2)
 			.attr('y', (d) => height - ticks.textHeight)
 			.attr('dy', '1.2em')
