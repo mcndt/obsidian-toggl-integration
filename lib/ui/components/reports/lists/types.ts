@@ -11,3 +11,11 @@ export interface ReportListItem {
 	hex?: string;
 	count?: number;
 }
+
+export interface ProjectSummaryItem {
+	hex: string;
+	title: string;
+	client_title?: string;
+	totalTime: string;
+	percent: number;
+}

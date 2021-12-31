@@ -5,35 +5,6 @@
 	export let totalTime: string;
 	export let hex: string = undefined;
 	export let data: ReportListItem[];
-
-	const test_data = [
-		{
-			name: 'Design report block in figma',
-			totalTime: '3:40:54',
-			hex: '#9E5BD9'
-		},
-		{
-			name: '1q84 (Murakami, 2009)',
-			totalTime: '6:13:01',
-			hex: '#06A893'
-		},
-		{
-			name: 'Capital and Ideology (Piketty, 2019)',
-			totalTime: '4:25:33',
-			hex: '#06A893',
-			count: 2
-		},
-		{
-			name: 'Write book review Gates2021',
-			totalTime: '1:20:23',
-			hex: '#E36A00',
-			count: 13
-		}
-	];
-
-	$: test_data_alt = test_data.map((e) => {
-		return { ...e, hex: undefined };
-	});
 </script>
 
 <main class="mt-5">
@@ -74,35 +45,5 @@
 </main>
 
 <style>
-	.time-entry-group-header {
-		font-weight: 600;
-		font-size: 1.1em;
-
-		border-bottom: 2px solid var(--background-modifier-border);
-	}
-
-	.project-circle {
-		width: 0.7em;
-		height: 0.7em;
-		border-radius: 50%;
-	}
-
-	.group-item-time {
-		color: var(--text-muted);
-	}
-
-	.group-item-count {
-		color: var(--text-muted);
-		font-size: 0.7em;
-		text-align: center;
-		border-radius: 50%;
-		border: 1px solid var(--background-modifier-border);
-		height: 1.75em;
-		width: 1.75em;
-	}
-
-	.group-item-count span {
-		position: relative;
-		top: 5%;
-	}
+	/* Moved to style.css */
 </style>

@@ -1,11 +1,16 @@
 <script lang="ts">
-	import type { ReportListGroupData } from '../components/reports/lists/types';
+	import type {
+		ProjectSummaryItem,
+		ReportListGroupData
+	} from '../components/reports/lists/types';
 	import type { ChartData } from '../components/reports/charts/types';
 
 	import ReportBlockHeader from '../components/reports/ReportBlockHeader.svelte';
 	import BarChart from '../components/reports/charts/BarChart.svelte';
 	import DonutChart from '../components/reports/charts/DonutChart.svelte';
-	import ReportBlockList from '../components/reports/lists/ReportBlockList.svelte';
+	import TimeEntryList from '../components/reports/lists/TimeEntryList.svelte';
+	import ProjectSummaryList from '../components/reports/lists/ProjectSummaryList.svelte';
+	import TimeEntryList from '../components/reports/lists/TimeEntryList.svelte';
 
 	const DONUT_WIDTH = 190;
 
@@ -101,13 +106,37 @@
 					count: 13
 				}
 			]
+		},
+		{
+			name: 'Writing',
+			hex: '#E36A00',
+			totalTime: '5:21:00',
+			data: [
+				{
+					name: 'Design report block in figma',
+					totalTime: '3:40:54'
+				},
+				{
+					name: '1q84 (Murakami, 2009)',
+					totalTime: '6:13:01'
+				},
+				{
+					name: 'Capital and Ideology (Piketty, 2019)',
+					totalTime: '4:25:33',
+					count: 2
+				},
+				{
+					name: 'Write book review Gates2021',
+					totalTime: '1:20:23',
+					count: 13
+				}
+			]
 		}
 	];
 
 	const list_by_date: ReportListGroupData[] = [
 		{
 			name: 'Tuesday, December 13',
-			hex: '#9E5BD9',
 			totalTime: '6:01:45',
 			data: [
 				{
@@ -134,6 +163,35 @@
 			]
 		}
 	];
+
+	const list_proj_overview: ProjectSummaryItem[] = [
+		{
+			title: 'Programming',
+			client_title: 'Work',
+			totalTime: '8:32:09',
+			hex: '#9E5BD9',
+			percent: 55.4
+		},
+		{
+			title: 'Reading',
+			totalTime: '4:16:57',
+			hex: '#06A893',
+			percent: 33.6
+		},
+		{
+			title: 'Writing',
+			totalTime: '2:01:32',
+			hex: '#E36A00',
+			percent: 21.4
+		},
+		{
+			title: 'Commuting',
+			client_title: 'Work',
+			totalTime: '1:15:00',
+			hex: '#0B83D9',
+			percent: 5.6
+		}
+	];
 </script>
 
 <main bind:clientWidth={_width}>
@@ -145,7 +203,9 @@
 		{/if}
 	</div>
 
-	<ReportBlockList data={list_by_group} />
+	<ProjectSummaryList data={list_proj_overview} />
+	<TimeEntryList data={list_by_date} />
+	<TimeEntryList data={list_by_group} />
 </main>
 
 <style>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ReportListGroup from './ReportListGroup.svelte';
+	import TimeEntryListGroup from './TimeEntryListGroup.svelte';
 	import type { ReportListGroupData } from './types';
 
 	export let data: ReportListGroupData[];
@@ -7,7 +7,7 @@
 
 <main>
 	{#each data as a}
-		<ReportListGroup {...a} />
+		<TimeEntryListGroup {...a} />
 	{/each}
 </main>
 
