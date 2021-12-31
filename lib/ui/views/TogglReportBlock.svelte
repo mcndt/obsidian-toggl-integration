@@ -1,10 +1,11 @@
 <script lang="ts">
-	import ReportBlockHeader from '../components/report_blocks/ReportBlockHeader.svelte';
-	import ReportBlockList from '../components/report_blocks/list/ReportBlockList.svelte';
-	import type { ReportListGroupData } from '../components/report_blocks/list/types';
-	import BarChart from '../components/report_blocks/summary/BarChart.svelte';
-	import DonutChart from '../components/report_blocks/summary/DonutChart.svelte';
-	import type { ChartData } from '../components/report_blocks/summary/types';
+	import type { ReportListGroupData } from '../components/reports/lists/types';
+	import type { ChartData } from '../components/reports/charts/types';
+
+	import ReportBlockHeader from '../components/reports/ReportBlockHeader.svelte';
+	import BarChart from '../components/reports/charts/BarChart.svelte';
+	import DonutChart from '../components/reports/charts/DonutChart.svelte';
+	import ReportBlockList from '../components/reports/lists/ReportBlockList.svelte';
 
 	const DONUT_WIDTH = 190;
 

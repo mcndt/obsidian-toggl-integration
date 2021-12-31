@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type Report from 'lib/model/Report';
+	import type { Report } from 'lib/model/Report';
 	import { dailySummary } from 'lib/util/stores';
 	import { onDestroy } from 'svelte';
 
 	let list: { color: string; percentage: number }[];
 
-	const computeList = (r: Report) => {
+	const computeList = (r: Report<any>) => {
 		if (r == null) {
 			return [];
 		}

@@ -3,15 +3,15 @@
 
 	import millisecondsToTimeString from 'lib/util/millisecondsToTimeString';
 	import { apiStatusStore, dailySummary } from 'lib/util/stores';
-	import CurrentTimer from '../components/CurrentTimerDisplay.svelte';
-	import TogglReportBarChart from '../components/TogglReportBarChart.svelte';
-	import TogglReportProjectList from '../components/TogglReportProjectList.svelte';
+	import CurrentTimerDisplay from '../components/current_timer/CurrentTimerDisplay.svelte';
+	import TogglReportBarChart from '../components/reports/TogglReportBarChart.svelte';
+	import TogglReportProjectList from '../components/reports/TogglReportProjectList.svelte';
 </script>
 
 <div class="container">
 	<div class="p-1">
 		<div class="timer px-1">
-			<CurrentTimer />
+			<CurrentTimerDisplay />
 		</div>
 		<hr class="mt-4" />
 
