@@ -11,12 +11,15 @@
 	import ReportBlockHeader from '../components/reports/ReportBlockHeader.svelte';
 
 	const DONUT_WIDTH = 190;
+	const BREAKPOINT = 500;
 
 	export let query: Query;
 	export let summary: Report<Summary>;
 	export let detailed: Report<Detailed>;
+	export let title: string = 'No title';
 
 	let _width: number;
+	let _barWidth: number;
 	let _barData: ChartData[];
 	let _pieData: ChartData[];
 	let _listData: ProjectSummaryItem[];
@@ -24,6 +27,7 @@
 	$: _pieData = getPieData(summary);
 	$: _barData = getBarData(detailed, query);
 	$: _listData = getListData(summary);
+	$: _barWidth = computeBarWidth(_width);
 
 	function getPieData(summary: Report<Summary>): ChartData[] {
 		return summary.data.map((s: Summary): ChartData => {
@@ -62,9 +66,6 @@
 			data.push({ date: date, time: time });
 		}
 
-		console.log(query);
-		console.log(timePerDay);
-
 		return data.map(
 			(d): ChartData => ({
 				name: moment(d.date).format('ddd DD-M').replace(' ', '\n'),
@@ -89,10 +90,17 @@
 			)
 			.sort((a, b) => Number(a.title > b.title) * 2 - 1);
 	}
+
+	function computeBarWidth(width: number): number {
+		if (_width >= BREAKPOINT) {
+			return Math.max(0, _width - DONUT_WIDTH - 24);
+		}
+		return _width;
+	}
 </script>
 
 <ReportBlockHeader
-	title="This month"
+	{title}
 	totalTime={millisecondsToTimeString(summary.total_grand)}
 />
 
@@ -100,9 +108,11 @@
 	bind:clientWidth={_width}
 	class="is-flex is-justify-content-space-between is-align-items-center"
 >
-	{#if _width && _barData && _pieData}
-		<BarChart data={_barData} width={Math.max(0, _width - DONUT_WIDTH)} />
-		<DonutChart data={_pieData} width={DONUT_WIDTH} />
+	{#if _barWidth && _barData && _pieData}
+		<BarChart data={_barData} width={_barWidth} />
+		{#if _width >= BREAKPOINT}
+			<DonutChart data={_pieData} width={DONUT_WIDTH} />
+		{/if}
 	{/if}
 </div>
 

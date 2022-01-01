@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { Report } from 'lib/model/Report';
+	import type { Report, Summary } from 'lib/model/Report';
 	import { dailySummary } from 'lib/util/stores';
 	import { onDestroy } from 'svelte';
 
 	let list: { color: string; percentage: number }[];
 
-	const computeList = (r: Report<any>) => {
+	const computeList = (r: Report<Summary>) => {
 		if (r == null) {
 			return [];
 		}
@@ -63,5 +63,9 @@
 
 	.bar-chart-element:last-child {
 		border-radius: 0 4px 4px 0;
+	}
+
+	.bar-chart-element:only-child {
+		border-radius: 4px;
 	}
 </style>

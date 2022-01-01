@@ -1,7 +1,12 @@
 <script lang="ts">
 	import type { Detailed, Report, Summary } from 'lib/model/Report';
 	import { parse } from 'lib/reports/parser/Parse';
-	import { tokenize } from 'lib/reports/parser/Tokenize';
+	import {
+		Keyword,
+		Keyword,
+		Token,
+		tokenize
+	} from 'lib/reports/parser/Tokenize';
 	import { Query, QueryType } from 'lib/reports/ReportQuery';
 	import { togglStore } from 'lib/util/stores';
 	import { onMount } from 'svelte';
@@ -19,6 +24,7 @@
 	let _query: Query;
 	let _summaryReport: Report<Summary>;
 	let _detailedReport: Report<Detailed>;
+	let _title: string;
 	let _reportComponent: any;
 
 	onMount(async () => {
@@ -37,7 +43,25 @@
 	function parseQuery(source: string): Query {
 		const tokens = tokenize(source);
 		const query: Query = parse(source);
+		_title = getTitle(tokens);
 		return query;
+	}
+
+	function getTitle(tokens: Token[]): string {
+		switch (tokens[1]) {
+			case Keyword.TODAY:
+				return 'Today';
+			case Keyword.WEEK:
+				return 'This week';
+			case Keyword.MONTH:
+				return 'This month';
+			case Keyword.FROM:
+				return `${tokens[2]} to ${tokens[4]}`;
+			case Keyword.PREVIOUS:
+				return `Past ${tokens[2]} ${(<string>tokens[3]).toLowerCase()}`;
+			default:
+				return 'Untitled Toggl Report';
+		}
 	}
 
 	async function getDetailedReport(query: Query): Promise<Report<Detailed>> {
@@ -57,6 +81,7 @@
 	{#if _summaryReport && _detailedReport}
 		<svelte:component
 			this={_reportComponent}
+			title={_title}
 			summary={_summaryReport}
 			detailed={_detailedReport}
 			query={_query}

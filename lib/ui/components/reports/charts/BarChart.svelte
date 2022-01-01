@@ -24,9 +24,9 @@
 	const render = (data: ChartData[], width: number, height: number): void => {
 		const margin = {
 			top: 8,
-			right: 24,
+			right: 0,
 			bottom: 48,
-			left: 16
+			left: 24
 		};
 
 		const ticks = {
