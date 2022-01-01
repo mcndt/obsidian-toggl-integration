@@ -1,4 +1,4 @@
-import type { ListQuery, Query, SummaryQuery } from '../ReportQuery';
+import { ListQuery, Query, QueryType, SummaryQuery } from '../ReportQuery';
 import { SelectionMode } from '../ReportQuery';
 
 import moment from 'moment';
@@ -18,11 +18,18 @@ export function parse(queryString: string): Query {
 	let tokens = tokenize(queryString);
 
 	// Parse query type
-	const type = tokens.splice(0, 1)[0];
+	const queryTypeToken = tokens.splice(0, 1)[0];
 	const accepted_types: Token[] = [Keyword.SUMMARY, Keyword.LIST];
 
-	if (!accepted_types.includes(type)) {
-		throw new InvalidTokenError(type, accepted_types);
+	if (!accepted_types.includes(queryTypeToken)) {
+		throw new InvalidTokenError(queryTypeToken, accepted_types);
+	}
+
+	let queryType: QueryType;
+	if (queryTypeToken === Keyword.SUMMARY) {
+		queryType = QueryType.SUMMARY;
+	} else if (queryTypeToken === Keyword.LIST) {
+		queryType = QueryType.LIST;
 	}
 
 	// Parse time interval expression
@@ -32,7 +39,7 @@ export function parse(queryString: string): Query {
 	if (since == null && until == null) {
 		throw new NoTimeIntervalExpression();
 	}
-	query = { from: since, to: until };
+	query = { type: queryType, from: since, to: until };
 
 	// Parse inclusion/exclusion statements
 

@@ -39,9 +39,9 @@ export interface Detailed {
 	tid?: any;
 	uid: number;
 	description: string;
-	start: Date;
-	end: Date;
-	updated: Date;
+	start: string;
+	end: string;
+	updated: string;
 	dur: number;
 	user: string;
 	use_stop: boolean;
@@ -61,10 +61,10 @@ export interface Detailed {
  */
 export interface Summary {
 	id?: number;
-	title: object;
+	title: any;
 	time: number;
 	total_currencies: TotalCurrency[];
-	items: object[];
+	items: any[];
 }
 
 export interface TotalCurrency {

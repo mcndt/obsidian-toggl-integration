@@ -8,38 +8,7 @@
 	let _el: HTMLElement;
 	let _chart: d3.Selection<SVGSVGElement, unknown, undefined, null>;
 
-	export let data: ChartData[];
-
-	// const data: ChartData[] = [
-	// 	{
-	// 		name: 'Mon\n20-12',
-	// 		value: 9.2
-	// 	},
-	// 	{
-	// 		name: 'Tue\n21-12',
-	// 		value: 7.1
-	// 	},
-	// 	{
-	// 		name: 'Wed\n22-12',
-	// 		value: 6.0
-	// 	},
-	// 	{
-	// 		name: 'Thu\n23-12',
-	// 		value: 8.0
-	// 	},
-	// 	{
-	// 		name: 'Fri\n24-12',
-	// 		value: 4.25
-	// 	},
-	// 	{
-	// 		name: 'Sat\n25-12',
-	// 		value: 4.9
-	// 	},
-	// 	{
-	// 		name: 'Sun\n26-12',
-	// 		value: 5.7
-	// 	}
-	// ];
+	export let data: ChartData[] = [{ name: 'unset', value: 1 }];
 
 	onMount(() => {
 		render(data, width, 250);

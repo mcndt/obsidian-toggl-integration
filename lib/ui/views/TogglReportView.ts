@@ -16,7 +16,6 @@ export default class TogglReportView extends ItemView {
 	}
 
 	/* Obsidian event lifecycle */
-
 	async onOpen(): Promise<void> {
 		this.content = new TogglSidebarPane({
 			target: this.contentEl,

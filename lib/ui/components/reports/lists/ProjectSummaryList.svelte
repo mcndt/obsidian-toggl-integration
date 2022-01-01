@@ -31,7 +31,7 @@
 
 				<div class="is-flex">
 					<div class="group-item-time">{d.totalTime}</div>
-					<div class="group-item-time percent">{d.percent}%</div>
+					<div class="group-item-time percent">{d.percent.toFixed(1)}%</div>
 				</div>
 			</div>
 		{/each}

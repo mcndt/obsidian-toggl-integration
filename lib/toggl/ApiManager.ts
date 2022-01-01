@@ -1,9 +1,10 @@
 import type { PluginSettings } from 'lib/config/PluginSettings';
 import type { Project } from 'lib/model/Project';
-import type { Report, Summary } from 'lib/model/Report';
+import type { Detailed, Report, Summary } from 'lib/model/Report';
 import type { Tag } from 'lib/model/Tag';
 import type { TimeEntry, TimeEntryStart } from 'lib/model/TimeEntry';
 import type { TogglWorkspace } from 'lib/model/TogglWorkspace';
+import type { ISODate } from 'lib/reports/parser/Parse';
 import { settingsStore } from 'lib/util/stores';
 import moment from 'moment';
 import TogglClient from 'toggl-client';
@@ -113,7 +114,7 @@ export default class ApiManager {
 	 *       access the latest report, subscribe to the store {@link dailyReport}
 	 */
 	public async getDailySummary(): Promise<Report<Summary>> {
-		const response: Report<any> = await this._api.reports.summary(
+		const response: Report<Summary> = await this._api.reports.summary(
 			this._settings.workspace.id,
 			{
 				since: moment().format('YYYY-MM-DD'),
@@ -121,6 +122,48 @@ export default class ApiManager {
 				order_desc: 'on'
 			}
 		);
+		return response;
+	}
+
+	/**
+	 * Gets a Toggl Summary Report between since and until date.
+	 * @param since ISO-formatted date string of the first day of the summary range (inclusive).
+	 * @param until ISO-formatted date string of the last day of the summary range (inclusive).
+	 * @returns The report.
+	 */
+	public async getSummary(
+		since: ISODate,
+		until: ISODate
+	): Promise<Report<Summary>> {
+		const response: Report<Summary> = await this._api.reports.summary(
+			this._settings.workspace.id,
+			{
+				since: since,
+				until: until,
+				order_field: 'duration',
+				order_desc: 'on'
+			}
+		);
+		return response;
+	}
+
+	/**
+	 * Gets a Toggl Detailed Report between since and until date.
+	 * @param since ISO-formatted date string of the first day of the summary range (inclusive).
+	 * @param until ISO-formatted date string of the last day of the summary range (inclusive).
+	 * @param page Pagination id. Note that the Toggl API counts pages from 1!
+	 * @returns The time entries on the specified page.
+	 */
+	public async getDetailedReport(
+		since: ISODate,
+		until: ISODate,
+		page: number
+	): Promise<Report<Detailed>> {
+		const response = this._api.reports.details(this._settings.workspace.id, {
+			since: since,
+			until: until,
+			page: page
+		});
 		return response;
 	}
 

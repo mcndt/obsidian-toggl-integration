@@ -3,7 +3,7 @@ import type { Project } from 'lib/model/Project';
 import type { TimeEntry } from 'lib/model/TimeEntry';
 import type { TimeEntryStart } from 'lib/model/TimeEntry';
 import type { TogglWorkspace } from 'lib/model/TogglWorkspace';
-import type { Report, Summary } from 'lib/model/Report';
+import type { Detailed, Report, Summary } from 'lib/model/Report';
 import { Notice } from 'obsidian';
 
 import {
@@ -15,6 +15,7 @@ import {
 import { ACTIVE_TIMER_POLLING_INTERVAL } from 'lib/constants';
 import type { Tag } from 'lib/model/Tag';
 import ApiManager from './ApiManager';
+import type { Query } from 'lib/reports/ReportQuery';
 
 export enum ApiStatus {
 	AVAILABLE,
@@ -261,13 +262,9 @@ export default class TogglManager {
 	 * @returns timer duration in seconds
 	 */
 	private getTimerDuration(timeEntry: any): number {
-		// If the time entry is not currently running, the duration field
-		// contains the timer length in seconds.
 		if (timeEntry.stop) {
 			return timeEntry.duration;
 		}
-		// If the time entry is currently active, the duration field contains
-		// the offset of the current unix epoch time to obtain the duration.
 		// true_duration = epoch_time + duration
 		const epoch_time = Math.round(new Date().getTime() / 1000);
 		return epoch_time + timeEntry.duration;
@@ -293,6 +290,54 @@ export default class TogglManager {
 				);
 				break;
 		}
+	}
+
+	/**
+	 * Fullfills a query for Toggl Track reports and returns the report object.
+	 */
+	// TODO: these generics are awful...
+	// public async getReport(query: Query): Promise<{summary: Report<Summary>, detailed: Report<Detailed>}> {
+	// 	if (query.type === QueryType.SUMMARY) {
+	// 		return this._apiManager.getSummary(query.from, query.to);
+	// 	} else if (query.type === QueryType.LIST) {
+	// 		throw new Error('List queries are not yet implemented.');
+	// 	} else {
+	// 		throw new Error(
+	// 			`There is no query implementation for type ${query.type}.`
+	// 		);
+	// 	}
+	// }
+
+	public async getSummaryReport(query: Query): Promise<Report<Summary>> {
+		return this._apiManager.getSummary(query.from, query.to);
+	}
+
+	public async GetDetailedReport(query: Query): Promise<Report<Detailed>> {
+		const page0 = await this._apiManager.getDetailedReport(
+			query.from,
+			query.to,
+			0
+		);
+
+		if (page0.total_count <= page0.per_page) {
+			return page0;
+		}
+
+		const nPages = Math.ceil(page0.total_count / page0.per_page);
+		const promises: Promise<Report<Detailed>>[] = [];
+		// pages count from 1 in Toggl API
+		for (let i = 2; i <= nPages; i++) {
+			promises.push(
+				this._apiManager.getDetailedReport(query.from, query.to, i)
+			);
+		}
+
+		const pages = await Promise.all(promises);
+
+		return pages.reduce((prevPage, currPage) => {
+			prevPage.data = prevPage.data.concat(currPage.data);
+			return prevPage;
+		}, page0);
 	}
 
 	/** True if API token is valid and Toggl API is responsive. */

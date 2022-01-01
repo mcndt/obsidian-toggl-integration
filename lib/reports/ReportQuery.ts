@@ -1,9 +1,15 @@
 import type { ISODate } from './parser/Parse';
 
+export enum QueryType {
+	SUMMARY = 'SUMMARY',
+	LIST = 'LIST'
+}
+
 /**
  * Data required to fullfill a Toggl Report query.
  */
 export interface Query {
+	type: QueryType;
 	/** Start of query time interval. */
 	from: ISODate;
 	/** End of query time interval. */

@@ -7,7 +7,13 @@ import {
 	parseList,
 	parseSelection
 } from './Parse';
-import { Query, SelectionMode, Selection, SummaryQuery } from '../ReportQuery';
+import {
+	Query,
+	SelectionMode,
+	Selection,
+	SummaryQuery,
+	QueryType
+} from '../ReportQuery';
 
 /* CONSTANTS */
 
@@ -269,6 +275,7 @@ describe('parseList', () => {
 describe('parseSelection', () => {
 	beforeEach(() => {
 		test_query = {
+			type: QueryType.SUMMARY,
 			from: '2020-01-01',
 			to: '2020-01-31'
 		};
@@ -411,7 +418,7 @@ describe('parse', () => {
 			queryString: `SUMMARY PREVIOUS 10 DAYS`,
 			expected: {
 				from: '2020-01-22',
-				to: '2020-01-31',
+				to: '2020-01-31'
 			} as SummaryQuery
 		});
 	});

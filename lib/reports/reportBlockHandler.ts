@@ -1,6 +1,4 @@
 import type { MarkdownPostProcessorContext } from 'obsidian';
-import { parse } from './parser/Parse';
-import { tokenize } from './parser/Tokenize';
 import TogglReportBlock from '../ui/views/TogglReportBlock.svelte';
 
 /**
@@ -11,11 +9,9 @@ export default function reportBlockHandler(
 	el: HTMLElement,
 	ctx: MarkdownPostProcessorContext
 ) {
-	// const tokens = tokenize(source);
-	// el.setText(`${tokens.map((t) => t).join(', ')}`);
-	// const query = parse(source);
-	new TogglReportBlock({
-		target: el,
-		props: {}
-	});
+	if (!source) {
+		return;
+	}
+
+	new TogglReportBlock({ target: el, props: { source: source } });
 }
