@@ -44,8 +44,9 @@
 		const timePerDay: Map<string, number> = new Map();
 
 		let start = moment(query.from);
-		let end = moment(query.to).add(1, 'days');
+		let end = moment(query.to ? query.to : query.from).add(1, 'days');
 		let current = start;
+
 		while (current.diff(end, 'days') !== 0) {
 			timePerDay.set(current.format('YYYY-MM-DD'), 0);
 			current = current.add(1, 'days');

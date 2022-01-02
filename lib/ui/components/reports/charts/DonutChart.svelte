@@ -7,8 +7,15 @@
 
 	let _el: HTMLElement;
 
-	export let data: ChartData[] = [
-		{ name: 'unset', value: 1, hex: 'var(--text-faint)' }
+	export let data: ChartData[];
+
+	const defaultData = [
+		{
+			name: '',
+			value: 1,
+			hex: 'var(--background-primary-alt)',
+			displayValue: ''
+		}
 	];
 
 	onMount(() => {
@@ -16,6 +23,10 @@
 	});
 
 	const render = (data: ChartData[], width: number, height: number): void => {
+		if (!data || data.length == 0) {
+			data = defaultData;
+		}
+
 		const margin = {
 			top: 16,
 			right: 0,
