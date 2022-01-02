@@ -1,16 +1,12 @@
 <script lang="ts">
 	import type { Detailed, Report, Summary } from 'lib/model/Report';
 	import { parse } from 'lib/reports/parser/Parse';
-	import {
-		Keyword,
-		Keyword,
-		Token,
-		tokenize
-	} from 'lib/reports/parser/Tokenize';
+	import { Keyword, Token, tokenize } from 'lib/reports/parser/Tokenize';
 	import { Query, QueryType } from 'lib/reports/ReportQuery';
 	import { togglStore } from 'lib/util/stores';
 	import { onMount } from 'svelte';
 	import ParsingError from './ParsingError.svelte';
+	import ApiError from './ApiError.svelte';
 	import TogglSummaryReport from './TogglSummaryReport.svelte';
 	import TogglListReport from './TogglListReport.svelte';
 	import LoadingAnimation from '../components/LoadingAnimation.svelte';
@@ -21,6 +17,7 @@
 
 	let _width: number;
 	let _parseError: string;
+	let _apiError: string;
 	let _query: Query;
 	let _summaryReport: Report<Summary>;
 	let _detailedReport: Report<Detailed>;
@@ -30,9 +27,17 @@
 	onMount(async () => {
 		try {
 			_query = parseQuery(source);
-			getDetailedReport(_query).then((report) => (_detailedReport = report));
+			getDetailedReport(_query)
+				.then((report) => (_detailedReport = report))
+				.catch((err) => {
+					_apiError = err.message;
+				});
 			if (_query.type === QueryType.SUMMARY) {
-				getSummaryReport(_query).then((report) => (_summaryReport = report));
+				getSummaryReport(_query)
+					.then((report) => (_summaryReport = report))
+					.catch((err) => {
+						_apiError = err.message;
+					});
 				_reportComponent = TogglSummaryReport;
 			}
 		} catch (err) {
@@ -78,6 +83,10 @@
 		<ParsingError query={source} message={_parseError} />
 	{/if}
 
+	{#if _apiError}
+		<ApiError message={_apiError} />
+	{/if}
+
 	{#if _summaryReport && _detailedReport}
 		<svelte:component
 			this={_reportComponent}
@@ -88,7 +97,7 @@
 		/>
 	{/if}
 
-	{#if !(_summaryReport && _detailedReport) && !_parseError}
+	{#if !(_summaryReport && _detailedReport) && !_parseError && !_apiError}
 		<div style="text-align: center">
 			<LoadingAnimation color="var(--interactive-accent)" />
 			<p class="mt-0" style="color: var(--text-muted)">
