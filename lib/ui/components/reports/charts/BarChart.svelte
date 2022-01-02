@@ -124,23 +124,33 @@
 
 		// Render xtick labels
 
-		const show_label = (index: number, length: number) => {
-			let show_label = true;
-			if (length > 10) {
-				show_label = index % 2 == 0;
+		const show_label = (text: string, index: number, length: number) => {
+			if (text.length > 5) {
+				if (length > 15) {
+					return index % 3 == 0;
+				}
+				if (length > 7) {
+					return index % 2 == 0;
+				}
+			} else {
+				if (length > 21) {
+					return index % 3 == 0;
+				}
+				if (length > 10) {
+					return index % 2 == 0;
+				}
 			}
-			if (length > 21) {
-				show_label = index % 3 == 0;
-			}
-			return show_label;
+			return true;
 		};
 
 		const get_label_top = (data: any, index: number, series: any[]) => {
-			return show_label(index, series.length) ? data.name.split('\n')[0] : '';
+			return show_label(data.name.split('\n')[0], index, series.length)
+				? data.name.split('\n')[0]
+				: '';
 		};
 
 		const get_label_bottom = (data: any, index: number, series: any[]) => {
-			return show_label(index, series.length)
+			return show_label(data.name.split('\n')[0], index, series.length)
 				? data.name.includes('\n')
 					? data.name.split('\n')[1]
 					: ''

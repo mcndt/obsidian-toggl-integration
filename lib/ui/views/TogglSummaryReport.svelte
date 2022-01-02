@@ -3,6 +3,7 @@
 	import type { Query } from 'lib/reports/ReportQuery';
 	import millisecondsToTimeString from 'lib/util/millisecondsToTimeString';
 	import moment from 'moment';
+	import { stringify } from 'querystring';
 	import BarChart from '../components/reports/charts/BarChart.svelte';
 	import DonutChart from '../components/reports/charts/DonutChart.svelte';
 	import type { ChartData } from '../components/reports/charts/types';
@@ -67,15 +68,77 @@
 			data.push({ date: date, time: time });
 		}
 
-		return data.map(
-			(d): ChartData => ({
-				name: moment(d.date).format('ddd DD-M').replace(' ', '\n'),
-				value: d.time / 1000 / 60 / 60,
-				displayValue: `${moment(d.date).format(
-					'll'
-				)} (${millisecondsToTimeString(d.time)})`
-			})
-		);
+		if (data.length > 120) {
+			data = groupByMonth(data);
+			return data.map(
+				(d): ChartData => ({
+					name: `${moment(d.date, 'MMM YYYY').format('MMM')}`,
+					value: d.time / 1000 / 60 / 60,
+					displayValue: `Week ${d.date} (${millisecondsToTimeString(d.time)})`
+				})
+			);
+		} else if (data.length > 31) {
+			data = groupByWeek(data);
+			return data.map(
+				(d): ChartData => ({
+					name: `Week ${d.date}\n${moment(d.date, 'W').format('DD-M')}`,
+					value: d.time / 1000 / 60 / 60,
+					displayValue: `Week ${d.date} (${millisecondsToTimeString(d.time)})`
+				})
+			);
+		} else {
+			return data.map(
+				(d): ChartData => ({
+					name: moment(d.date).format('ddd DD-M').replace(' ', '\n'),
+					value: d.time / 1000 / 60 / 60,
+					displayValue: `${moment(d.date).format(
+						'll'
+					)} (${millisecondsToTimeString(d.time)})`
+				})
+			);
+		}
+	}
+
+	function groupByWeek(
+		data: { date: string; time: number }[]
+	): { date: string; time: number }[] {
+		const timePerWeek: Map<string, number> = new Map();
+		for (const d of data) {
+			const week = `${moment(d.date).format('W')}`;
+			if (!timePerWeek.has(week)) {
+				timePerWeek.set(week, d.time);
+			} else {
+				timePerWeek.set(week, timePerWeek.get(week) + d.time);
+			}
+		}
+
+		const returnData: { date: string; time: number }[] = [];
+		for (const [date, time] of timePerWeek) {
+			returnData.push({ date: date, time: time });
+		}
+
+		return returnData;
+	}
+
+	function groupByMonth(
+		data: { date: string; time: number }[]
+	): { date: string; time: number }[] {
+		const timePerMonth: Map<string, number> = new Map();
+		for (const d of data) {
+			const month = `${moment(d.date).format('MMM YYYY')}`;
+			if (!timePerMonth.has(month)) {
+				timePerMonth.set(month, d.time);
+			} else {
+				timePerMonth.set(month, timePerMonth.get(month) + d.time);
+			}
+		}
+
+		const returnData: { date: string; time: number }[] = [];
+		for (const [date, time] of timePerMonth) {
+			returnData.push({ date: date, time: time });
+		}
+
+		return returnData;
 	}
 
 	function getListData(summary: Report<Summary>): ProjectSummaryItem[] {
