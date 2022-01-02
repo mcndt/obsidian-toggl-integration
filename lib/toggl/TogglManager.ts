@@ -308,10 +308,22 @@ export default class TogglManager {
 	// 	}
 	// }
 
+	/**
+	 * Gets a Toggl Summary report based on the query parameter.
+	 * @param query query to be fullfilled.
+	 * @returns Summary report returned by Toggl API.
+	 */
 	public async getSummaryReport(query: Query): Promise<Report<Summary>> {
 		return this._apiManager.getSummary(query.from, query.to);
 	}
 
+	/**
+	 * Gets a Toggl Detailed report based on the query parameter.
+	 * Makes multiple HTTP requests until all pages of the paginated result are
+	 * gathered, then returns the combined report as a single object.
+	 * @param query query to be fullfilled.
+	 * @returns Summary report returned by Toggl API.
+	 */
 	public async GetDetailedReport(query: Query): Promise<Report<Detailed>> {
 		const page0 = await this._apiManager.getDetailedReport(
 			query.from,
@@ -324,15 +336,39 @@ export default class TogglManager {
 		}
 
 		const nPages = Math.ceil(page0.total_count / page0.per_page);
-		const promises: Promise<Report<Detailed>>[] = [];
-		// pages count from 1 in Toggl API
-		for (let i = 2; i <= nPages; i++) {
-			promises.push(
-				this._apiManager.getDetailedReport(query.from, query.to, i)
-			);
-		}
+		let pages: Report<Detailed>[];
 
-		const pages = await Promise.all(promises);
+		if (nPages <= 8) {
+			console.debug(`Requesting ${nPages} time entry pages in parallel mode.`);
+			const promises: Promise<Report<Detailed>>[] = [];
+			for (let i = 2; i <= nPages; i++) {
+				promises.push(
+					this._apiManager.getDetailedReport(query.from, query.to, i)
+				);
+			}
+			pages = await Promise.all(promises);
+		} else {
+			console.debug(`Requesting ${nPages} time entry pages in batch mode.`);
+			// Stagger requests to avoid HTTP 429 Too Many Requests
+			const batchSize = 10;
+			const nBatches = Math.ceil(nPages / batchSize);
+
+			pages = [];
+			for (let batch = 0; batch < nBatches; batch++) {
+				const promises: Promise<Report<Detailed>>[] = [];
+				for (
+					let i = Math.max(2, batch * batchSize);
+					i <= Math.min(nPages, (batch + 1) * batchSize - 1);
+					i++
+				) {
+					promises.push(
+						this._apiManager.getDetailedReport(query.from, query.to, i)
+					);
+					const newPages = await Promise.all(promises);
+					pages = pages.concat(newPages);
+				}
+			}
+		}
 
 		return pages.reduce((prevPage, currPage) => {
 			prevPage.data = prevPage.data.concat(currPage.data);
