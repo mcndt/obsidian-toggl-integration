@@ -23,7 +23,7 @@
 
 	const render = (data: ChartData[], width: number, height: number): void => {
 		const margin = {
-			top: 8,
+			top: 24,
 			right: 0,
 			bottom: 48,
 			left: 24
@@ -87,7 +87,10 @@
 					.style('font-size', ticks.size)
 					.style('font-family', 'var(--default-font)')
 					.style('font-weight', ticks.weight)
-					.attr('transform', `translate(${getXTickLabelOffset(data)}, -10)`)
+					// .attr('transform', `translate(${getXTickLabelOffset(data)}, -10)`)
+					.attr('transform', (d) => {
+						`translate(${getXTickLabelOffset(data)}, -10)`;
+					})
 			);
 
 		// Render data bars
