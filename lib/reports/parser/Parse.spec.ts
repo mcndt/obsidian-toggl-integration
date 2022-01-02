@@ -143,12 +143,12 @@ describe('parseQueryInterval (relative intervals)', () => {
 		);
 	});
 
-	it('fails for intervals larger than 356 days', () => {
+	it('fails for intervals larger than 365 days', () => {
 		test_date = '2020-01-01';
 
 		testParseQueryInterval(
 			{
-				input: [Keyword.PREVIOUS, 366, Keyword.DAYS, 'extra_token'],
+				input: [Keyword.PREVIOUS, 368, Keyword.DAYS, 'extra_token'],
 				since: null,
 				until: null,
 				remaining: null
@@ -224,14 +224,14 @@ describe('parseQueryInterval (absolute intervals)', () => {
 		);
 	});
 
-	it('fails for intervals larger than 356 days', () => {
+	it('fails for intervals larger than 365 days', () => {
 		testParseQueryInterval(
 			{
 				input: [
 					Keyword.FROM,
 					'2019-01-01',
 					Keyword.TO,
-					'2020-01-02',
+					'2020-01-03',
 					'extra_token'
 				],
 				since: null,

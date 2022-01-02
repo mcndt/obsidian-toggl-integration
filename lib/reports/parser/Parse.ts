@@ -145,8 +145,8 @@ export function parseQueryInterval(
 	}
 
 	if (
-		(_since && _until && _until.diff(_since, 'days') > 356) ||
-		(_since && !_until && moment().diff(_since) > 356)
+		(_since && _until && _until.diff(_since, 'days') > 366) ||
+		(_since && !_until && moment().diff(_since) > 366)
 	) {
 		throw new IntervalTooLargeError();
 	}
