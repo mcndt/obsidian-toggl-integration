@@ -3,7 +3,6 @@
 	import type { Query } from 'lib/reports/ReportQuery';
 	import millisecondsToTimeString from 'lib/util/millisecondsToTimeString';
 	import moment from 'moment';
-	import { stringify } from 'querystring';
 	import BarChart from '../components/reports/charts/BarChart.svelte';
 	import DonutChart from '../components/reports/charts/DonutChart.svelte';
 	import type { ChartData } from '../components/reports/charts/types';

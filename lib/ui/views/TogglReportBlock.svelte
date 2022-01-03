@@ -2,7 +2,7 @@
 	import type { Detailed, Report, Summary } from 'lib/model/Report';
 	import { parse } from 'lib/reports/parser/Parse';
 	import { Keyword, Token, tokenize } from 'lib/reports/parser/Tokenize';
-	import { Query, QueryType } from 'lib/reports/ReportQuery';
+	import { Query, QueryType, SelectionMode } from 'lib/reports/ReportQuery';
 	import { togglStore } from 'lib/util/stores';
 	import { onMount } from 'svelte';
 	import ParsingError from './ParsingError.svelte';
@@ -10,6 +10,7 @@
 	import TogglSummaryReport from './TogglSummaryReport.svelte';
 	import TogglListReport from './TogglListReport.svelte';
 	import LoadingAnimation from '../components/LoadingAnimation.svelte';
+	import { match } from 'assert';
 
 	const DONUT_WIDTH = 190;
 
@@ -28,13 +29,17 @@
 		try {
 			_query = parseQuery(source);
 			getDetailedReport(_query)
-				.then((report) => (_detailedReport = report))
+				.then(
+					(report) => (_detailedReport = filterDetailedReport(report, _query))
+				)
 				.catch((err) => {
 					_apiError = err.message;
 				});
 			if (_query.type === QueryType.SUMMARY) {
 				getSummaryReport(_query)
-					.then((report) => (_summaryReport = report))
+					.then(
+						(report) => (_summaryReport = filterSummaryReport(report, _query))
+					)
 					.catch((err) => {
 						_apiError = err.message;
 					});
@@ -75,6 +80,47 @@
 
 	async function getSummaryReport(query: Query): Promise<Report<Summary>> {
 		return $togglStore.getSummaryReport(query);
+	}
+
+	function filterDetailedReport(
+		report: Report<Detailed>,
+		query: Query
+	): Report<Detailed> {
+		if (query.projectSelection) {
+			const include = query.projectSelection.mode === SelectionMode.INCLUDE;
+			const list = query.projectSelection.list;
+
+			report.data = report.data.filter((d: Detailed) => {
+				const match = list.includes(d.project) || list.includes(d.pid);
+				return include ? match : !match;
+			});
+		}
+		return report;
+	}
+
+	function filterSummaryReport(
+		report: Report<Summary>,
+		query: Query
+	): Report<Summary> {
+		if (query.projectSelection) {
+			const include = query.projectSelection.mode === SelectionMode.INCLUDE;
+			const list = query.projectSelection.list;
+
+			let selectionTime = 0;
+
+			report.data = report.data.filter((d: Summary) => {
+				const match = list.includes(d.title.project) || list.includes(d.id);
+				if (match) {
+					selectionTime += d.time;
+				}
+				return include ? match : !match;
+			});
+
+			report.total_grand = include
+				? selectionTime
+				: report.total_grand - selectionTime;
+		}
+		return report;
 	}
 </script>
 

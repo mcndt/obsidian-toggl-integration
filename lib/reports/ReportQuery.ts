@@ -55,17 +55,17 @@ export interface ListQuery extends Query {
 
 export enum SelectionMode {
 	/** Only include the projects in the subset in the query results. */
-	INCLUDE,
+	INCLUDE = 'INCLUDE',
 	/** Exclude the projects in the subset from the query results. */
-	EXCLUDE
+	EXCLUDE = 'EXCLUDE'
 }
 
 export enum GroupBy {
-	PROJECT,
-	DATE
+	PROJECT = 'PROJECT',
+	DATE = 'DATE'
 }
 
 export enum SortMode {
-	ASCENDING,
-	DESCENDING
+	ASC = 'ASC',
+	DESC = 'DESC'
 }
