@@ -1,4 +1,5 @@
-import { Keyword, tokenize } from './Tokenize';
+import { Keyword } from './Parser';
+import { tokenize } from './Tokenize';
 
 describe('Tokenization', () => {
 	test('empty query string', () => {

@@ -1,4 +1,4 @@
-import type { ISODate } from './parser/Parse';
+export type ISODate = string;
 
 export enum QueryType {
 	SUMMARY = 'SUMMARY',

@@ -1,43 +1,4 @@
-export enum Keyword {
-	// query type keywords
-	SUMMARY = 'SUMMARY',
-	LIST = 'LIST',
-
-	// query time interval keywords
-	TODAY = 'TODAY',
-	WEEK = 'WEEK',
-	MONTH = 'MONTH',
-	PREVIOUS = 'PREVIOUS',
-	DAYS = 'DAYS',
-	WEEKS = 'WEEKS',
-	MONTHS = 'MONTHS',
-	FROM = 'FROM',
-	TO = 'TO',
-
-	// inclusion/exclusion keywords
-	INCLUDE = 'INCLUDE',
-	EXCLUDE = 'EXCLUDE',
-	PROJECTS = 'PROJECTS',
-
-	// summary specific keywords
-	HIDE = 'HIDE',
-	BAR = 'BAR',
-	// LIST, but already introduced earlier
-	AREA = 'AREA',
-
-	// list specific keywords
-	GROUP = 'GROUP',
-	BY = 'BY',
-	DATE = 'DATE',
-	PROJECT = 'PROJECT',
-	SORT = 'SORT',
-	ASC = 'ASC',
-	DESC = 'DESC',
-	LIMIT = 'LIMIT'
-}
-
-export type UserInput = string | number;
-export type Token = Keyword | UserInput;
+import { Keyword, Token } from './Parser';
 
 /**
  * @param query query string
