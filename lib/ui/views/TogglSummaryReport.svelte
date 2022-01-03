@@ -148,7 +148,7 @@
 					hex: s.title.hex_color,
 					totalTime: millisecondsToTimeString(s.time),
 					percent: (s.time / summary.total_grand) * 100,
-					client_title: s.title.client ? s.title.cient : undefined
+					client_title: s.title.client ? s.title.client : undefined
 				})
 			)
 			.sort((a, b) => Number(a.title > b.title) * 2 - 1);
