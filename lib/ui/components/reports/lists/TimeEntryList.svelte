@@ -7,7 +7,9 @@
 
 <main>
 	{#each data as a}
-		<TimeEntryListGroup {...a} />
+		{#if a.data.length > 0}
+			<TimeEntryListGroup {...a} />
+		{/if}
 	{/each}
 </main>
 
