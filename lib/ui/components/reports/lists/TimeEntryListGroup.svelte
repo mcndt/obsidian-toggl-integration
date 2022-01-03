@@ -23,6 +23,10 @@
 			<div>{millisecondsToTimeString(totalTime)}</div>
 		</div>
 		<div class="group-items">
+			{#if data.length == 0}
+				<p class="ml-2">(No time entries)</p>
+			{/if}
+
 			{#each data as e}
 				<div class="group-item mb-2 is-flex is-justify-content-space-between">
 					<div class="is-flex is-align-items-center">
