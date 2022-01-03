@@ -10,9 +10,6 @@
 	import TogglSummaryReport from './TogglSummaryReport.svelte';
 	import TogglListReport from './TogglListReport.svelte';
 	import LoadingAnimation from '../components/LoadingAnimation.svelte';
-	import { match } from 'assert';
-
-	const DONUT_WIDTH = 190;
 
 	export let source: string;
 
@@ -25,6 +22,23 @@
 	let _title: string;
 	let _reportComponent: any;
 
+	let _ready = false;
+	let _error = false;
+
+	$: if (!_ready) {
+		if (_query) {
+			switch (_query.type) {
+				case QueryType.SUMMARY:
+					_ready = !!_summaryReport && !!_detailedReport;
+					break;
+				case QueryType.LIST:
+					_ready = !!_detailedReport;
+			}
+		}
+	}
+
+	$: _error = !!_apiError || !!_parseError;
+
 	onMount(async () => {
 		try {
 			_query = parseQuery(source);
@@ -36,6 +50,7 @@
 					_apiError = err.message;
 				});
 			if (_query.type === QueryType.SUMMARY) {
+				_reportComponent = TogglSummaryReport;
 				getSummaryReport(_query)
 					.then(
 						(report) => (_summaryReport = filterSummaryReport(report, _query))
@@ -43,7 +58,8 @@
 					.catch((err) => {
 						_apiError = err.message;
 					});
-				_reportComponent = TogglSummaryReport;
+			} else if (_query.type === QueryType.LIST) {
+				_reportComponent = TogglListReport;
 			}
 		} catch (err) {
 			_parseError = err.message;
@@ -133,7 +149,7 @@
 		<ApiError message={_apiError} />
 	{/if}
 
-	{#if _summaryReport && _detailedReport}
+	{#if _ready && !_error}
 		<svelte:component
 			this={_reportComponent}
 			title={_title}
@@ -143,7 +159,7 @@
 		/>
 	{/if}
 
-	{#if !(_summaryReport && _detailedReport) && !_parseError && !_apiError}
+	{#if !_ready && !_error}
 		<div style="text-align: center">
 			<LoadingAnimation color="var(--interactive-accent)" />
 			<p class="mt-0" style="color: var(--text-muted)">

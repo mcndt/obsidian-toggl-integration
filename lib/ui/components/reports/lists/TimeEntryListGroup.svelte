@@ -1,8 +1,10 @@
 <script lang="ts">
+	import millisecondsToTimeString from 'lib/util/millisecondsToTimeString';
+
 	import type { ReportListItem } from './types';
 
 	export let name: string;
-	export let totalTime: string;
+	export let totalTime: number;
 	export let hex: string = undefined;
 	export let data: ReportListItem[];
 </script>
@@ -18,7 +20,7 @@
 				{/if}
 				<span>{name}</span>
 			</div>
-			<div>{totalTime}</div>
+			<div>{millisecondsToTimeString(totalTime)}</div>
 		</div>
 		<div class="group-items">
 			{#each data as e}
@@ -30,14 +32,18 @@
 								style="background-color:{e.hex}"
 							/>
 						{/if}
-						{#if e.count}
-							<div class="group-item-count mr-2">
+						{#if e.count && e.count != 1}
+							<div
+								class="group-item-count mr-2 is-flex is-align-items-center is-justify-content-center"
+							>
 								<span>{e.count}</span>
 							</div>
 						{/if}
 						<span>{e.name}</span>
 					</div>
-					<div class="group-item-time">{e.totalTime}</div>
+					<div class="group-item-time">
+						{millisecondsToTimeString(e.totalTime)}
+					</div>
 				</div>
 			{/each}
 		</div>

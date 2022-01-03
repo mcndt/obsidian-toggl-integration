@@ -1,13 +1,13 @@
 export interface ReportListGroupData {
 	name: string;
-	totalTime: string;
+	totalTime: number;
 	hex?: string;
 	data: ReportListItem[];
 }
 
 export interface ReportListItem {
 	name: string;
-	totalTime: string;
+	totalTime: number;
 	hex?: string;
 	count?: number;
 }
