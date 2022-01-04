@@ -19,7 +19,6 @@ export class CustomTitleParser extends Parser {
 		try {
 			[list, _tokens] = parseList(_tokens, 1);
 		} catch (err) {
-			console.log(err.message);
 			throw new QueryParseError(
 				'"TITLE" must be followed by a string wrapped in double quotes. For example: \'TITLE "Work Projects"\''
 			);
