@@ -86,7 +86,9 @@ function testParseSelection(
 	expectedError?: RegExp
 ): void {
 	if (expectedError == undefined) {
-		expect(parseSelection(params.input, params.query)).toEqual([]);
+		expect(parseSelection(params.input, params.query)).toEqual(
+			params.remaining
+		);
 
 		expect(params.query.projectSelection).toEqual(expect.anything());
 		expect(params.query.projectSelection).toMatchObject<Selection>({

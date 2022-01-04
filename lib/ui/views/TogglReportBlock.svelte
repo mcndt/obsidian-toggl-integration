@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Detailed, Report, Summary } from 'lib/model/Report';
 	import { parse } from 'lib/reports/parser/Parse';
-	import { Keyword, Token, tokenize } from 'lib/reports/parser/Tokenize';
 	import { Query, QueryType, SelectionMode } from 'lib/reports/ReportQuery';
 	import { togglStore } from 'lib/util/stores';
 	import { onMount } from 'svelte';
@@ -10,6 +9,8 @@
 	import TogglSummaryReport from './TogglSummaryReport.svelte';
 	import TogglListReport from './TogglListReport.svelte';
 	import LoadingAnimation from '../components/LoadingAnimation.svelte';
+	import { Keyword, Token } from 'lib/reports/parser/Parser';
+	import { tokenize } from 'lib/reports/parser/Tokenize';
 
 	export let source: string;
 

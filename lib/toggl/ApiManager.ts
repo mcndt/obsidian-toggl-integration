@@ -4,7 +4,7 @@ import type { Detailed, Report, Summary } from 'lib/model/Report';
 import type { Tag } from 'lib/model/Tag';
 import type { TimeEntry, TimeEntryStart } from 'lib/model/TimeEntry';
 import type { TogglWorkspace } from 'lib/model/TogglWorkspace';
-import type { ISODate } from 'lib/reports/parser/Parse';
+import type { ISODate } from 'lib/reports/ReportQuery';
 import { settingsStore } from 'lib/util/stores';
 import moment from 'moment';
 import TogglClient from 'toggl-client';
