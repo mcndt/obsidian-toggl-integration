@@ -62,12 +62,16 @@
 
 		// render horizontal gridlines
 
-		const getXTickLabelOffset = (data: ChartData[]) => {
-			const max = maxValue(data);
-			// @ts-ignore
-			const mult = (max >= 10) + (max >= 100) + (max >= 1000) + (max >= 10000);
-			return 25 + mult * 8;
-		};
+		function getXTickLabelOffset(labels: any) {
+			let maxWidth = 0;
+			for (const label of labels) {
+				const width = label.getBoundingClientRect().width;
+				if (width > maxWidth) {
+					maxWidth = width;
+				}
+			}
+			return 8 + maxWidth;
+		}
 
 		svg
 			.append('g')
@@ -80,18 +84,18 @@
 			)
 			.style('color', ticks.strokeColor)
 			.call((g) => g.select('.domain').remove())
-			.call(
-				(g) =>
-					g
-						.selectAll('.tick text')
-						.style('color', ticks.textColor)
-						.style('font-size', ticks.size)
-						.style('font-family', 'var(--default-font)')
-						.style('font-weight', ticks.weight)
-						.attr('transform', `translate(${getXTickLabelOffset(data)}, -10)`)
-				// .attr('transform', (d) => {
-				// 	`translate(${getXTickLabelOffset(data)}, -10)`;
-				// })
+			.call((g) =>
+				g
+					.selectAll('.tick text')
+					.style('color', ticks.textColor)
+					.style('font-size', ticks.size)
+					.style('font-family', 'var(--default-font)')
+					.style('font-weight', ticks.weight)
+					.attr(
+						'transform',
+						(val, index, nodes) =>
+							`translate(${getXTickLabelOffset(nodes)}, -10)`
+					)
 			);
 
 		// Render data bars
@@ -128,7 +132,6 @@
 		}
 
 		// Render xtick labels
-
 		const show_label = (text: string, index: number, length: number) => {
 			if (text.length > 5) {
 				if (length > 15) {
