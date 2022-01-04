@@ -99,14 +99,15 @@
 		const bars = svg.selectAll('bar').data(data).enter();
 
 		// Render bar rectangles
-
 		const rects = bars
 			.append('rect')
 			.attr('x', (d) => xScale(d.name))
 			.attr('y', (d) => yScale(d.value))
 			.attr('width', xScale.bandwidth())
 			.style('fill', 'var(--interactive-accent)')
-			.attr('height', (d) => height - margin.bottom - yScale(d.value));
+			.attr('height', (d) =>
+				d.value > 0 ? height - margin.bottom - yScale(d.value) : 0
+			);
 
 		// NOTE: need to use 'function' syntax to access 'this' object.
 		//       Does not work with lambda function notation.
