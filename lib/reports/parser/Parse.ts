@@ -34,7 +34,7 @@ export function parse(queryString: string): Query {
 class TooManyTokensError extends QueryParseError {
 	constructor(token: Token) {
 		super(
-			`Invalid token at end of query: "${token}". Perhaps the statement order is incorrect, or the query contains a typo.`
+			`Invalid token at end of query: "${token}". Perhaps the expression order is incorrect, or the query contains a typo.`
 		);
 	}
 }

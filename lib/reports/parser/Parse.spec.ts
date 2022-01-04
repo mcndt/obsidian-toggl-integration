@@ -30,7 +30,7 @@ describe('parse', () => {
 			expected: {
 				from: CURRENT_WEEK_SINCE,
 				to: CURRENT_WEEK_UNTIL
-			} as SummaryQuery
+			} as Query
 		});
 	});
 
@@ -40,7 +40,7 @@ describe('parse', () => {
 			expected: {
 				from: '2020-01-01',
 				to: '2020-03-01'
-			} as SummaryQuery
+			} as Query
 		});
 	});
 
@@ -90,7 +90,7 @@ describe('parse', () => {
 			expected: {
 				from: '2020-01-22',
 				to: '2020-01-31'
-			} as SummaryQuery
+			} as Query
 		});
 	});
 
@@ -104,7 +104,7 @@ describe('parse', () => {
 					mode: SelectionMode.INCLUDE,
 					list: ['project A', 123456789]
 				}
-			} as SummaryQuery
+			} as Query
 		});
 	});
 
@@ -144,7 +144,7 @@ describe('parse', () => {
 				queryString: `SUMMARY PREVIOUS 10 DAYS "unexpected_token"`,
 				expected: null
 			},
-			/Invalid token at end of query: ""unexpected_token""/g
+			/Invalid token at end of query: "unexpected_token"/g
 		);
 	});
 });

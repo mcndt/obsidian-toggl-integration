@@ -7,11 +7,11 @@ describe('Tokenization', () => {
 	});
 
 	test('Keyword tokens', () => {
-		expect(tokenize('SUMMARY TODAY HIDE BAR')).toEqual([
+		expect(tokenize('SUMMARY TODAY HIDE CHARTS')).toEqual([
 			Keyword.SUMMARY,
 			Keyword.TODAY,
 			Keyword.HIDE,
-			Keyword.BAR
+			Keyword.CHARTS
 		]);
 	});
 
@@ -71,7 +71,7 @@ describe('Tokenization', () => {
 
 	test('Mixed keywords and user-generated strings', () => {
 		expect(
-			tokenize(`SUMMARY TODAY INCLUDE PROJECTS "item A", "item B" HIDE AREA`)
+			tokenize(`SUMMARY TODAY INCLUDE PROJECTS "item A", "item B" HIDE TITLE`)
 		).toEqual([
 			Keyword.SUMMARY,
 			Keyword.TODAY,
@@ -80,7 +80,7 @@ describe('Tokenization', () => {
 			'"item A"',
 			'"item B"',
 			Keyword.HIDE,
-			Keyword.AREA
+			Keyword.TITLE
 		]);
 	});
 });

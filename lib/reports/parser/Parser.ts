@@ -24,20 +24,21 @@ export enum Keyword {
 	EXCLUDE = 'EXCLUDE',
 	PROJECTS = 'PROJECTS',
 
-	// summary specific keywords
-	HIDE = 'HIDE',
-	BAR = 'BAR',
-	// LIST, but already introduced earlier
-	AREA = 'AREA',
-	// list specific keywords
+	// Group lists by
 	GROUP = 'GROUP',
 	BY = 'BY',
 	DATE = 'DATE',
 	PROJECT = 'PROJECT',
+
+	// Sort lists by
 	SORT = 'SORT',
 	ASC = 'ASC',
 	DESC = 'DESC',
-	LIMIT = 'LIMIT'
+
+	// Visual things
+	HIDE = 'HIDE',
+	CHARTS = 'CHARTS',
+	TITLE = 'TITLE'
 }
 
 /**
@@ -80,6 +81,40 @@ export abstract class Parser {
 	 * List of accepted tokens at the head of the query stream.
 	 */
 	abstract get _acceptedTokens(): Token[];
+}
+
+/**
+ * Parses tokens with the first parser that accepts the token stream head.
+ */
+export class CombinedParser extends Parser {
+	private _parsers: Parser[];
+
+	/**
+	 * @param parsers Parsers to decode tokens with.
+	 */
+	constructor(parsers: Parser[]) {
+		super();
+		this._parsers = parsers;
+	}
+
+	public parse(tokens: Token[], query: Query): Token[] {
+		this.test(tokens, true);
+		const _tokens = [...tokens];
+
+		for (const parser of this._parsers) {
+			if (parser.test(_tokens)) {
+				return parser.parse(_tokens, query);
+			}
+		}
+	}
+
+	get _acceptedTokens(): Token[] {
+		const tokens: Token[] = [];
+		for (const parser of this._parsers) {
+			tokens.push(...parser._acceptedTokens);
+		}
+		return tokens;
+	}
 }
 
 /**

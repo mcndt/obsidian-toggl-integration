@@ -16,6 +16,8 @@ export interface Query {
 	to: ISODate;
 	/** Optional, list of Toggl project IDs to include/exclude. */
 	projectSelection?: Selection;
+	/** Optional, indicates a sort order for rendered results. */
+	sort?: SortOrder;
 }
 
 /**
@@ -30,27 +32,11 @@ export interface Selection {
 }
 
 /**
- * Data required to fullfill a Toggl summary report query.
+ * Defines the order to sort rendered results in (ascending or descending)
  */
-export interface SummaryQuery extends Query {
-	/** Hide the project breakdown chart UI element from the report. */
-	// hidePie: boolean;
-	/** Hide the time breakdown chart UI element from the report. */
-	// hideBar: boolean;
-	/** Hide the project list UI element from the report. */
-	// hideList: boolean;
-}
-
-/**
- * Data required to fullfill a Toggl timer list report query.
- */
-export interface ListQuery extends Query {
-	/** Optional, group the time entries by project or day. */
-	groupBy?: GroupBy;
-	/** Optional, change sort order by date. */
-	sort?: SortMode;
-	/** Optional, limit the amount of results shown. */
-	limit?: number;
+export enum SortOrder {
+	ASC = 'ASC',
+	DESC = 'DESC'
 }
 
 export enum SelectionMode {

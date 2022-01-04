@@ -3,7 +3,6 @@ import { QueryTypeParser } from './parseQueryType';
 import { Keyword, newQuery, Parser, Token } from './Parser';
 
 let test_query: Query;
-let parser: Parser;
 
 describe('parseQueryType', () => {
 	beforeEach(() => {
