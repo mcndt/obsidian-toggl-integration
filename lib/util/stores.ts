@@ -11,6 +11,7 @@ import { writable } from 'svelte/store';
  */
 
 export const settingsStore = writable<PluginSettings>(null);
+export const versionLogDismissed = writable<boolean>(false);
 
 export const togglStore = writable<TogglManager>(null);
 export const apiStatusStore = writable<ApiStatus>(null);

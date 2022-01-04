@@ -2,10 +2,21 @@
 	import { ApiStatus } from 'lib/toggl/TogglManager';
 
 	import millisecondsToTimeString from 'lib/util/millisecondsToTimeString';
-	import { apiStatusStore, dailySummary } from 'lib/util/stores';
+	import {
+		apiStatusStore,
+		dailySummary,
+		versionLogDismissed
+	} from 'lib/util/stores';
+	import { fade } from 'svelte/transition';
 	import CurrentTimerDisplay from '../components/current_timer/CurrentTimerDisplay.svelte';
 	import TogglReportBarChart from '../components/reports/TogglReportBarChart.svelte';
 	import TogglReportProjectList from '../components/reports/TogglReportProjectList.svelte';
+	import NewFeatureNotification from './NewFeatureNotification.svelte';
+
+	function onDismiss() {
+		console.log('test');
+		versionLogDismissed.set(true);
+	}
 </script>
 
 <div class="container">
@@ -13,7 +24,7 @@
 		<div class="timer px-1">
 			<CurrentTimerDisplay />
 		</div>
-		<hr class="mt-4" />
+		<hr class="my-4" />
 
 		{#if $apiStatusStore === ApiStatus.NO_TOKEN}
 			<p class="error-message">
@@ -28,8 +39,14 @@
 			</p>
 		{/if}
 
+		{#if !$versionLogDismissed}
+			<div out:fade={{ duration: 500 }}>
+				<NewFeatureNotification {onDismiss} />
+			</div>
+		{/if}
+
 		{#if $dailySummary}
-			<div class="px-1">
+			<div class="px-1 mt-5">
 				<div class="mt-4">
 					<div class="is-flex is-justify-content-space-between">
 						<span class="report-scope">Today</span>
@@ -57,7 +74,6 @@
 	}
 
 	hr {
-		/* margin: 16px 0 24px 0; */
 		border-top: 2px solid var(--background-modifier-border);
 	}
 
