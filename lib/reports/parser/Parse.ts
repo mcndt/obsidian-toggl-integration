@@ -12,6 +12,7 @@ import { QueryTypeParser } from './parseQueryType';
 import { QueryIntervalParser } from './parseQueryInterval';
 import { SelectionParser } from './parseSelection';
 import { SortParser } from './parseSort';
+import { GroupByParser } from './parseGroupBy';
 
 /**
  * @param tokens list of keyword tokens part of a query.
@@ -35,7 +36,10 @@ export function parse(queryString: string): Query {
 	}
 
 	// Expression 4: Grouping and Sorting
-	const groupSortParser = new CombinedParser([new SortParser()]);
+	const groupSortParser = new CombinedParser([
+		new SortParser(),
+		new GroupByParser()
+	]);
 	while (groupSortParser.test(tokens)) {
 		tokens = groupSortParser.parse(tokens, query);
 	}

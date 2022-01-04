@@ -23,7 +23,7 @@ export class SortParser extends Parser {
 				query.sort = SortOrder.DESC;
 				break;
 			default:
-				throw new InvalidTokenError(_tokens[1], this._acceptedTokens);
+				throw new InvalidTokenError(_tokens[1], [Keyword.ASC, Keyword.DESC]);
 		}
 
 		return _tokens.slice(2);

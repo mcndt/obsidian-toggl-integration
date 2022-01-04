@@ -1,6 +1,12 @@
 import moment from 'moment';
 import { parse } from './Parse';
-import { Query, SelectionMode, ISODate, SortOrder } from '../ReportQuery';
+import {
+	Query,
+	SelectionMode,
+	ISODate,
+	SortOrder,
+	GroupBy
+} from '../ReportQuery';
 
 /* CONSTANTS */
 const CURRENT_DATE = '2020-01-31';
@@ -167,6 +173,61 @@ describe('parse', () => {
 			},
 			/A query can only contain a single "SORT" expression/g
 		);
+	});
+
+	test('TC-05c (Group by date)', () => {
+		testParse({
+			queryString: `LIST PREVIOUS 10 DAYS GROUP BY DATE`,
+			expected: {
+				from: '2020-01-22',
+				to: '2020-01-31',
+				groupBy: GroupBy.DATE
+			} as Query
+		});
+	});
+
+	test('TC-05d (Fails on double group by expression)', () => {
+		testParse(
+			{
+				queryString: `LIST PREVIOUS 10 DAYS GROUP BY DATE GROUP BY PROJECT`,
+				expected: null
+			},
+			/A query can only contain a single \"GROUP BY\" expression/g
+		);
+	});
+
+	test('TC-05e (Group by fails on incompatible type expression)', () => {
+		testParse(
+			{
+				queryString: `SUMMARY PREVIOUS 10 DAYS GROUP BY DATE`,
+				expected: null
+			},
+			/"GROUP BY" can only be used on "LIST" queries./g
+		);
+	});
+
+	test('TC-05f (Group by date after sort)', () => {
+		testParse({
+			queryString: `LIST PREVIOUS 10 DAYS SORT ASC GROUP BY DATE`,
+			expected: {
+				from: '2020-01-22',
+				to: '2020-01-31',
+				sort: SortOrder.ASC,
+				groupBy: GroupBy.DATE
+			} as Query
+		});
+	});
+
+	test('TC-05f (Sort after group by)', () => {
+		testParse({
+			queryString: `LIST PREVIOUS 10 DAYS GROUP BY PROJECT SORT DESC`,
+			expected: {
+				from: '2020-01-22',
+				to: '2020-01-31',
+				sort: SortOrder.DESC,
+				groupBy: GroupBy.PROJECT
+			} as Query
+		});
 	});
 });
 

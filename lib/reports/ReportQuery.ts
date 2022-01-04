@@ -18,6 +18,8 @@ export interface Query {
 	projectSelection?: Selection;
 	/** Optional, indicates a sort order for rendered results. */
 	sort?: SortOrder;
+	/** Optional, indicates a grouping for list reports. */
+	groupBy?: GroupBy;
 }
 
 /**
@@ -31,14 +33,6 @@ export interface Selection {
 	list: (string | number)[];
 }
 
-/**
- * Defines the order to sort rendered results in (ascending or descending)
- */
-export enum SortOrder {
-	ASC = 'ASC',
-	DESC = 'DESC'
-}
-
 export enum SelectionMode {
 	/** Only include the projects in the subset in the query results. */
 	INCLUDE = 'INCLUDE',
@@ -46,12 +40,22 @@ export enum SelectionMode {
 	EXCLUDE = 'EXCLUDE'
 }
 
-export enum GroupBy {
-	PROJECT = 'PROJECT',
-	DATE = 'DATE'
+export enum SortOrder {
+	/**
+	 * Order dates in chronological order,
+	 * or order projects by ascending total time.
+	 */
+	ASC = 'ASC',
+	/**
+	 * Order dates in reverse chronological order,
+	 * or order projects by descending total time.
+	 */
+	DESC = 'DESC'
 }
 
-export enum SortMode {
-	ASC = 'ASC',
-	DESC = 'DESC'
+export enum GroupBy {
+	/** Group list of time entries by project. */
+	PROJECT = 'PROJECT',
+	/** Group list of time entries by date. */
+	DATE = 'DATE'
 }
