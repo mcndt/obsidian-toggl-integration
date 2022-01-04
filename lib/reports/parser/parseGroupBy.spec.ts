@@ -67,14 +67,14 @@ describe('parseGroupBy', () => {
 	});
 });
 
-interface parseGropuByTestParams {
+interface parseGroupByTestParams {
 	input: Token[];
 	query: Query;
 	expectedGroupBy: GroupBy;
 	remaining: Token[];
 }
 
-function testGroupBy(params: parseGropuByTestParams, expectedError?: RegExp) {
+function testGroupBy(params: parseGroupByTestParams, expectedError?: RegExp) {
 	const parser = new GroupByParser();
 
 	if (expectedError == undefined) {

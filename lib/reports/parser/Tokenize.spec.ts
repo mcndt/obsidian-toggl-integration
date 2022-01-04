@@ -7,12 +7,7 @@ describe('Tokenization', () => {
 	});
 
 	test('Keyword tokens', () => {
-		expect(tokenize('SUMMARY TODAY HIDE CHARTS')).toEqual([
-			Keyword.SUMMARY,
-			Keyword.TODAY,
-			Keyword.HIDE,
-			Keyword.CHARTS
-		]);
+		expect(tokenize('SUMMARY TODAY')).toEqual([Keyword.SUMMARY, Keyword.TODAY]);
 	});
 
 	test('String input (single quotes)', () => {
@@ -71,7 +66,7 @@ describe('Tokenization', () => {
 
 	test('Mixed keywords and user-generated strings', () => {
 		expect(
-			tokenize(`SUMMARY TODAY INCLUDE PROJECTS "item A", "item B" HIDE TITLE`)
+			tokenize(`SUMMARY TODAY INCLUDE PROJECTS "item A", "item B" TITLE`)
 		).toEqual([
 			Keyword.SUMMARY,
 			Keyword.TODAY,
@@ -79,7 +74,6 @@ describe('Tokenization', () => {
 			Keyword.PROJECTS,
 			'"item A"',
 			'"item B"',
-			Keyword.HIDE,
 			Keyword.TITLE
 		]);
 	});

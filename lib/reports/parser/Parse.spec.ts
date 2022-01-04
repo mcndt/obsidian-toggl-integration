@@ -218,7 +218,7 @@ describe('parse', () => {
 		});
 	});
 
-	test('TC-05f (Sort after group by)', () => {
+	test('TC-05g (Sort after group by)', () => {
 		testParse({
 			queryString: `LIST PREVIOUS 10 DAYS GROUP BY PROJECT SORT DESC`,
 			expected: {
@@ -226,6 +226,18 @@ describe('parse', () => {
 				to: '2020-01-31',
 				sort: SortOrder.DESC,
 				groupBy: GroupBy.PROJECT
+			} as Query
+		});
+	});
+
+	test('TC-06a (Custom title)', () => {
+		testParse({
+			queryString: `LIST PREVIOUS 10 DAYS SORT DESC TITLE "My report"`,
+			expected: {
+				from: '2020-01-22',
+				to: '2020-01-31',
+				sort: SortOrder.DESC,
+				customTitle: 'My report'
 			} as Query
 		});
 	});

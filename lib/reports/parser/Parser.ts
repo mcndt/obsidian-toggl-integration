@@ -35,9 +35,7 @@ export enum Keyword {
 	ASC = 'ASC',
 	DESC = 'DESC',
 
-	// Visual things
-	HIDE = 'HIDE',
-	CHARTS = 'CHARTS',
+	// Customize report
 	TITLE = 'TITLE'
 }
 

@@ -74,7 +74,7 @@ export class SelectionParser extends Parser {
 	}
 }
 
-export class NoUserInputTokensError extends QueryParseError {
+class NoUserInputTokensError extends QueryParseError {
 	constructor(mode: SelectionMode, qualifier: Keyword) {
 		super(
 			`"${mode} ${qualifier}" must be followed by at least one item. For example: 'INCLUDE PROJECTS "project A", 12345678, "Project C"'`
@@ -84,7 +84,7 @@ export class NoUserInputTokensError extends QueryParseError {
 	}
 }
 
-export class DuplicateSelectionExpression extends QueryParseError {
+class DuplicateSelectionExpression extends QueryParseError {
 	constructor(qualifier: Keyword) {
 		super(
 			`A query can only contain a single selection expression for keyword "${qualifier}"`

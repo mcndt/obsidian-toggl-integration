@@ -8,12 +8,15 @@ import { Keyword, Token, UserInput } from './Parser';
  * @throws EvalError when no UserInput tokens are present at the head
  * of the tokens array.
  */
-export default function parseList(tokens: Token[]): [UserInput[], Token[]] {
+export default function parseList(
+	tokens: Token[],
+	maxResults?: number
+): [UserInput[], Token[]] {
 	const _tokens = [...tokens];
 
 	const list: UserInput[] = [];
 
-	while (_tokens.length > 0) {
+	while (_tokens.length > 0 && (!maxResults || list.length < maxResults)) {
 		if (_tokens[0] in Keyword) break;
 		if (typeof _tokens[0] == 'string' && _tokens[0][0] == '"') {
 			list.push(_tokens[0].slice(1, -1));

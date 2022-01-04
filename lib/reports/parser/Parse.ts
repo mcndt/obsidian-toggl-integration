@@ -13,6 +13,7 @@ import { QueryIntervalParser } from './parseQueryInterval';
 import { SelectionParser } from './parseSelection';
 import { SortParser } from './parseSort';
 import { GroupByParser } from './parseGroupBy';
+import { CustomTitleParser } from './parseCustomTitle';
 
 /**
  * @param tokens list of keyword tokens part of a query.
@@ -45,7 +46,10 @@ export function parse(queryString: string): Query {
 	}
 
 	// Expression 5: Configure rendered result
-	// TODO
+	const configParser = new CombinedParser([new CustomTitleParser()]);
+	while (configParser.test(tokens)) {
+		tokens = configParser.parse(tokens, query);
+	}
 
 	if (tokens.length > 0) {
 		throw new TooManyTokensError(tokens[0]);

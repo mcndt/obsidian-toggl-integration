@@ -20,6 +20,8 @@ export interface Query {
 	sort?: SortOrder;
 	/** Optional, indicates a grouping for list reports. */
 	groupBy?: GroupBy;
+	/** User-defined title for the rendered report. */
+	customTitle?: string;
 }
 
 /**

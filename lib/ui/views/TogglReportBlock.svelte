@@ -70,7 +70,7 @@
 	function parseQuery(source: string): Query {
 		const tokens = tokenize(source);
 		const query: Query = parse(source);
-		_title = getTitle(tokens);
+		_title = query.customTitle ? query.customTitle : getTitle(tokens);
 		return query;
 	}
 

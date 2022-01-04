@@ -136,7 +136,6 @@ export default class TogglManager {
 		this.executeIfAPIAvailable(async () => {
 			let new_timer: TimeEntryStart;
 			const timers = await this._apiManager.getRecentTimeEntries();
-			console.dir(timers);
 			new_timer = await this._plugin.input.selectTimer(timers);
 
 			// user wants to start a new timer
