@@ -85,9 +85,8 @@
 		});
 
 		// Add tooltips
-
 		if (data[0].displayValue) {
-			pieChart.append('svg:title').text((d, index) => data[index].displayValue);
+			pieChart.attr('aria-label', (d, index) => data[index].displayValue);
 		}
 	};
 </script>

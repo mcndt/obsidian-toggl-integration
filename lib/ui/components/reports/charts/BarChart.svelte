@@ -123,7 +123,7 @@
 		// Add tooltips
 
 		if (data[0].displayValue) {
-			rects.append('svg:title').text((d) => d.displayValue);
+			rects.attr('aria-label', (d) => d.displayValue);
 		}
 
 		// Render xtick labels
