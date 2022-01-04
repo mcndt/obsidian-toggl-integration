@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { parse } from './Parse';
-import { Query, SelectionMode, SummaryQuery, ISODate } from '../ReportQuery';
+import { Query, SelectionMode, ISODate } from '../ReportQuery';
 
 /* CONSTANTS */
 const CURRENT_DATE = '2020-01-31';
@@ -144,7 +144,7 @@ describe('parse', () => {
 				queryString: `SUMMARY PREVIOUS 10 DAYS "unexpected_token"`,
 				expected: null
 			},
-			/Invalid token at end of query: "unexpected_token"/g
+			/Invalid token at end of query: ""unexpected_token""/g
 		);
 	});
 });

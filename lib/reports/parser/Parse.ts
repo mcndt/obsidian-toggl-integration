@@ -3,7 +3,7 @@ import type { Query } from '../ReportQuery';
 import { InvalidTokenError, newQuery, QueryParseError, Token } from './Parser';
 import { tokenize } from './Tokenize';
 import { QueryTypeParser } from './parseQueryType';
-import parseQueryInterval from './parseQueryInterval';
+import { QueryIntervalParser } from './parseQueryInterval';
 import { SelectionParser } from './parseSelection';
 
 /**
@@ -15,14 +15,23 @@ export function parse(queryString: string): Query {
 	let tokens = tokenize(queryString);
 	let query = newQuery();
 
+	// Expression 1: Query Type
 	tokens = new QueryTypeParser().parse(tokens, query);
-	tokens = parseQueryInterval(tokens, query);
 
-	// Parse inclusion/exclusion statements
+	// Expression 2: Query Interval
+	tokens = new QueryIntervalParser().parse(tokens, query);
+
+	// Expression 3: Inclusion/exclusion expressions
 	const selectionParser = new SelectionParser();
 	while (selectionParser.test(tokens)) {
 		tokens = selectionParser.parse(tokens, query);
 	}
+
+	// Expression 4: Grouping and Sorting
+	// TODO
+
+	// Expression 5: Configure rendered result
+	// TODO
 
 	if (tokens.length > 0) {
 		throw new TooManyTokensError(tokens[0]);

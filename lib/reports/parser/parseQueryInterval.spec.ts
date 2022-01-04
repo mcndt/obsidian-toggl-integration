@@ -1,6 +1,6 @@
 import moment from 'moment';
 import type { ISODate, Query } from '../ReportQuery';
-import parseQueryInterval from './parseQueryInterval';
+import { QueryIntervalParser } from './parseQueryInterval';
 import { Keyword, newQuery, Token } from './Parser';
 
 const CURRENT_DATE = '2020-01-31';
@@ -239,16 +239,15 @@ function testParseQueryInterval(
 	expectedError?: RegExp
 ): void {
 	let query = newQuery();
+	let parser = new QueryIntervalParser();
 
 	if (expectedError == undefined) {
-		expect(parseQueryInterval(params.input, query)).toEqual<Token[]>(
+		expect(parser.parse(params.input, query)).toEqual<Token[]>(
 			params.remaining
 		);
 		expect(query.from).toEqual(params.to);
 		expect(query.to).toEqual(params.until);
 	} else {
-		expect(() => parseQueryInterval(params.input, query)).toThrowError(
-			expectedError
-		);
+		expect(() => parser.parse(params.input, query)).toThrowError(expectedError);
 	}
 }
