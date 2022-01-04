@@ -83,7 +83,7 @@ describe('parse', () => {
 	test('TC-02e (fails on time interval larger than 1 year)', () => {
 		testParse(
 			{
-				queryString: `SUMMARY PREVIOUS 400 DAYS`,
+				queryString: `SUMMARY PAST 400 DAYS`,
 				expected: null
 			},
 			/Toggl only provides reports over time spans less than 1 year/g
@@ -92,7 +92,7 @@ describe('parse', () => {
 
 	test('TC-02f (Relative time interval)', () => {
 		testParse({
-			queryString: `SUMMARY PREVIOUS 10 DAYS`,
+			queryString: `SUMMARY PAST 10 DAYS`,
 			expected: {
 				from: '2020-01-22',
 				to: '2020-01-31'
@@ -102,7 +102,7 @@ describe('parse', () => {
 
 	test('TC-03a (include projects (string or integer id))', () => {
 		testParse({
-			queryString: `SUMMARY PREVIOUS 10 DAYS INCLUDE PROJECTS 'project A', 123456789`,
+			queryString: `SUMMARY PAST 10 DAYS INCLUDE PROJECTS 'project A', 123456789`,
 			expected: {
 				from: '2020-01-22',
 				to: '2020-01-31',
@@ -117,7 +117,7 @@ describe('parse', () => {
 	test('TC-03b (Fails on contradicting selection statements over projects)', () => {
 		testParse(
 			{
-				queryString: `SUMMARY PREVIOUS 10 DAYS INCLUDE PROJECTS 'project A', 123456789 EXCLUDE PROJECTS 'project B'`,
+				queryString: `SUMMARY PAST 10 DAYS INCLUDE PROJECTS 'project A', 123456789 EXCLUDE PROJECTS 'project B'`,
 				expected: null
 			},
 			/query can only contain a single selection expression for keyword/g
@@ -127,7 +127,7 @@ describe('parse', () => {
 	test('TC-03c (Fails on double selection statement over projects)', () => {
 		testParse(
 			{
-				queryString: `SUMMARY PREVIOUS 10 DAYS INCLUDE PROJECTS 'project A', 123456789 INCLUDE PROJECTS 'project B'`,
+				queryString: `SUMMARY PAST 10 DAYS INCLUDE PROJECTS 'project A', 123456789 INCLUDE PROJECTS 'project B'`,
 				expected: null
 			},
 			/query can only contain a single selection expression for keyword/g
@@ -137,7 +137,7 @@ describe('parse', () => {
 	test('TC-03d (Fails on unknown selection qualifier)', () => {
 		testParse(
 			{
-				queryString: `SUMMARY PREVIOUS 10 DAYS INCLUDE WEEKS 'project A', 123456789`,
+				queryString: `SUMMARY PAST 10 DAYS INCLUDE WEEKS 'project A', 123456789`,
 				expected: null
 			},
 			/Invalid token/g
@@ -147,7 +147,7 @@ describe('parse', () => {
 	test('TC-04 (Fails on unexpected token at the end of the query)', () => {
 		testParse(
 			{
-				queryString: `SUMMARY PREVIOUS 10 DAYS "unexpected_token"`,
+				queryString: `SUMMARY PAST 10 DAYS "unexpected_token"`,
 				expected: null
 			},
 			/Invalid token at end of query: ""unexpected_token""/g
@@ -156,7 +156,7 @@ describe('parse', () => {
 
 	test('TC-05a (Sort ascending)', () => {
 		testParse({
-			queryString: `LIST PREVIOUS 10 DAYS SORT ASC`,
+			queryString: `LIST PAST 10 DAYS SORT ASC`,
 			expected: {
 				from: '2020-01-22',
 				to: '2020-01-31',
@@ -168,7 +168,7 @@ describe('parse', () => {
 	test('TC-05b (Fails on double sort expression)', () => {
 		testParse(
 			{
-				queryString: `LIST PREVIOUS 10 DAYS SORT ASC SORT DESC`,
+				queryString: `LIST PAST 10 DAYS SORT ASC SORT DESC`,
 				expected: null
 			},
 			/A query can only contain a single "SORT" expression/g
@@ -177,7 +177,7 @@ describe('parse', () => {
 
 	test('TC-05c (Group by date)', () => {
 		testParse({
-			queryString: `LIST PREVIOUS 10 DAYS GROUP BY DATE`,
+			queryString: `LIST PAST 10 DAYS GROUP BY DATE`,
 			expected: {
 				from: '2020-01-22',
 				to: '2020-01-31',
@@ -189,7 +189,7 @@ describe('parse', () => {
 	test('TC-05d (Fails on double group by expression)', () => {
 		testParse(
 			{
-				queryString: `LIST PREVIOUS 10 DAYS GROUP BY DATE GROUP BY PROJECT`,
+				queryString: `LIST PAST 10 DAYS GROUP BY DATE GROUP BY PROJECT`,
 				expected: null
 			},
 			/A query can only contain a single \"GROUP BY\" expression/g
@@ -199,7 +199,7 @@ describe('parse', () => {
 	test('TC-05e (Group by fails on incompatible type expression)', () => {
 		testParse(
 			{
-				queryString: `SUMMARY PREVIOUS 10 DAYS GROUP BY DATE`,
+				queryString: `SUMMARY PAST 10 DAYS GROUP BY DATE`,
 				expected: null
 			},
 			/"GROUP BY" can only be used on "LIST" queries./g
@@ -208,7 +208,7 @@ describe('parse', () => {
 
 	test('TC-05f (Group by date after sort)', () => {
 		testParse({
-			queryString: `LIST PREVIOUS 10 DAYS SORT ASC GROUP BY DATE`,
+			queryString: `LIST PAST 10 DAYS SORT ASC GROUP BY DATE`,
 			expected: {
 				from: '2020-01-22',
 				to: '2020-01-31',
@@ -220,7 +220,7 @@ describe('parse', () => {
 
 	test('TC-05g (Sort after group by)', () => {
 		testParse({
-			queryString: `LIST PREVIOUS 10 DAYS GROUP BY PROJECT SORT DESC`,
+			queryString: `LIST PAST 10 DAYS GROUP BY PROJECT SORT DESC`,
 			expected: {
 				from: '2020-01-22',
 				to: '2020-01-31',
@@ -232,7 +232,7 @@ describe('parse', () => {
 
 	test('TC-06a (Custom title)', () => {
 		testParse({
-			queryString: `LIST PREVIOUS 10 DAYS SORT DESC TITLE "My report"`,
+			queryString: `LIST PAST 10 DAYS SORT DESC TITLE "My report"`,
 			expected: {
 				from: '2020-01-22',
 				to: '2020-01-31',

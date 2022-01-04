@@ -83,8 +83,8 @@
 			case Keyword.MONTH:
 				return 'This month';
 			case Keyword.FROM:
-				return `${tokens[2]} to ${tokens[4]}`;
-			case Keyword.PREVIOUS:
+				return `${tokens[2]} to ${(tokens[4] as string).toLowerCase()}`;
+			case Keyword.PAST:
 				return `Past ${tokens[2]} ${(<string>tokens[3]).toLowerCase()}`;
 			default:
 				return 'Untitled Toggl Report';

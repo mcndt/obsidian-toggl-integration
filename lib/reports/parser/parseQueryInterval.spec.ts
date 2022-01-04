@@ -20,9 +20,9 @@ describe('parseQueryInterval (relative intervals)', () => {
 	- TODAYS
 	- WEEK 
 	- MONTH
-	- PREVIOUS ... DAYS
-	- PREVIOUS ... WEEKS
-	- PREVIOUS ... MONTHS
+	- PAST ... DAYS
+	- PAST ... WEEKS
+	- PAST ... MONTHS
 	*/
 
 	beforeEach(() => {
@@ -70,33 +70,33 @@ describe('parseQueryInterval (relative intervals)', () => {
 		});
 	});
 
-	test('"PREVIOUS 10 DAYS" includes the last ten days', () => {
+	test('"PAST 10 DAYS" includes the last ten days', () => {
 		test_date = '2020-01-10';
 
 		testParseQueryInterval({
-			input: [Keyword.PREVIOUS, 10, Keyword.DAYS, 'extra_token'],
+			input: [Keyword.PAST, 10, Keyword.DAYS, 'extra_token'],
 			to: '2020-01-01',
 			until: '2020-01-10',
 			remaining: ['extra_token']
 		});
 	});
 
-	test('"PREVOUS 3 WEEKS" includes current and previous two weeks', () => {
+	test('"PREVOUS 3 WEEKS" includes current and past two weeks', () => {
 		test_date = '2020-02-01';
 
 		testParseQueryInterval({
-			input: [Keyword.PREVIOUS, 3, Keyword.WEEKS, 'extra_token'],
+			input: [Keyword.PAST, 3, Keyword.WEEKS, 'extra_token'],
 			to: '2020-01-13',
 			until: '2020-02-02',
 			remaining: ['extra_token']
 		});
 	});
 
-	test('"PREVOUS 3 MONTHS" includes current and previous two months', () => {
+	test('"PREVOUS 3 MONTHS" includes current and past two months', () => {
 		test_date = '2020-01-28';
 
 		testParseQueryInterval({
-			input: [Keyword.PREVIOUS, 3, Keyword.MONTHS, 'extra_token'],
+			input: [Keyword.PAST, 3, Keyword.MONTHS, 'extra_token'],
 			to: '2019-11-01',
 			until: '2020-01-31',
 			remaining: ['extra_token']
@@ -106,7 +106,7 @@ describe('parseQueryInterval (relative intervals)', () => {
 	it('fails for relative window without decimal number', () => {
 		testParseQueryInterval(
 			{
-				input: [Keyword.PREVIOUS, 'ten', Keyword.DAYS, 'extra_token'],
+				input: [Keyword.PAST, 'ten', Keyword.DAYS, 'extra_token'],
 				to: null,
 				until: null,
 				remaining: null
@@ -118,7 +118,7 @@ describe('parseQueryInterval (relative intervals)', () => {
 	it('fails for relative window with invalid unit size', () => {
 		testParseQueryInterval(
 			{
-				input: [Keyword.PREVIOUS, 'ten', Keyword.TODAY, 'extra_token'],
+				input: [Keyword.PAST, 'ten', Keyword.TODAY, 'extra_token'],
 				to: null,
 				until: null,
 				remaining: null
@@ -132,7 +132,7 @@ describe('parseQueryInterval (relative intervals)', () => {
 
 		testParseQueryInterval(
 			{
-				input: [Keyword.PREVIOUS, 368, Keyword.DAYS, 'extra_token'],
+				input: [Keyword.PAST, 368, Keyword.DAYS, 'extra_token'],
 				to: null,
 				until: null,
 				remaining: null

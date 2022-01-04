@@ -12,7 +12,7 @@ export enum Keyword {
 	TODAY = 'TODAY',
 	WEEK = 'WEEK',
 	MONTH = 'MONTH',
-	PREVIOUS = 'PREVIOUS',
+	PAST = 'PAST',
 	DAYS = 'DAYS',
 	WEEKS = 'WEEKS',
 	MONTHS = 'MONTHS',

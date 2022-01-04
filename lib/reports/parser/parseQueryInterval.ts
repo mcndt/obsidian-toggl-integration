@@ -48,13 +48,16 @@ export class QueryIntervalParser extends Parser {
 				if (_tokens[pos + 2] != Keyword.TO) {
 					throw new InvalidTokenError(_tokens[pos + 2], [Keyword.TO]);
 				}
-				_to = moment(_tokens[pos + 3], ISODateFormat, true);
+				_to =
+					_tokens[pos + 3] === Keyword.TODAY
+						? moment()
+						: moment(_tokens[pos + 3], ISODateFormat, true);
 				if (!_to.isValid()) {
 					throw new InvalidDateFormatError(Keyword.TO, _tokens[pos + 3]);
 				}
 				_tokens.splice(0, 4);
 				break;
-			case Keyword.PREVIOUS:
+			case Keyword.PAST:
 				const accepted: Token[] = [Keyword.DAYS, Keyword.WEEKS, Keyword.MONTHS];
 				if (typeof _tokens[pos + 1] != 'number') {
 					throw new InvalidTokenError(_tokens[pos + 1], ['decimal number']);
@@ -124,7 +127,7 @@ export class QueryIntervalParser extends Parser {
 			Keyword.WEEK,
 			Keyword.MONTH,
 			Keyword.FROM,
-			Keyword.PREVIOUS
+			Keyword.PAST
 		];
 	}
 }
@@ -173,7 +176,7 @@ export function parseQueryInterval(tokens: Token[], query: Query): Token[] {
 			}
 			_tokens.splice(0, 4);
 			break;
-		case Keyword.PREVIOUS:
+		case Keyword.PAST:
 			const accepted: Token[] = [Keyword.DAYS, Keyword.WEEKS, Keyword.MONTHS];
 			if (typeof _tokens[pos + 1] != 'number') {
 				throw new InvalidTokenError(_tokens[pos + 1], ['decimal number']);
@@ -263,7 +266,7 @@ export class NoTimeIntervalExpression extends QueryParseError {
 		"${Keyword.TODAY}", 
 		"${Keyword.WEEK}", 
 		"${Keyword.MONTH}", 
-		"${Keyword.PREVIOUS} ... ${Keyword.DAYS}/${Keyword.WEEKS}/${Keyword.MONTHS}", 
+		"${Keyword.PAST} ... ${Keyword.DAYS}/${Keyword.WEEKS}/${Keyword.MONTHS}", 
 		"${Keyword.FROM} ... ${Keyword.TO} ..."`);
 	}
 }

@@ -1,5 +1,5 @@
 import type { PluginSettings } from 'lib/config/PluginSettings';
-import { MarkdownPostProcessorContext, Plugin, WorkspaceLeaf } from 'obsidian';
+import { Plugin, WorkspaceLeaf } from 'obsidian';
 import TogglManager from 'lib/toggl/TogglManager';
 import TogglSettingsTab from 'lib/ui/TogglSettingsTab';
 import { DEFAULT_SETTINGS } from 'lib/config/DefaultSettings';
@@ -9,7 +9,6 @@ import { VIEW_TYPE_REPORT } from 'lib/ui/views/TogglReportView';
 import { CODEBLOCK_LANG } from 'lib/constants';
 import reportBlockHandler from 'lib/reports/reportBlockHandler';
 import { settingsStore, versionLogDismissed } from 'lib/util/stores';
-import { settings } from 'cluster';
 
 export default class MyPlugin extends Plugin {
 	public settings: PluginSettings;
