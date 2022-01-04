@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { parse } from './Parse';
-import { Query, SelectionMode, ISODate } from '../ReportQuery';
+import { Query, SelectionMode, ISODate, SortOrder } from '../ReportQuery';
 
 /* CONSTANTS */
 const CURRENT_DATE = '2020-01-31';
@@ -145,6 +145,27 @@ describe('parse', () => {
 				expected: null
 			},
 			/Invalid token at end of query: ""unexpected_token""/g
+		);
+	});
+
+	test('TC-05a (Sort ascending)', () => {
+		testParse({
+			queryString: `LIST PREVIOUS 10 DAYS SORT ASC`,
+			expected: {
+				from: '2020-01-22',
+				to: '2020-01-31',
+				sort: SortOrder.ASC
+			} as Query
+		});
+	});
+
+	test('TC-05b (Fails on double sort expression)', () => {
+		testParse(
+			{
+				queryString: `LIST PREVIOUS 10 DAYS SORT ASC SORT DESC`,
+				expected: null
+			},
+			/A query can only contain a single "SORT" expression/g
 		);
 	});
 });

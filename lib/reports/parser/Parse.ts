@@ -1,10 +1,17 @@
 import type { Query } from '../ReportQuery';
 
-import { InvalidTokenError, newQuery, QueryParseError, Token } from './Parser';
+import {
+	CombinedParser,
+	InvalidTokenError,
+	newQuery,
+	QueryParseError,
+	Token
+} from './Parser';
 import { tokenize } from './Tokenize';
 import { QueryTypeParser } from './parseQueryType';
 import { QueryIntervalParser } from './parseQueryInterval';
 import { SelectionParser } from './parseSelection';
+import { SortParser } from './parseSort';
 
 /**
  * @param tokens list of keyword tokens part of a query.
@@ -28,7 +35,10 @@ export function parse(queryString: string): Query {
 	}
 
 	// Expression 4: Grouping and Sorting
-	// TODO
+	const groupSortParser = new CombinedParser([new SortParser()]);
+	while (groupSortParser.test(tokens)) {
+		tokens = groupSortParser.parse(tokens, query);
+	}
 
 	// Expression 5: Configure rendered result
 	// TODO
