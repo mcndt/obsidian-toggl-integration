@@ -137,6 +137,16 @@ describe('parse', () => {
 			/Invalid token/g
 		);
 	});
+
+	test('TC-04 (Fails on unexpected token at the end of the query)', () => {
+		testParse(
+			{
+				queryString: `SUMMARY PREVIOUS 10 DAYS "unexpected_token"`,
+				expected: null
+			},
+			/Invalid token at end of query: ""unexpected_token""/g
+		);
+	});
 });
 
 interface ParseTestParams {

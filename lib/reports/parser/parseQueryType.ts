@@ -1,28 +1,29 @@
 import { Query, QueryType } from '../ReportQuery';
-import { InvalidTokenError, Keyword, Token } from './Parser';
+import { Keyword, Parser, Token } from './Parser';
 
-/**
- * Parses the query type from a list of query tokens.
- * @returns remaining tokens.
- */
-export default function parseQueryType(tokens: Token[], query: Query): Token[] {
-	const queryTypeToken = tokens[0];
+export class QueryTypeParser extends Parser {
+	/**
+	 * Parses the query type from a list of query tokens.
+	 * @returns remaining tokens.
+	 */
+	public parse(tokens: Token[], query: Query): Token[] {
+		this.test(tokens, true);
 
-	const accepted_types: Token[] = [Keyword.SUMMARY, Keyword.LIST];
+		const queryTypeToken = tokens[0];
 
-	if (!accepted_types.includes(queryTypeToken)) {
-		throw new InvalidTokenError(queryTypeToken, accepted_types);
+		switch (queryTypeToken) {
+			case Keyword.SUMMARY:
+				query.type = QueryType.SUMMARY;
+				break;
+			case Keyword.LIST:
+				query.type = QueryType.LIST;
+				break;
+		}
+
+		return [...tokens].slice(1);
 	}
 
-	switch (queryTypeToken) {
-		case Keyword.SUMMARY:
-			query.type = QueryType.SUMMARY;
-			break;
-		case Keyword.LIST:
-			query.type = QueryType.LIST;
-			break;
+	get _acceptedTokens() {
+		return [Keyword.SUMMARY, Keyword.LIST];
 	}
-
-	// return copy
-	return [...tokens].slice(1);
 }

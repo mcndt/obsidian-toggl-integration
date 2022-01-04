@@ -1,8 +1,9 @@
 import { Query, QueryType } from '../ReportQuery';
-import parseQueryType from './parseQueryType';
-import { Keyword, newQuery, Token } from './Parser';
+import { QueryTypeParser } from './parseQueryType';
+import { Keyword, newQuery, Parser, Token } from './Parser';
 
 let test_query: Query;
+let parser: Parser;
 
 describe('parseQueryType', () => {
 	beforeEach(() => {
@@ -51,14 +52,16 @@ function testParseQueryType(
 	params: parseQueryTypeTestParams,
 	expectedError?: RegExp
 ) {
+	const parser = new QueryTypeParser();
+
 	if (expectedError == undefined) {
-		expect(parseQueryType(params.input, params.query)).toEqual<Token[]>(
+		expect(parser.parse(params.input, params.query)).toEqual<Token[]>(
 			params.remaining
 		);
 
 		expect(params.query.type).toEqual(params.expectedType);
 	} else {
-		expect(() => parseQueryType(params.input, params.query)).toThrowError(
+		expect(() => parser.parse(params.input, params.query)).toThrowError(
 			expectedError
 		);
 	}

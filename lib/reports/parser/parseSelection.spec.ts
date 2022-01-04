@@ -1,6 +1,6 @@
 import { Query, QueryType, SelectionMode, Selection } from '../ReportQuery';
 import { Keyword, Token } from './Parser';
-import parseSelection from './parseSelection';
+import { SelectionParser } from './parseSelection';
 
 let test_query: Query;
 
@@ -85,10 +85,10 @@ function testParseSelection(
 	params: SelectionTestParams,
 	expectedError?: RegExp
 ): void {
+	const parser = new SelectionParser();
+
 	if (expectedError == undefined) {
-		expect(parseSelection(params.input, params.query)).toEqual(
-			params.remaining
-		);
+		expect(parser.parse(params.input, params.query)).toEqual(params.remaining);
 
 		expect(params.query.projectSelection).toEqual(expect.anything());
 		expect(params.query.projectSelection).toMatchObject<Selection>({
@@ -96,7 +96,7 @@ function testParseSelection(
 			list: params.list
 		});
 	} else {
-		expect(() => parseSelection(params.input, params.query)).toThrowError(
+		expect(() => parser.parse(params.input, params.query)).toThrowError(
 			expectedError
 		);
 	}

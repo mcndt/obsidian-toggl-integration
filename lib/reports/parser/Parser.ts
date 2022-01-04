@@ -55,12 +55,32 @@ export type Token = Keyword | UserInput;
  */
 export const ISODateFormat = 'YYYY-MM-DD';
 
-/**
- * A Parser is a function which takes a list of tokens and tries to consume them,
- * adding data to the query reference passed. If parsed successfully, The parser
- * returns a list of remaining tokens.
- */
-export type Parser = (tokens: Token[], query: Query) => Token[];
+export abstract class Parser {
+	/**
+	 * Takes a list of tokens and tries to consume them, adding data to the query
+	 * reference passed. If parsed successfully, The parser returns a list of remaining tokens.
+	 */
+	public abstract parse(tokens: Token[], query: Query): Token[];
+
+	/**
+	 * Check whether the token list is parsable by a parser.
+	 * The passed query will NOT be mutated by this test.
+	 * @param throws if true, will throw an InvalidTokenError instead of returning false.
+	 * @returns false if parser throws an exception, true otherwise.
+	 */
+	public test(tokens: Token[], throws = false): boolean {
+		const success = this._acceptedTokens.includes(tokens[0]);
+		if (!success && throws) {
+			throw new InvalidTokenError(tokens[0], this._acceptedTokens);
+		}
+		return success;
+	}
+
+	/**
+	 * List of accepted tokens at the head of the query stream.
+	 */
+	abstract get _acceptedTokens(): Token[];
+}
 
 /**
  * Produces an empty query.
