@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Detailed, Report, Summary } from 'lib/model/Report';
-	import type { Query } from 'lib/reports/ReportQuery';
+	import { Query, SortOrder } from 'lib/reports/ReportQuery';
 	import millisecondsToTimeString from 'lib/util/millisecondsToTimeString';
 	import moment from 'moment';
 	import BarChart from '../components/reports/charts/BarChart.svelte';
@@ -151,7 +151,13 @@
 					client_title: s.title.client ? s.title.client : undefined
 				})
 			)
-			.sort((a, b) => Number(a.title > b.title) * 2 - 1);
+			.sort((a, b) => {
+				const aKey = query.sort ? a.percent : a.title;
+				const bKey = query.sort ? b.percent : b.title;
+				const sortValue = query.sort && query.sort === SortOrder.DESC ? -1 : 1;
+
+				return aKey > bKey ? sortValue : -sortValue;
+			});
 	}
 
 	function computeBarWidth(width: number): number {

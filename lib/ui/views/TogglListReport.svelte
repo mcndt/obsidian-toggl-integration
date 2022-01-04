@@ -2,7 +2,7 @@
 	import { groups } from 'd3';
 
 	import type { Detailed, Report } from 'lib/model/Report';
-	import type { Query } from 'lib/reports/ReportQuery';
+	import { Query, SortOrder } from 'lib/reports/ReportQuery';
 	import millisecondsToTimeString from 'lib/util/millisecondsToTimeString';
 	import moment from 'moment';
 	import TimeEntryList from '../components/reports/lists/TimeEntryList.svelte';
@@ -57,6 +57,16 @@
 		// Stack duplicated entries
 		let returnData = Array.from(entryMap.values());
 		returnData = stackGroupItems(returnData);
+
+		// Sort, if requested
+		if (query.sort) {
+			const _sortValue = query.sort === SortOrder.ASC ? 1 : -1;
+			returnData.sort((a, b) => {
+				const _a = moment(a.name, 'LL').format('YYYY-MM-DD');
+				const _b = moment(b.name, 'LL').format('YYYY-MM-DD');
+				return _a > _b ? _sortValue : -_sortValue;
+			});
+		}
 
 		return returnData;
 	}
