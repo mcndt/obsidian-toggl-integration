@@ -80,17 +80,18 @@
 			)
 			.style('color', ticks.strokeColor)
 			.call((g) => g.select('.domain').remove())
-			.call((g) =>
-				g
-					.selectAll('.tick text')
-					.style('color', ticks.textColor)
-					.style('font-size', ticks.size)
-					.style('font-family', 'var(--default-font)')
-					.style('font-weight', ticks.weight)
-					// .attr('transform', `translate(${getXTickLabelOffset(data)}, -10)`)
-					.attr('transform', (d) => {
-						`translate(${getXTickLabelOffset(data)}, -10)`;
-					})
+			.call(
+				(g) =>
+					g
+						.selectAll('.tick text')
+						.style('color', ticks.textColor)
+						.style('font-size', ticks.size)
+						.style('font-family', 'var(--default-font)')
+						.style('font-weight', ticks.weight)
+						.attr('transform', `translate(${getXTickLabelOffset(data)}, -10)`)
+				// .attr('transform', (d) => {
+				// 	`translate(${getXTickLabelOffset(data)}, -10)`;
+				// })
 			);
 
 		// Render data bars
