@@ -46,6 +46,36 @@
 	border-radius: 50%;
 }
 
+/* REPORTS */
+
+.time-entry-group-header {
+	font-weight: 600;
+	font-size: 1.1em;
+
+	border-bottom: 2px solid var(--background-modifier-border);
+}
+
+.project-circle {
+	width: 0.7em;
+	height: 0.7em;
+	border-radius: 50%;
+}
+
+.group-item-time {
+	color: var(--text-muted);
+	text-align: right;
+}
+
+.group-item-count {
+	color: var(--text-muted);
+	font-size: 0.7em;
+	text-align: center;
+	border-radius: 50%;
+	border: 1px solid var(--background-modifier-border);
+	height: 1.75em;
+	width: 1.75em;
+}
+
 /* -------------- */
 /* HELPER CLASSES */
 /* -------------- */

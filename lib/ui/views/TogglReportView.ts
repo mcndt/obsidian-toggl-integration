@@ -1,14 +1,14 @@
 import type { TimeEntry } from 'lib/model/TimeEntry';
 import type MyPlugin from 'main';
 import { ItemView, WorkspaceLeaf } from 'obsidian';
-import TogglReport from './TogglReport.svelte';
+import TogglSidebarPane from './TogglSidebarPane.svelte';
 
 export const VIEW_TYPE_REPORT = 'toggl-report';
 
 export default class TogglReportView extends ItemView {
 	private readonly plugin: MyPlugin;
 
-	private content: TogglReport;
+	private content: TogglSidebarPane;
 
 	constructor(leaf: WorkspaceLeaf, plugin: MyPlugin) {
 		super(leaf);
@@ -16,9 +16,8 @@ export default class TogglReportView extends ItemView {
 	}
 
 	/* Obsidian event lifecycle */
-
 	async onOpen(): Promise<void> {
-		this.content = new TogglReport({
+		this.content = new TogglSidebarPane({
 			target: this.contentEl,
 			props: {}
 		});

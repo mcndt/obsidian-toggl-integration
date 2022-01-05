@@ -14,4 +14,6 @@ export interface PluginSettings {
 	 * the status bar.
 	 */
 	charLimitStatusBar: number;
+	/** Has dismissed the update alert for 0.4.0 */
+	hasDismissedAlert?: boolean;
 }

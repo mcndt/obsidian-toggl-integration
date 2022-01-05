@@ -6,8 +6,8 @@
   ],
   "compilerOptions": {
     "baseUrl": ".",
-    "types": ["node", "svelte"],
-    // "inlineSourceMap": true,
+    "types": ["node", "svelte", "jest"],
+    "inlineSourceMap": false,
     "inlineSources": true,
     "module": "ESNext",
     "target": "es6",
@@ -19,7 +19,8 @@
       "dom",
       "es5",
       "scripthost",
-      "es2015"
+      "es2015",
+      "es2019" 
     ]
   },
 }

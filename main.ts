@@ -6,6 +6,9 @@ import { DEFAULT_SETTINGS } from 'lib/config/DefaultSettings';
 import UserInputHelper from 'lib/util/UserInputHelper';
 import TogglReportView from 'lib/ui/views/TogglReportView';
 import { VIEW_TYPE_REPORT } from 'lib/ui/views/TogglReportView';
+import { CODEBLOCK_LANG } from 'lib/constants';
+import reportBlockHandler from 'lib/reports/reportBlockHandler';
+import { settingsStore, versionLogDismissed } from 'lib/util/stores';
 
 export default class MyPlugin extends Plugin {
 	public settings: PluginSettings;
@@ -40,6 +43,9 @@ export default class MyPlugin extends Plugin {
 		} else {
 			this.app.workspace.onLayoutReady(this.initLeaf.bind(this));
 		}
+
+		// Enable processing codeblocks for rendering in-note reports
+		this.registerCodeBlockProcessor();
 	}
 
 	initLeaf(): void {
@@ -51,13 +57,32 @@ export default class MyPlugin extends Plugin {
 		});
 	}
 
+	/**
+	 * Registeres the MarkdownPostProcessor for rendering reports from
+	 * codeblock queries.
+	 */
+	registerCodeBlockProcessor() {
+		this.registerMarkdownCodeBlockProcessor(CODEBLOCK_LANG, reportBlockHandler);
+	}
+
 	onunload() {}
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		if (!this.settings.hasDismissedAlert) {
+			this.settings.hasDismissedAlert = false;
+		}
+		settingsStore.set(this.settings);
+
+		versionLogDismissed.set(this.settings.hasDismissedAlert);
+		versionLogDismissed.subscribe((bool) => {
+			this.settings.hasDismissedAlert = bool;
+			this.saveSettings();
+		});
 	}
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		settingsStore.set(this.settings);
 	}
 }
