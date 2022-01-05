@@ -179,7 +179,15 @@ export default class TogglManager {
 			return;
 		}
 		const prev = this._currentTimeEntry;
-		let curr = await this._apiManager.getCurrentTimer();
+		let curr: any;
+
+		try {
+			curr = await this._apiManager.getCurrentTimer();
+		} catch (err) {
+			console.error('Error reaching Toggl API');
+			console.error(err);
+			return;
+		}
 
 		// TODO properly handle multiple workspaces
 		// Drop timers from different workspaces

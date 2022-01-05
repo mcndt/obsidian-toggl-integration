@@ -12,6 +12,10 @@ To learn how, check out the [getting started](https://github.com/mcndt/obsidian-
 - Generate summary reports
 - Generate list reports
 
+### 🐛 Fixes
+
+- (Probably) fixed [a bug](https://github.com/mcndt/obsidian-toggl-integration/issues/34) where the sidebar periodically clears due to failing API requests.
+
 ## [0.3.0]
 
 ### ✨ Features
