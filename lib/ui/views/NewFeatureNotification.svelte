@@ -7,8 +7,8 @@
 		New in 0.4.0: Create Toggl reports inside of your notes with code blocks.
 		Learn more by reading the
 		<a
-			href="https://github.com/mcndt/obsidian-toggl-integration/releases/tag/0.4.0"
-			>release notes</a
+			href="https://github.com/mcndt/obsidian-toggl-integration/wiki/Creating-Toggl-reports-inside-notes"
+			>getting started page</a
 		>.
 	</p>
 	<footer>

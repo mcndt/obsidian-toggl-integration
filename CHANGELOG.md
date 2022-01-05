@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.0]
+
+This is the biggest update so far! This update enables you to visualize your Toggl time entry data right inside your Obsidian notes.
+
+To learn how, check out the [getting started](https://github.com/mcndt/obsidian-toggl-integration/wiki/Creating-Toggl-reports-inside-notes) page!
+
+### ✨ Features
+
+- You can now generate Toggl reports inside notes using code blocks with the language '`toggl`'
+- Generate summary reports
+- Generate list reports
+
 ## [0.3.0]
 
 ### ✨ Features
