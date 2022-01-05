@@ -27,7 +27,7 @@ export function parse(queryString: string): Query {
 	// Expression 1: Query Type
 	tokens = new QueryTypeParser().parse(tokens, query);
 
-	// Expression 2: Query Interval
+	// Expression 2: Time Range
 	tokens = new QueryIntervalParser().parse(tokens, query);
 
 	// Expression 3: Inclusion/exclusion expressions
