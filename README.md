@@ -3,10 +3,10 @@
 Add integration with the Toggl Track API to manage your timers inside Obsidian.
 
 ## Functionality
+- ✨ **NEW**: **Generate time tracking reports inside of your notes with code blocks**
 - See your current timer and how long it has been running  in the status bar
 - Get a summary of your day in the side panel
-- Create and start a new timer using the command palette, or restart an recent one
-- Stop your timer using the command palette
+- Create, start, and stop a new timer using the command palette, or restart an recent one
 
 ![](https://raw.githubusercontent.com/mcndt/obsidian-toggl-integration/master/demo.gif)
 
