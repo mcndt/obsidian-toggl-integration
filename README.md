@@ -8,7 +8,7 @@ Add integration with the Toggl Track API to manage your timers inside Obsidian.
 - Get a summary of your day in the side panel
 - Create, start, and stop a new timer using the command palette, or restart an recent one
 
-![](https://raw.githubusercontent.com/mcndt/obsidian-toggl-integration/master/demo.gif)
+![](https://raw.githubusercontent.com/mcndt/obsidian-toggl-integration/master/demo2.gif)
 
 ## Setup
 Configuring this plugin requires you to first request an API token from Toggl. More info on how to do this [can be found here](https://support.toggl.com/en/articles/3116844-where-is-my-api-token-located).
