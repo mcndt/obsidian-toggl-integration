@@ -5,6 +5,8 @@
 ### 🐛 Fixes
 
 - Fixed time entries without a project showing project 'null' in Toggl reports (now listed under '(No project)').
+- Fixed duplicated time entries from the Toggl API response inflating total times in reports.
+- Fixed summary report bar chart tooltips from saying "week" instead of the month's name.
 
 ## [0.4.0]
 
