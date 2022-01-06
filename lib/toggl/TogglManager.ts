@@ -377,10 +377,18 @@ export default class TogglManager {
 			}
 		}
 
-		return pages.reduce((prevPage, currPage) => {
+		const completeReport = pages.reduce((prevPage, currPage) => {
 			prevPage.data = prevPage.data.concat(currPage.data);
 			return prevPage;
 		}, page0);
+
+		// Sometimes the Toggl API returns duplicate entries,
+		// need to deduplicate by entry id
+		completeReport.data = completeReport.data.filter(
+			(el, index, self) => index === self.findIndex((el2) => el2.id === el.id)
+		);
+
+		return completeReport;
 	}
 
 	/** True if API token is valid and Toggl API is responsive. */

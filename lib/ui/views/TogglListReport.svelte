@@ -73,7 +73,12 @@
 		const entryMap: Map<string, ReportListGroupData> = new Map();
 
 		const addGroup = (name: string, hex: string) => {
-			entryMap.set(name, { name: name, totalTime: 0, data: [], hex: hex });
+			entryMap.set(name, {
+				name: name ? name : '(No project)',
+				totalTime: 0,
+				data: [],
+				hex: hex
+			});
 		};
 
 		// Fill the map

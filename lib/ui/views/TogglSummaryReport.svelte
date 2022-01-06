@@ -73,7 +73,7 @@
 				(d): ChartData => ({
 					name: `${moment(d.date, 'MMM YYYY').format('MMM')}`,
 					value: d.time / 1000 / 60 / 60,
-					displayValue: `Week ${d.date} (${millisecondsToTimeString(d.time)})`
+					displayValue: `${d.date} (${millisecondsToTimeString(d.time)})`
 				})
 			);
 		} else if (data.length > 31) {

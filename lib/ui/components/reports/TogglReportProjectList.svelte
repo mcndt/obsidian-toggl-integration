@@ -30,7 +30,7 @@
 			<div class="is-flex is-align-items-center">
 				<span class="project-circle" style="background-color: {e.color};" />
 				<span class="ml-3 project-row-name" style="color: {e.color};">
-					{e.name}
+					{e.name ? e.name : '(No project)'}
 				</span>
 			</div>
 			<span class="project-row-duration">{e.duration}</span>
