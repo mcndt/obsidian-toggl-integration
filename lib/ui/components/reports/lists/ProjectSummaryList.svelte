@@ -23,7 +23,7 @@
 					{#if d.hex}
 						<div class="project-circle mr-2" style="background-color:{d.hex}" />
 					{/if}
-					<span>{d.title}</span>
+					<span>{d.title ? d.title : '(No project)'}</span>
 					{#if d.client_title}
 						&nbsp<span class="project-client">• {d.client_title}</span>
 					{/if}
