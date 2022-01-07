@@ -14,8 +14,10 @@ export interface Query {
 	from: ISODate;
 	/** End of query time interval. */
 	to: ISODate;
-	/** Optional, list of Toggl project IDs to include/exclude. */
+	/** Optional, list of Toggl project IDs or names to include/exclude. */
 	projectSelection?: Selection;
+	/** Optional, list of Toggl client IDs or names to include/exclude. */
+	clientSelection?: Selection;
 	/** Optional, indicates a sort order for rendered results. */
 	sort?: SortOrder;
 	/** Optional, indicates a grouping for list reports. */

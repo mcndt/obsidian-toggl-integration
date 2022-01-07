@@ -23,6 +23,7 @@ export enum Keyword {
 	INCLUDE = 'INCLUDE',
 	EXCLUDE = 'EXCLUDE',
 	PROJECTS = 'PROJECTS',
+	CLIENTS = 'CLIENTS',
 
 	// Group lists by
 	GROUP = 'GROUP',

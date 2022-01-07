@@ -10,6 +10,11 @@ import {
 } from './Parser';
 
 export class SelectionParser extends Parser {
+	private static readonly _acceptedQualifiers: Token[] = [
+		Keyword.PROJECTS,
+		Keyword.CLIENTS
+	];
+
 	/**
 	 * Parses a selection statement from the tokens array and consumes tokens.
 	 * Results are added into the passed query object.
@@ -17,9 +22,8 @@ export class SelectionParser extends Parser {
 	 *  @throws EvalError when parsing fails.
 	 */
 	public parse(tokens: Token[], query: Query): Token[] {
+		this.test(tokens, true);
 		let _tokens = [...tokens];
-
-		this.test(_tokens, true);
 
 		// Get selection mode
 		let mode: SelectionMode;
@@ -35,21 +39,21 @@ export class SelectionParser extends Parser {
 
 		// Get qualifier
 		const qualifier: Token = _tokens[0];
-		const accepted_qualifiers = [Keyword.PROJECTS] as Token[];
-		if (!accepted_qualifiers.includes(qualifier)) {
-			throw new InvalidTokenError(qualifier, accepted_qualifiers);
+		if (!SelectionParser._acceptedQualifiers.includes(qualifier)) {
+			throw new InvalidTokenError(
+				qualifier,
+				SelectionParser._acceptedQualifiers
+			);
 		}
 		_tokens.splice(0, 1);
 
 		// Check for duplicate selection
-		if (qualifier === Keyword.PROJECTS) {
-			if (query.projectSelection) {
-				throw new DuplicateSelectionExpression(Keyword.PROJECTS);
-			}
-		} else {
-			throw new Error(
-				`No selection parser implementation for selection qualifier ${qualifier}`
-			);
+		const duplicateProjectFilter =
+			qualifier === Keyword.PROJECTS && query.projectSelection != null;
+		const duplicateClientFilter =
+			qualifier === Keyword.CLIENTS && query.clientSelection != null;
+		if (duplicateProjectFilter || duplicateClientFilter) {
+			throw new DuplicateSelectionExpression(qualifier);
 		}
 
 		// Get selection list
@@ -64,6 +68,15 @@ export class SelectionParser extends Parser {
 		switch (qualifier) {
 			case Keyword.PROJECTS:
 				query.projectSelection = { mode, list };
+				break;
+			case Keyword.CLIENTS:
+				if (list.filter((v) => typeof v === 'number').length > 0) {
+					throw new QueryParseError(
+						'Filtering by numeric client id is not currently supported.'
+					);
+				}
+				query.clientSelection = { mode, list };
+				break;
 		}
 
 		return _tokens;
