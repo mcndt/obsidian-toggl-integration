@@ -58,8 +58,10 @@ export enum SortOrder {
 }
 
 export enum GroupBy {
-	/** Group list of time entries by project. */
+	/** Group list of time entries by client. */
 	PROJECT = 'PROJECT',
+	/** Group list of time entries by project. */
+	CLIENT = 'CLIENT',
 	/** Group list of time entries by date. */
 	DATE = 'DATE'
 }

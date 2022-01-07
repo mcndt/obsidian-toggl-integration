@@ -26,8 +26,18 @@
 	): ReportListGroupData[] {
 		// Group entries by date or project
 		let returnData: ReportListGroupData[];
-		if (query.groupBy && query.groupBy === GroupBy.PROJECT) {
-			returnData = groupByProject(report, query);
+		if (query.groupBy) {
+			if (query.groupBy === GroupBy.PROJECT) {
+				returnData = groupByAttribute(
+					report,
+					query,
+					'project',
+					false,
+					'project_hex_color'
+				);
+			} else if (query.groupBy === GroupBy.CLIENT) {
+				returnData = groupByAttribute(report, query, 'client', true);
+			}
 		} else {
 			returnData = groupByDate(report, query);
 		}
@@ -37,8 +47,8 @@
 
 		// Sort, if requested
 		if (query.sort) {
-			if (query.groupBy && query.groupBy === GroupBy.PROJECT) {
-				sortProjectGroups(returnData, query.sort);
+			if (query.groupBy && query.groupBy !== GroupBy.DATE) {
+				sortNamedGroups(returnData, query.sort);
 			} else {
 				sortDateGroups(returnData, query.sort);
 			}
@@ -66,15 +76,17 @@
 		return groups;
 	}
 
-	function groupByProject(
+	function groupByAttribute(
 		report: Report<Detailed>,
-		query: Query
+		query: Query,
+		nameAttr: 'project' | 'client',
+		entryColor: boolean = false,
+		groupColorAttr: 'project_hex_color' = null
 	): ReportListGroupData[] {
 		const entryMap: Map<string, ReportListGroupData> = new Map();
-
-		const addGroup = (name: string, hex: string) => {
+		const addGroup = (name: string, hex?: string) => {
 			entryMap.set(name, {
-				name: name ? name : '(No project)',
+				name: name ? name : `(No ${nameAttr})`,
 				totalTime: 0,
 				data: [],
 				hex: hex
@@ -83,20 +95,52 @@
 
 		// Fill the map
 		for (const d of report.data) {
-			if (!entryMap.has(d.project)) {
-				addGroup(d.project, d.project_hex_color);
+			if (!entryMap.has(d[nameAttr])) {
+				addGroup(d[nameAttr], d[groupColorAttr]);
 			}
-			const group = entryMap.get(d.project);
+			const group = entryMap.get(d[nameAttr]);
 			group.data.push({
 				name: d.description,
 				totalTime: d.dur,
-				count: 1
+				count: 1,
+				hex: entryColor ? d.project_hex_color : null
 			});
 			group.totalTime += d.dur;
 		}
 
 		return Array.from(entryMap.values());
 	}
+
+	// function groupByProject(
+	// 	report: Report<Detailed>,
+	// 	query: Query
+	// ): ReportListGroupData[] {
+	// 	const entryMap: Map<string, ReportListGroupData> = new Map();
+	// 	const addGroup = (name: string, hex: string) => {
+	// 		entryMap.set(name, {
+	// 			name: name ? name : '(No project)',
+	// 			totalTime: 0,
+	// 			data: [],
+	// 			hex: hex
+	// 		});
+	// 	};
+
+	// 	// Fill the map
+	// 	for (const d of report.data) {
+	// 		if (!entryMap.has(d.project)) {
+	// 			addGroup(d.project, d.project_hex_color);
+	// 		}
+	// 		const group = entryMap.get(d.project);
+	// 		group.data.push({
+	// 			name: d.description,
+	// 			totalTime: d.dur,
+	// 			count: 1
+	// 		});
+	// 		group.totalTime += d.dur;
+	// 	}
+
+	// 	return Array.from(entryMap.values());
+	// }
 
 	function groupByDate(
 		report: Report<Detailed>,
@@ -144,7 +188,7 @@
 	}
 
 	// Projects are sorted by total time
-	function sortProjectGroups(groups: ReportListGroupData[], order: SortOrder) {
+	function sortNamedGroups(groups: ReportListGroupData[], order: SortOrder) {
 		const _sortValue = order === SortOrder.ASC ? 1 : -1;
 		return groups.sort((a, b) => {
 			return a.totalTime > b.totalTime ? _sortValue : -_sortValue;

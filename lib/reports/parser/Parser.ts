@@ -30,6 +30,7 @@ export enum Keyword {
 	BY = 'BY',
 	DATE = 'DATE',
 	PROJECT = 'PROJECT',
+	CLIENT = 'CLIENT',
 
 	// Sort lists by
 	SORT = 'SORT',

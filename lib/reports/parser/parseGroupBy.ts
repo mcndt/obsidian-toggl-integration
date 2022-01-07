@@ -8,6 +8,12 @@ import {
 } from './Parser';
 
 export class GroupByParser extends Parser {
+	private static readonly _acceptedGroupings = [
+		Keyword.DATE,
+		Keyword.PROJECT,
+		Keyword.CLIENT
+	];
+
 	public parse(tokens: Token[], query: Query): Token[] {
 		this.test(tokens, true);
 		if (tokens[1] !== Keyword.BY) {
@@ -33,11 +39,14 @@ export class GroupByParser extends Parser {
 			case Keyword.PROJECT:
 				query.groupBy = GroupBy.PROJECT;
 				break;
+			case Keyword.CLIENT:
+				query.groupBy = GroupBy.CLIENT;
+				break;
 			default:
-				throw new InvalidTokenError(_tokens[2], [
-					Keyword.DATE,
-					Keyword.PROJECT
-				]);
+				throw new InvalidTokenError(
+					_tokens[2],
+					GroupByParser._acceptedGroupings
+				);
 		}
 
 		return _tokens.slice(3);
