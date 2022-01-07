@@ -103,12 +103,22 @@
 		report: Report<Detailed>,
 		query: Query
 	): Report<Detailed> {
+		// filter by project
 		if (query.projectSelection) {
 			const include = query.projectSelection.mode === SelectionMode.INCLUDE;
 			const list = query.projectSelection.list;
-
 			report.data = report.data.filter((d: Detailed) => {
 				const match = list.includes(d.project) || list.includes(d.pid);
+				return include ? match : !match;
+			});
+		}
+
+		// filter by client
+		if (query.clientSelection) {
+			const include = query.clientSelection.mode === SelectionMode.INCLUDE;
+			const list = query.clientSelection.list;
+			report.data = report.data.filter((d: Detailed) => {
+				const match = list.includes(d.client);
 				return include ? match : !match;
 			});
 		}
@@ -119,24 +129,32 @@
 		report: Report<Summary>,
 		query: Query
 	): Report<Summary> {
+		// filter by project
 		if (query.projectSelection) {
 			const include = query.projectSelection.mode === SelectionMode.INCLUDE;
 			const list = query.projectSelection.list;
-
-			let selectionTime = 0;
-
 			report.data = report.data.filter((d: Summary) => {
 				const match = list.includes(d.title.project) || list.includes(d.id);
-				if (match) {
-					selectionTime += d.time;
-				}
 				return include ? match : !match;
 			});
-
-			report.total_grand = include
-				? selectionTime
-				: report.total_grand - selectionTime;
 		}
+
+		// filter by client
+		if (query.clientSelection) {
+			const include = query.clientSelection.mode === SelectionMode.INCLUDE;
+			const list = query.clientSelection.list;
+			report.data = report.data.filter((d: Summary) => {
+				const match = list.includes(d.title.client);
+				return include ? match : !match;
+			});
+		}
+
+		// calculate new total time
+		report.total_grand = report.data.reduce(
+			(prev, curr) => prev + curr.time,
+			0
+		);
+
 		return report;
 	}
 </script>

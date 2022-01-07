@@ -28,6 +28,15 @@ describe('parseGroupBy', () => {
 		});
 	});
 
+	test('Group by client', () => {
+		testGroupBy({
+			input: [Keyword.GROUP, Keyword.BY, Keyword.CLIENT, 'extra token'],
+			remaining: ['extra token'],
+			query: test_query,
+			expectedGroupBy: GroupBy.CLIENT
+		});
+	});
+
 	test('Fails on unknown group keyword', () => {
 		testGroupBy(
 			{

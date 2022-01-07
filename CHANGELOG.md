@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0]
+
+### ✨ Features
+
+- Added support for filtering reports by client via `{INCLUDE|EXCLUDE} CLIENTS "Client A"[, "Client B", ...]`
+- Added support for grouping list reports by client via `GROUP BY CLIENT`
+
 ## [0.4.1] 
 
 ### 🐛 Fixes

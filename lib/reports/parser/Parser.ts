@@ -23,12 +23,14 @@ export enum Keyword {
 	INCLUDE = 'INCLUDE',
 	EXCLUDE = 'EXCLUDE',
 	PROJECTS = 'PROJECTS',
+	CLIENTS = 'CLIENTS',
 
 	// Group lists by
 	GROUP = 'GROUP',
 	BY = 'BY',
 	DATE = 'DATE',
 	PROJECT = 'PROJECT',
+	CLIENT = 'CLIENT',
 
 	// Sort lists by
 	SORT = 'SORT',

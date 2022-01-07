@@ -114,7 +114,7 @@ describe('parse', () => {
 		});
 	});
 
-	test('TC-03b (Fails on contradicting selection statements over projects)', () => {
+	test('TC-03b (Fails on contradicting selection statements)', () => {
 		testParse(
 			{
 				queryString: `SUMMARY PAST 10 DAYS INCLUDE PROJECTS 'project A', 123456789 EXCLUDE PROJECTS 'project B'`,
@@ -124,10 +124,10 @@ describe('parse', () => {
 		);
 	});
 
-	test('TC-03c (Fails on double selection statement over projects)', () => {
+	test('TC-03c (Fails on double selection statement)', () => {
 		testParse(
 			{
-				queryString: `SUMMARY PAST 10 DAYS INCLUDE PROJECTS 'project A', 123456789 INCLUDE PROJECTS 'project B'`,
+				queryString: `SUMMARY PAST 10 DAYS INCLUDE CLIENTS 'project A', 'project C' INCLUDE CLIENTS 'project B'`,
 				expected: null
 			},
 			/query can only contain a single selection expression for keyword/g
@@ -142,6 +142,24 @@ describe('parse', () => {
 			},
 			/Invalid token/g
 		);
+	});
+
+	test('TC-03e (select over projects and clients)', () => {
+		testParse({
+			queryString: `SUMMARY PAST 10 DAYS INCLUDE PROJECTS 'project A', 123456789 EXCLUDE CLIENTS "Client B"`,
+			expected: {
+				from: '2020-01-22',
+				to: '2020-01-31',
+				projectSelection: {
+					mode: SelectionMode.INCLUDE,
+					list: ['project A', 123456789]
+				},
+				clientSelection: {
+					mode: SelectionMode.EXCLUDE,
+					list: ['Client B']
+				}
+			} as Query
+		});
 	});
 
 	test('TC-04 (Fails on unexpected token at the end of the query)', () => {
