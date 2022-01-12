@@ -27,7 +27,7 @@
 		// Group entries by date or project
 		report = sanitizeData(report);
 		let returnData: ReportListGroupData[];
-		if (query.groupBy) {
+		if (query.groupBy && query.groupBy !== GroupBy.DATE) {
 			if (query.groupBy === GroupBy.PROJECT) {
 				returnData = groupByAttribute(
 					report,
@@ -61,9 +61,9 @@
 	function sanitizeData(report: Report<Detailed>): Report<Detailed> {
 		for (const d of report.data) {
 			// sanitize Markdown links
-			const match = d.description.match(/\[([^\[]+)\](\(.*\))/gm)
+			const match = d.description.match(/\[([^\[]+)\](\(.*\))/gm);
 			if (match) {
-				const linkText = /\[([^\[]+)\](\(.*\))/.exec(d.description)[1]
+				const linkText = /\[([^\[]+)\](\(.*\))/.exec(d.description)[1];
 				d.description = linkText.trim().length > 0 ? linkText : '(Empty link)';
 			}
 		}

@@ -10,6 +10,7 @@
 ### 🐛 Fixes
 
 - Fix time entries with very long descriptions overflowing the rendered list report block (issue #43)
+- Fix explicity `GROUP BY DATE` expression causing exceptions. (issue #45)
 
 ## [0.5.0]
 
