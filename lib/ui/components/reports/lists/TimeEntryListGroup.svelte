@@ -25,7 +25,7 @@
 		<div class="group-items">
 			{#each data as e}
 				<div class="group-item mb-2 is-flex is-justify-content-space-between">
-					<div class="is-flex is-align-items-center">
+					<div class="is-flex is-align-items-center group-item-description">
 						{#if e.hex}
 							<div
 								class="project-circle mr-2"
@@ -41,7 +41,7 @@
 						{/if}
 						<span>{e.name}</span>
 					</div>
-					<div class="group-item-time">
+					<div class="group-item-time ml-3">
 						{millisecondsToTimeString(e.totalTime)}
 					</div>
 				</div>

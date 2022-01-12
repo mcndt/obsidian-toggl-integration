@@ -25,6 +25,7 @@
 		query: Query
 	): ReportListGroupData[] {
 		// Group entries by date or project
+		report = sanitizeData(report);
 		let returnData: ReportListGroupData[];
 		if (query.groupBy) {
 			if (query.groupBy === GroupBy.PROJECT) {
@@ -55,6 +56,18 @@
 		}
 
 		return returnData;
+	}
+
+	function sanitizeData(report: Report<Detailed>): Report<Detailed> {
+		for (const d of report.data) {
+			// sanitize Markdown links
+			const match = d.description.match(/\[([^\[]+)\](\(.*\))/gm)
+			if (match) {
+				const linkText = /\[([^\[]+)\](\(.*\))/.exec(d.description)[1]
+				d.description = linkText.trim().length > 0 ? linkText : '(Empty link)';
+			}
+		}
+		return report;
 	}
 
 	function stackGroupItems(
@@ -110,37 +123,6 @@
 
 		return Array.from(entryMap.values());
 	}
-
-	// function groupByProject(
-	// 	report: Report<Detailed>,
-	// 	query: Query
-	// ): ReportListGroupData[] {
-	// 	const entryMap: Map<string, ReportListGroupData> = new Map();
-	// 	const addGroup = (name: string, hex: string) => {
-	// 		entryMap.set(name, {
-	// 			name: name ? name : '(No project)',
-	// 			totalTime: 0,
-	// 			data: [],
-	// 			hex: hex
-	// 		});
-	// 	};
-
-	// 	// Fill the map
-	// 	for (const d of report.data) {
-	// 		if (!entryMap.has(d.project)) {
-	// 			addGroup(d.project, d.project_hex_color);
-	// 		}
-	// 		const group = entryMap.get(d.project);
-	// 		group.data.push({
-	// 			name: d.description,
-	// 			totalTime: d.dur,
-	// 			count: 1
-	// 		});
-	// 		group.totalTime += d.dur;
-	// 	}
-
-	// 	return Array.from(entryMap.values());
-	// }
 
 	function groupByDate(
 		report: Report<Detailed>,
