@@ -25,6 +25,7 @@
 		query: Query
 	): ReportListGroupData[] {
 		// Group entries by date or project
+		report = sanitizeData(report);
 		let returnData: ReportListGroupData[];
 		if (query.groupBy) {
 			if (query.groupBy === GroupBy.PROJECT) {
@@ -55,6 +56,18 @@
 		}
 
 		return returnData;
+	}
+
+	function sanitizeData(report: Report<Detailed>): Report<Detailed> {
+		for (const d of report.data) {
+			// sanitize Markdown links
+			const match = d.description.match(/\[([^\[]+)\](\(.*\))/gm)
+			if (match) {
+				const linkText = /\[([^\[]+)\](\(.*\))/.exec(d.description)[1]
+				d.description = linkText.trim().length > 0 ? linkText : '(Empty link)';
+			}
+		}
+		return report;
 	}
 
 	function stackGroupItems(

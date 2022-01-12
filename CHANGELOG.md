@@ -2,6 +2,11 @@
 
 ## [0.5.1] 
 
+### ✨ Features
+
+- Time entries with a Markdown link as description (e.g. automatically started from Todoist tasks) will now only display the link annotation in list reports. (issue #43)
+
+
 ### 🐛 Fixes
 
 - Fix time entries with very long descriptions overflowing the rendered list report block (issue #43)
