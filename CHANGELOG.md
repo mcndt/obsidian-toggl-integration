@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.1] 
+
+### 🐛 Fixes
+
+- Fix time entries with very long descriptions overflowing the rendered list report block (issue #43)
+
 ## [0.5.0]
 
 ### ✨ Features

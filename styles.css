@@ -61,6 +61,10 @@
 	border-radius: 50%;
 }
 
+.group-item-description {
+	overflow: hidden;
+}
+
 .group-item-time {
 	color: var(--text-muted);
 	text-align: right;

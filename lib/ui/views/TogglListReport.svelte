@@ -111,37 +111,6 @@
 		return Array.from(entryMap.values());
 	}
 
-	// function groupByProject(
-	// 	report: Report<Detailed>,
-	// 	query: Query
-	// ): ReportListGroupData[] {
-	// 	const entryMap: Map<string, ReportListGroupData> = new Map();
-	// 	const addGroup = (name: string, hex: string) => {
-	// 		entryMap.set(name, {
-	// 			name: name ? name : '(No project)',
-	// 			totalTime: 0,
-	// 			data: [],
-	// 			hex: hex
-	// 		});
-	// 	};
-
-	// 	// Fill the map
-	// 	for (const d of report.data) {
-	// 		if (!entryMap.has(d.project)) {
-	// 			addGroup(d.project, d.project_hex_color);
-	// 		}
-	// 		const group = entryMap.get(d.project);
-	// 		group.data.push({
-	// 			name: d.description,
-	// 			totalTime: d.dur,
-	// 			count: 1
-	// 		});
-	// 		group.totalTime += d.dur;
-	// 	}
-
-	// 	return Array.from(entryMap.values());
-	// }
-
 	function groupByDate(
 		report: Report<Detailed>,
 		query: Query
