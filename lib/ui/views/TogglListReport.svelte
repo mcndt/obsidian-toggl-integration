@@ -1,23 +1,29 @@
 <script lang="ts">
-	import { groups } from 'd3';
-
 	import type { Detailed, Report } from 'lib/model/Report';
 	import { GroupBy, Query, SortOrder } from 'lib/reports/ReportQuery';
-	import millisecondsToTimeString from 'lib/util/millisecondsToTimeString';
 	import moment from 'moment';
 	import TimeEntryList from '../components/reports/lists/TimeEntryList.svelte';
 	import type {
 		ReportListGroupData,
 		ReportListItem
 	} from '../components/reports/lists/types';
+	import JsError from './JSError.svelte';
 
 	export let query: Query;
 	export let detailed: Report<Detailed>;
 
+	let _error: string;
+
 	let _listGroups: ReportListGroupData[] = [];
 
 	$: if (query && detailed) {
-		_listGroups = getListGroups(detailed, query);
+		try {
+			_error = null;
+			_listGroups = getListGroups(detailed, query);
+		} catch (err) {
+			_error = err.stack;
+			console.error(err);
+		}
 	}
 
 	function getListGroups(
@@ -180,4 +186,8 @@
 
 <!-- <ReportBlockHeader title="list" totalTime="0:00:00" /> -->
 
-<TimeEntryList data={_listGroups} />
+{#if _error}
+	<JsError message={_error} />
+{:else}
+	<TimeEntryList data={_listGroups} />
+{/if}
