@@ -33,7 +33,7 @@
 		// Group entries by date or project
 		report = sanitizeData(report);
 		let returnData: ReportListGroupData[];
-		if (query.groupBy) {
+		if (query.groupBy && query.groupBy !== GroupBy.DATE) {
 			if (query.groupBy === GroupBy.PROJECT) {
 				returnData = groupByAttribute(
 					report,
