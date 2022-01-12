@@ -9,6 +9,7 @@
 	import ProjectSummaryList from '../components/reports/lists/ProjectSummaryList.svelte';
 	import type { ProjectSummaryItem } from '../components/reports/lists/types';
 	import ReportBlockHeader from '../components/reports/ReportBlockHeader.svelte';
+	import JsError from './JSError.svelte';
 
 	const DONUT_WIDTH = 190;
 	const BREAKPOINT = 500;
@@ -23,11 +24,19 @@
 	let _barData: ChartData[];
 	let _pieData: ChartData[];
 	let _listData: ProjectSummaryItem[];
+	let _error: string;
 
-	$: _pieData = getPieData(summary);
-	$: _barData = getBarData(detailed, query);
-	$: _listData = getListData(summary);
-	$: _barWidth = computeBarWidth(_width);
+	$: {
+		try {
+			_pieData = getPieData(summary);
+			_barData = getBarData(detailed, query);
+			_listData = getListData(summary);
+			_barWidth = computeBarWidth(_width);
+		} catch (err) {
+			_error = err.stack;
+			console.error(err);
+		}
+	}
 
 	function getPieData(summary: Report<Summary>): ChartData[] {
 		return summary.data.map((s: Summary): ChartData => {
@@ -185,4 +194,8 @@
 	{/if}
 </div>
 
-<ProjectSummaryList data={_listData} />
+{#if _error}
+	<JsError message={_error} />
+{:else}
+	<ProjectSummaryList data={_listData} />
+{/if}
