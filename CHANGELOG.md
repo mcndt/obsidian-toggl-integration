@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0]
+
+### ✨ Features
+
+- The daily total time in the sidebar will update in real time when a time entry is active. (If you find this distracting, it can be disabled in the settings.)
+- Hovering over the sidebar bar chart will now show the project name and total duration in a tooltip.
+
 ## [0.5.1] 
 
 ### ✨ Features

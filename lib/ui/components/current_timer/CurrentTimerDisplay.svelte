@@ -1,38 +1,12 @@
 <script lang="ts">
 	import type { TimeEntry } from 'lib/model/TimeEntry';
-	import { currentTimer } from 'lib/util/stores';
-	import moment from 'moment';
-	import { onDestroy } from 'svelte';
 	import CurrentTimerStopButton from './CurrentTimerStopButton.svelte';
 	import CurrentTimerStartButton from './CurrentTimerStartButton.svelte';
 	import millisecondsToTimeString from 'lib/util/millisecondsToTimeString';
 	import TimerTag from './TimerTag.svelte';
 
-	let timer: TimeEntry;
-
-	let hr = 0;
-	let min = 0;
-	let sec = 0;
-	let durationString: string;
-
-	const unsubscribe = currentTimer.subscribe((val) => {
-		timer = val;
-		updateDuration();
-	});
-
-	onDestroy(unsubscribe);
-
-	function updateDuration() {
-		if (timer == null) {
-			return;
-		}
-
-		const start = moment(timer.start);
-		const diff = moment().diff(start, 'milliseconds');
-		durationString = millisecondsToTimeString(diff);
-
-		setTimeout(updateDuration, 1000);
-	}
+	export let timer: TimeEntry;
+	export let duration: number;
 </script>
 
 <div
@@ -58,7 +32,7 @@
 					style="color: {timer.project_hex_color};">{timer.project}</span
 				>
 				<span class="divider-bullet mx-1">•</span>
-				<span class="timer-duration">{durationString}</span>
+				<span class="timer-duration">{millisecondsToTimeString(duration)}</span>
 			</div>
 			<!-- is-flex is-flex-wrap-wrap -->
 			<div id="toggl-tags" class="">

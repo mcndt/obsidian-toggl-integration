@@ -1,20 +1,47 @@
 <script lang="ts">
+	import type { TimeEntry } from 'lib/model/TimeEntry';
+
 	import { ApiStatus } from 'lib/toggl/TogglManager';
 
 	import millisecondsToTimeString from 'lib/util/millisecondsToTimeString';
 	import {
 		apiStatusStore,
+		currentTimer,
 		dailySummary,
+		settingsStore,
 		versionLogDismissed
 	} from 'lib/util/stores';
+	import moment from 'moment';
+	import { onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import CurrentTimerDisplay from '../components/current_timer/CurrentTimerDisplay.svelte';
 	import TogglReportBarChart from '../components/reports/TogglReportBarChart.svelte';
 	import TogglReportProjectList from '../components/reports/TogglReportProjectList.svelte';
 	import NewFeatureNotification from './NewFeatureNotification.svelte';
 
+	let timer: TimeEntry;
+	let duration: number;
+
+	const unsubscribe = currentTimer.subscribe((val) => {
+		timer = val;
+		updateDuration();
+	});
+
+	onDestroy(unsubscribe);
+
+	function updateDuration() {
+		if (timer == null) {
+			duration = 0;
+			return;
+		}
+
+		const start = moment(timer.start);
+		const diff = moment().diff(start, 'milliseconds');
+		duration = diff;
+		setTimeout(updateDuration, 1000);
+	}
+
 	function onDismiss() {
-		console.log('test');
 		versionLogDismissed.set(true);
 	}
 </script>
@@ -22,7 +49,7 @@
 <div class="container">
 	<div class="p-1">
 		<div class="timer px-1">
-			<CurrentTimerDisplay />
+			<CurrentTimerDisplay {timer} {duration} />
 		</div>
 		<hr class="my-4" />
 
@@ -51,7 +78,10 @@
 					<div class="is-flex is-justify-content-space-between">
 						<span class="report-scope">Today</span>
 						<span class="total-duration"
-							>{millisecondsToTimeString($dailySummary.total_grand)}</span
+							>{millisecondsToTimeString(
+								$dailySummary.total_grand +
+									($settingsStore.updateInRealTime ? duration : 0)
+							)}</span
 						>
 					</div>
 					<TogglReportBarChart />

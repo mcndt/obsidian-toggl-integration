@@ -17,7 +17,7 @@ export default class MyPlugin extends Plugin {
 	public reportView: TogglReportView;
 
 	async onload() {
-		console.log('loading plugin');
+		console.log(`Loading obsidian-toggl-integration ${this.manifest.version}`);
 
 		await this.loadSettings();
 

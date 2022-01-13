@@ -1,9 +1,10 @@
 <script lang="ts">
 	import type { Report, Summary } from 'lib/model/Report';
+	import millisecondsToTimeString from 'lib/util/millisecondsToTimeString';
 	import { dailySummary } from 'lib/util/stores';
 	import { onDestroy } from 'svelte';
 
-	let list: { color: string; percentage: number }[];
+	let list: { color: string; percentage: number; text: string }[];
 
 	const computeList = (r: Report<Summary>) => {
 		if (r == null) {
@@ -15,7 +16,10 @@
 		let tmp_list = r.data.map((d) => ({
 			color: d.id != null ? d.title.hex_color : 'var(--text-muted)',
 			// min width = 5% (before rescaling)
-			percentage: Math.max((d.time / total) * 100, 5)
+			percentage: Math.max((d.time / total) * 100, 5),
+			text: `${
+				d.title.project ? d.title.project : '(No project)'
+			} (${millisecondsToTimeString(d.time)})`
 		}));
 
 		// Rescale the widths if necessary
@@ -40,6 +44,7 @@
 			<div
 				class="bar-chart-element"
 				style="background-color: {e.color}; width: {e.percentage}%"
+				aria-label={e.text}
 			/>
 		{/each}
 	</div>
