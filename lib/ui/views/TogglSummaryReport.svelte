@@ -41,10 +41,12 @@
 	function getPieData(summary: Report<Summary>): ChartData[] {
 		return summary.data.map((s: Summary): ChartData => {
 			return {
-				name: s.title.project,
+				name: s.title.project || '(No project)',
 				value: s.time,
-				hex: s.title.hex_color,
-				displayValue: `${s.title.project} (${millisecondsToTimeString(s.time)})`
+				hex: s.title.hex_color || 'var(--text-muted)',
+				displayValue: `${
+					s.title.project || '(No project)'
+				} (${millisecondsToTimeString(s.time)})`
 			};
 		});
 	}

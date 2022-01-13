@@ -4,9 +4,13 @@
 
 ### ✨ Features
 
-- The daily total time in the sidebar will update in real time when a time entry is active. (If you find this distracting, it can be disabled in the settings.)
+- The daily total time in the sidebar will update in real time when a time entry is active. (If you find this distracting, it can be disabled in the settings.) (issue #28)
 - Hovering over the sidebar bar chart will now show the project name and total duration in a tooltip.
 
+### 🐛 Fixes
+
+- Fixed summary report pie chart showing a black segment for time entries with no assigned project. (issue #53)
+ 
 ## [0.5.1] 
 
 ### ✨ Features
