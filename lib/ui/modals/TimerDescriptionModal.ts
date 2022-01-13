@@ -24,7 +24,6 @@ export class TimerDescriptionModal extends Modal {
 				value: '',
 				existingTags: plugin.toggl.cachedTags.map((tag) => tag.name),
 				onSubmit: (input: { description: string; tags: string[] }) => {
-					console.log(input);
 					this.resolve({
 						description: input.description,
 						pid: null,

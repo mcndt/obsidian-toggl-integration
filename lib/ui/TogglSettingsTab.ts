@@ -1,6 +1,5 @@
 import type MyPlugin from 'main';
 import type { TogglWorkspace } from '../model/TogglWorkspace';
-import { DEFAULT_SETTINGS } from '../config/DefaultSettings';
 import {
 	App,
 	ButtonComponent,
@@ -31,6 +30,7 @@ export default class TogglSettingsTab extends PluginSettingTab {
 		this.addApiTokenSetting(containerEl);
 		this.addTestConnectionSetting(containerEl);
 		this.addWorkspaceSetting(containerEl);
+		this.addUpdateRealTimeSetting(containerEl);
 	}
 
 	private addApiTokenSetting(containerEl: HTMLElement) {
@@ -83,6 +83,23 @@ export default class TogglSettingsTab extends PluginSettingTab {
 				});
 				this.workspaceDropdown = dropdown;
 				await this.fetchWorkspaces();
+			});
+	}
+
+	private addUpdateRealTimeSetting(containerEl: HTMLElement) {
+		new Setting(containerEl)
+			.setName('Real time daily total')
+			.setDesc(
+				'Update the daily total time in the sidebar ' +
+					'every second when a timer is running.'
+			)
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settings.updateInRealTime || false)
+					.onChange(async (value) => {
+						this.plugin.settings.updateInRealTime = value;
+						await this.plugin.saveSettings();
+					});
 			});
 	}
 
