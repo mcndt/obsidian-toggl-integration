@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { group } from 'console';
+
 	import type { Detailed, Report } from 'lib/model/Report';
 	import { GroupBy, Query, SortOrder } from 'lib/reports/ReportQuery';
 	import moment from 'moment';
@@ -59,6 +61,22 @@
 			} else {
 				sortDateGroups(returnData, query.sort);
 			}
+		}
+
+		// Sort group content chronologically
+		if (
+			query.groupBy &&
+			query.groupBy === GroupBy.DATE &&
+			query.sort &&
+			query.sort === SortOrder.DESC
+		) {
+			returnData.forEach((group) =>
+				group.data.sort((a, b) => b.order - a.order)
+			);
+		} else {
+			returnData.forEach((group) =>
+				group.data.sort((a, b) => a.order - b.order)
+			);
 		}
 
 		return returnData;
@@ -122,7 +140,8 @@
 				name: d.description,
 				totalTime: d.dur,
 				count: 1,
-				hex: entryColor ? d.project_hex_color : null
+				hex: entryColor ? d.project_hex_color : null,
+				order: moment(d.start).unix()
 			});
 			group.totalTime += d.dur;
 		}
@@ -157,7 +176,8 @@
 				name: d.description,
 				totalTime: d.dur,
 				count: 1,
-				hex: d.project_hex_color
+				hex: d.project_hex_color,
+				order: moment(d.start).unix()
 			});
 			group.totalTime += d.dur;
 		}

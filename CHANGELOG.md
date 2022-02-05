@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1]
+
+### 🐛 Fixes
+
+- Entries in a list report group are now ordered by entry start time (issue #55)
+- `SORT DESC` now sorts entries inside list report groups in order of descending starting time (issue #55)
+
 ## [0.6.0]
 
 ### ✨ Features
