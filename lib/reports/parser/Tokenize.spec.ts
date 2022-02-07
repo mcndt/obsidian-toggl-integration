@@ -47,6 +47,10 @@ describe('Tokenization', () => {
 		expect(tokenize(`10`)).toEqual([10]);
 	});
 
+	test('Tags', () => {
+		expect(tokenize(`#TAG`)).toEqual(['tag']);
+	});
+
 	it('fails on unknown keywords', () => {
 		expect(() => tokenize(`unknown_token`)).toThrowError(/is not a keyword/g);
 	});

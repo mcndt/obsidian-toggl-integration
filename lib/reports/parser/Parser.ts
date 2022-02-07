@@ -24,6 +24,7 @@ export enum Keyword {
 	EXCLUDE = 'EXCLUDE',
 	PROJECTS = 'PROJECTS',
 	CLIENTS = 'CLIENTS',
+	TAGS = 'TAGS',
 
 	// Group lists by
 	GROUP = 'GROUP',

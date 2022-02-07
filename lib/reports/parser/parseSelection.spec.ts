@@ -1,4 +1,10 @@
-import { Query, QueryType, SelectionMode, Selection } from '../ReportQuery';
+import {
+	Query,
+	QueryType,
+	SelectionMode,
+	Selection,
+	tag
+} from '../ReportQuery';
 import { Keyword, Token } from './Parser';
 import { SelectionParser } from './parseSelection';
 
@@ -57,6 +63,24 @@ describe('parseSelection', () => {
 				mode: SelectionMode.EXCLUDE,
 				list: ['client A', 'client B']
 			},
+			remaining: []
+		});
+	});
+
+	test('"INCLUDE TAGS" adds includedTags array to query object', () => {
+		testParseSelection({
+			input: [Keyword.INCLUDE, Keyword.TAGS, 'tag1', 'tag2'],
+			query: test_query,
+			includedTags: ['tag1', 'tag2'],
+			remaining: []
+		});
+	});
+
+	test('"EXCLUDE TAGS" adds excludedTags array to query object', () => {
+		testParseSelection({
+			input: [Keyword.EXCLUDE, Keyword.TAGS, 'tag1', 'tag2'],
+			query: test_query,
+			excludedTags: ['tag1', 'tag2'],
 			remaining: []
 		});
 	});
@@ -146,6 +170,30 @@ describe('parseSelection', () => {
 		);
 	});
 
+	it('fails on pre-existing included tags', () => {
+		test_query.includedTags = ['tag1', 'tag2'];
+		testParseSelection(
+			{
+				input: [Keyword.INCLUDE, Keyword.TAGS, 'tag1'],
+				query: test_query,
+				remaining: null
+			},
+			/A query can only contain one "INCLUDE" expression for "TAGS"/g
+		);
+	});
+
+	it('fails on pre-existing exclude tags', () => {
+		test_query.excludedTags = ['tag1', 'tag2'];
+		testParseSelection(
+			{
+				input: [Keyword.EXCLUDE, Keyword.TAGS, 'tag1'],
+				query: test_query,
+				remaining: null
+			},
+			/A query can only contain one "EXCLUDE" expression for "TAGS"/g
+		);
+	});
+
 	it('fails on client filtering using numeric ID', () => {
 		testParseSelection(
 			{
@@ -170,6 +218,8 @@ interface SelectionTestParams {
 		mode: SelectionMode;
 		list: (string | number)[];
 	};
+	includedTags?: tag[];
+	excludedTags?: tag[];
 }
 
 function testParseSelection(
@@ -193,6 +243,18 @@ function testParseSelection(
 				mode: params.clients.mode,
 				list: params.clients.list
 			});
+		}
+		if (params.includedTags) {
+			expect(params.query.includedTags).toEqual(expect.anything());
+			expect(params.query.includedTags).toMatchObject<tag[]>(
+				params.includedTags
+			);
+		}
+		if (params.excludedTags) {
+			expect(params.query.excludedTags).toEqual(expect.anything());
+			expect(params.query.excludedTags).toMatchObject<tag[]>(
+				params.excludedTags
+			);
 		}
 	} else {
 		expect(() => parser.parse(params.input, params.query)).toThrowError(

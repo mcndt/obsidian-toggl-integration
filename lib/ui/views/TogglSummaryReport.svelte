@@ -15,10 +15,10 @@
 	const BREAKPOINT = 500;
 
 	export let query: Query;
-	export let summary: Report<Summary>;
 	export let detailed: Report<Detailed>;
 	export let title: string = 'No title';
 
+	let _summary: Report<Summary>;
 	let _width: number;
 	let _barWidth: number;
 	let _barData: ChartData[];
@@ -28,14 +28,47 @@
 
 	$: {
 		try {
-			_pieData = getPieData(summary);
+			_summary = reduceSummary(detailed);
+			_pieData = getPieData(_summary);
 			_barData = getBarData(detailed, query);
-			_listData = getListData(summary);
+			_listData = getListData(_summary);
 			_barWidth = computeBarWidth(_width);
 		} catch (err) {
 			_error = err.stack;
 			console.error(err);
 		}
+	}
+
+	/**
+	 * Reduces a detailed report to a summary report.
+	 * @param detailed
+	 */
+	function reduceSummary(detailed: Report<Detailed>): Report<Summary> {
+		const summaryMap = new Map<number, Summary>();
+		let totalGrand = 0;
+
+		detailed.data.forEach((entry) => {
+			totalGrand += entry.dur;
+			if (summaryMap.has(entry.pid)) {
+				const mapEntry = summaryMap.get(entry.pid);
+				mapEntry.time += entry.dur;
+			} else {
+				summaryMap.set(entry.pid, {
+					id: entry.pid,
+					title: {
+						project: entry.project,
+						hex_color: entry.project_hex_color,
+						client: entry.client
+					},
+					time: entry.dur
+				});
+			}
+		});
+
+		return {
+			total_grand: totalGrand,
+			data: Array.from(summaryMap.values())
+		};
 	}
 
 	function getPieData(summary: Report<Summary>): ChartData[] {
@@ -181,7 +214,7 @@
 
 <ReportBlockHeader
 	{title}
-	totalTime={millisecondsToTimeString(summary.total_grand)}
+	totalTime={millisecondsToTimeString(_summary.total_grand)}
 />
 
 <div

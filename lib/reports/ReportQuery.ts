@@ -1,4 +1,5 @@
 export type ISODate = string;
+export type tag = string;
 
 export enum QueryType {
 	SUMMARY = 'SUMMARY',
@@ -18,6 +19,10 @@ export interface Query {
 	projectSelection?: Selection;
 	/** Optional, list of Toggl client IDs or names to include/exclude. */
 	clientSelection?: Selection;
+	/** Optional, tags to include in the report. */
+	includedTags?: tag[];
+	/** Optional, tags to exclude in the report. */
+	excludedTags?: tag[];
 	/** Optional, indicates a sort order for rendered results. */
 	sort?: SortOrder;
 	/** Optional, indicates a grouping for list reports. */

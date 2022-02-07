@@ -1,7 +1,12 @@
 <script lang="ts">
 	import type { Detailed, Report, Summary } from 'lib/model/Report';
 	import { parse } from 'lib/reports/parser/Parse';
-	import { Query, QueryType, SelectionMode } from 'lib/reports/ReportQuery';
+	import {
+		Query,
+		QueryType,
+		SelectionMode,
+		tag
+	} from 'lib/reports/ReportQuery';
 	import { togglStore } from 'lib/util/stores';
 	import { onMount } from 'svelte';
 	import ParsingError from './ParsingError.svelte';
@@ -14,11 +19,9 @@
 
 	export let source: string;
 
-	let _width: number;
 	let _parseError: string;
 	let _apiError: string;
 	let _query: Query;
-	let _summaryReport: Report<Summary>;
 	let _detailedReport: Report<Detailed>;
 	let _title: string;
 	let _reportComponent: any;
@@ -26,16 +29,8 @@
 	let _ready = false;
 	let _error = false;
 
-	$: if (!_ready) {
-		if (_query) {
-			switch (_query.type) {
-				case QueryType.SUMMARY:
-					_ready = !!_summaryReport && !!_detailedReport;
-					break;
-				case QueryType.LIST:
-					_ready = !!_detailedReport;
-			}
-		}
+	$: if (_query && !_ready) {
+		_ready = !!_detailedReport;
 	}
 
 	$: _error = !!_apiError || !!_parseError;
@@ -50,15 +45,9 @@
 				.catch((err) => {
 					_apiError = err.message;
 				});
+
 			if (_query.type === QueryType.SUMMARY) {
 				_reportComponent = TogglSummaryReport;
-				getSummaryReport(_query)
-					.then(
-						(report) => (_summaryReport = filterSummaryReport(report, _query))
-					)
-					.catch((err) => {
-						_apiError = err.message;
-					});
 			} else if (_query.type === QueryType.LIST) {
 				_reportComponent = TogglListReport;
 			}
@@ -122,44 +111,29 @@
 				return include ? match : !match;
 			});
 		}
-		return report;
-	}
 
-	function filterSummaryReport(
-		report: Report<Summary>,
-		query: Query
-	): Report<Summary> {
-		// filter by project
-		if (query.projectSelection) {
-			const include = query.projectSelection.mode === SelectionMode.INCLUDE;
-			const list = query.projectSelection.list;
-			report.data = report.data.filter((d: Summary) => {
-				const match = list.includes(d.title.project) || list.includes(d.id);
-				return include ? match : !match;
+		// filter by tags
+		if (query.includedTags) {
+			report.data = report.data.filter((entry: Detailed) => {
+				return entry.tags.reduce((prev, curr) => {
+					return prev || query.includedTags.includes(curr);
+				}, false);
 			});
 		}
 
-		// filter by client
-		if (query.clientSelection) {
-			const include = query.clientSelection.mode === SelectionMode.INCLUDE;
-			const list = query.clientSelection.list;
-			report.data = report.data.filter((d: Summary) => {
-				const match = list.includes(d.title.client);
-				return include ? match : !match;
+		if (query.excludedTags) {
+			report.data = report.data.filter((entry: Detailed) => {
+				return entry.tags.reduce((prev, curr) => {
+					return prev && !query.excludedTags.includes(curr);
+				}, true);
 			});
 		}
-
-		// calculate new total time
-		report.total_grand = report.data.reduce(
-			(prev, curr) => prev + curr.time,
-			0
-		);
 
 		return report;
 	}
 </script>
 
-<div class="my-5" bind:clientWidth={_width}>
+<div class="my-5">
 	{#if _parseError}
 		<ParsingError query={source} message={_parseError} />
 	{/if}
@@ -172,7 +146,6 @@
 		<svelte:component
 			this={_reportComponent}
 			title={_title}
-			summary={_summaryReport}
 			detailed={_detailedReport}
 			query={_query}
 		/>

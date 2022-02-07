@@ -5,6 +5,14 @@
 ### ✨ Features
 
 - Entries in a list report now show applied tags. Entries will only stack if their tags are the same. (issue #44)
+- Added support for filtering reports by tags via `{INCLUDE|EXCLUDE} TAGS #tag1[, #tag2, ...]`
+- Reports can be filtered
+
+See the [documentation](https://github.com/mcndt/obsidian-toggl-integration/wiki/Toggl-Query-Language-(TQL)-Reference#filtering-tags) on how to use tag filters.
+
+### ⚙️ Internal
+
+- Summary reports now only request a detailed report from the Toggl API instead of a summary report and a detailed report, resulting in faster load times for small reports.
 
 ## [0.6.1]
 
