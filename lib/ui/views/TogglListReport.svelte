@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { group } from 'console';
-
 	import type { Detailed, Report } from 'lib/model/Report';
 	import { GroupBy, Query, SortOrder } from 'lib/reports/ReportQuery';
 	import moment from 'moment';
@@ -39,20 +37,19 @@
 			if (query.groupBy === GroupBy.PROJECT) {
 				returnData = groupByAttribute(
 					report,
-					query,
 					'project',
 					false,
 					'project_hex_color'
 				);
 			} else if (query.groupBy === GroupBy.CLIENT) {
-				returnData = groupByAttribute(report, query, 'client', true);
+				returnData = groupByAttribute(report, 'client', true);
 			}
 		} else {
 			returnData = groupByDate(report, query);
 		}
 
 		// Stack duplicated entries
-		returnData = stackGroupItems(returnData);
+		returnData.forEach(stackGroupItems);
 
 		// Sort, if requested
 		if (query.sort) {
@@ -83,39 +80,49 @@
 	}
 
 	function sanitizeData(report: Report<Detailed>): Report<Detailed> {
-		for (const d of report.data) {
+		for (const entry of report.data) {
 			// sanitize Markdown links
-			const match = d.description.match(/\[([^\[]+)\](\(.*\))/gm);
+			const match = entry.description.match(/\[([^\[]+)\](\(.*\))/gm);
 			if (match) {
-				const linkText = /\[([^\[]+)\](\(.*\))/.exec(d.description)[1];
-				d.description = linkText.trim().length > 0 ? linkText : '(Empty link)';
+				const linkText = /\[([^\[]+)\](\(.*\))/.exec(entry.description)[1];
+				entry.description =
+					linkText.trim().length > 0 ? linkText : '(Empty link)';
+			}
+
+			// sort tags canonically
+			if (entry.tags) {
+				entry.tags.sort();
 			}
 		}
 		return report;
 	}
 
-	function stackGroupItems(
-		groups: ReportListGroupData[]
-	): ReportListGroupData[] {
-		for (const group of groups) {
-			const itemMap: Map<string, ReportListItem> = new Map();
-			for (const d of group.data) {
-				if (itemMap.has(d.name)) {
-					const item = itemMap.get(d.name);
-					item.totalTime += d.totalTime;
-					item.count += 1;
-				} else {
-					itemMap.set(d.name, d);
-				}
+	/**
+	 * Stacks groups entries based on equality conditions. Two entries are equal
+	 * <=> (i) the entry name is the same; (ii) the entry tags are the same.
+	 * @param group the group
+	 */
+	function stackGroupItems(group: ReportListGroupData) {
+		const getItemId = (item: ReportListItem) => {
+			return `${item.name}${item.tags.join()}`;
+		};
+
+		const itemMap: Map<string, ReportListItem> = new Map();
+		for (const entry of group.data) {
+			const mapId = getItemId(entry);
+			if (itemMap.has(mapId)) {
+				const item = itemMap.get(mapId);
+				item.totalTime += entry.totalTime;
+				item.count += 1;
+			} else {
+				itemMap.set(mapId, entry);
 			}
-			group.data = Array.from(itemMap.values());
 		}
-		return groups;
+		group.data = Array.from(itemMap.values());
 	}
 
 	function groupByAttribute(
 		report: Report<Detailed>,
-		query: Query,
 		nameAttr: 'project' | 'client',
 		entryColor: boolean = false,
 		groupColorAttr: 'project_hex_color' = null
@@ -141,7 +148,8 @@
 				totalTime: d.dur,
 				count: 1,
 				hex: entryColor ? d.project_hex_color : null,
-				order: moment(d.start).unix()
+				order: moment(d.start).unix(),
+				tags: d.tags
 			});
 			group.totalTime += d.dur;
 		}
@@ -177,7 +185,8 @@
 				totalTime: d.dur,
 				count: 1,
 				hex: d.project_hex_color,
-				order: moment(d.start).unix()
+				order: moment(d.start).unix(),
+				tags: d.tags
 			});
 			group.totalTime += d.dur;
 		}
@@ -203,8 +212,6 @@
 		});
 	}
 </script>
-
-<!-- <ReportBlockHeader title="list" totalTime="0:00:00" /> -->
 
 {#if _error}
 	<JsError message={_error} />

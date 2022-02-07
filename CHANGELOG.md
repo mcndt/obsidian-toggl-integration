@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.7.0]
+
+### ✨ Features
+
+- Entries in a list report now show applied tags. Entries will only stack if their tags are the same. (issue #44)
+
 ## [0.6.1]
 
 ### 🐛 Fixes

@@ -12,6 +12,7 @@ export interface ReportListItem {
 	count?: number;
 	/** Defines the ordering in the group. (e.g. derive from time) */
 	order?: number;
+	tags?: string[];
 }
 
 export interface ProjectSummaryItem {
