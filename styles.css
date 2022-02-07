@@ -308,6 +308,18 @@ https://github.com/jgthms/bulma/ under MIT License
 	flex-shrink: 5 !important;
 }
 
+.is-flex-wrap-nowrap {
+	flex-wrap: nowrap !important;
+}
+
+.is-flex-wrap-wrap {
+	flex-wrap: wrap !important;
+}
+
+.is-flex-wrap-wrap-reverse {
+	flex-wrap: wrap-reverse !important;
+}
+
 /* MARGINS */
 
 .m-0 {

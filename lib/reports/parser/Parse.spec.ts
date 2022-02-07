@@ -259,6 +259,40 @@ describe('parse', () => {
 			} as Query
 		});
 	});
+
+	test('TC-07a (Include tags)', () => {
+		testParse({
+			queryString: `LIST PAST 10 DAYS INCLUDE TAGS #tag1 #tag2`,
+			expected: {
+				from: '2020-01-22',
+				to: '2020-01-31',
+				includedTags: ['tag1', 'tag2']
+			} as Query
+		});
+	});
+
+	test('TC-07b (Exclude tags)', () => {
+		testParse({
+			queryString: `LIST PAST 10 DAYS EXCLUDE TAGS #tag1 #tag2`,
+			expected: {
+				from: '2020-01-22',
+				to: '2020-01-31',
+				excludedTags: ['tag1', 'tag2']
+			} as Query
+		});
+	});
+
+	test('TC-07c (Include and exclude tags)', () => {
+		testParse({
+			queryString: `LIST PAST 10 DAYS EXCLUDE TAGS #tag1 #tag2 INCLUDE TAGS #billed`,
+			expected: {
+				from: '2020-01-22',
+				to: '2020-01-31',
+				includedTags: ['billed'],
+				excludedTags: ['tag1', 'tag2']
+			} as Query
+		});
+	});
 });
 
 interface ParseTestParams {

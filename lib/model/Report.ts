@@ -61,10 +61,16 @@ export interface Detailed {
  */
 export interface Summary {
 	id?: number;
-	title: any;
+	title: SummaryTitle;
 	time: number;
-	total_currencies: TotalCurrency[];
-	items: any[];
+	total_currencies?: TotalCurrency[];
+	items?: any[];
+}
+
+export interface SummaryTitle {
+	project: string;
+	hex_color: string;
+	client: string;
 }
 
 export interface TotalCurrency {

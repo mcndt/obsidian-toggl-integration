@@ -1,4 +1,4 @@
-import { Query, SelectionMode } from '../ReportQuery';
+import { Query, SelectionMode, tag } from '../ReportQuery';
 import parseList from './parseList';
 import {
 	InvalidTokenError,
@@ -12,7 +12,8 @@ import {
 export class SelectionParser extends Parser {
 	private static readonly _acceptedQualifiers: Token[] = [
 		Keyword.PROJECTS,
-		Keyword.CLIENTS
+		Keyword.CLIENTS,
+		Keyword.TAGS
 	];
 
 	/**
@@ -56,6 +57,19 @@ export class SelectionParser extends Parser {
 			throw new DuplicateSelectionExpression(qualifier);
 		}
 
+		// Check for duplicate tag filter
+		const duplicateIncludedTags =
+			qualifier === Keyword.TAGS &&
+			mode === SelectionMode.INCLUDE &&
+			query.includedTags;
+		const duplicateExcludedTags =
+			qualifier === Keyword.TAGS &&
+			mode === SelectionMode.EXCLUDE &&
+			query.excludedTags;
+		if (duplicateIncludedTags || duplicateExcludedTags) {
+			throw new DuplicateTagFilter(tokens[0] as Keyword, qualifier);
+		}
+
 		// Get selection list
 		let list: UserInput[];
 		try {
@@ -76,6 +90,13 @@ export class SelectionParser extends Parser {
 					);
 				}
 				query.clientSelection = { mode, list };
+				break;
+			case Keyword.TAGS:
+				if (mode === SelectionMode.INCLUDE) {
+					query.includedTags = list as tag[];
+				} else if (mode === SelectionMode.EXCLUDE) {
+					query.excludedTags = list as tag[];
+				}
 				break;
 		}
 
@@ -101,6 +122,14 @@ class DuplicateSelectionExpression extends QueryParseError {
 	constructor(qualifier: Keyword) {
 		super(
 			`A query can only contain a single selection expression for keyword "${qualifier}"`
+		);
+	}
+}
+
+class DuplicateTagFilter extends QueryParseError {
+	constructor(selectionMode: Keyword, qualifier: Keyword) {
+		super(
+			`A query can only contain one "${selectionMode}" expression for "${qualifier}".`
 		);
 	}
 }
