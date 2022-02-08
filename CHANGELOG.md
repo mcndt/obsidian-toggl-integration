@@ -2,6 +2,10 @@
 
 ## [0.7.1] 
 
+### ✨ Features
+
+- When hovering over the project color circle of a list report row, it shows a tooltip with the project name.
+
 ### 🐛 Fixes
 
 - Fixed extra vertical whitespace appearing when a report block is rendered in preview mode.

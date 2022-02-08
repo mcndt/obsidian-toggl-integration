@@ -149,7 +149,8 @@
 				count: 1,
 				hex: entryColor ? d.project_hex_color : null,
 				order: moment(d.start).unix(),
-				tags: d.tags
+				tags: d.tags,
+				project: d.project
 			});
 			group.totalTime += d.dur;
 		}
@@ -186,7 +187,8 @@
 				count: 1,
 				hex: d.project_hex_color,
 				order: moment(d.start).unix(),
-				tags: d.tags
+				tags: d.tags,
+				project: d.project
 			});
 			group.totalTime += d.dur;
 		}

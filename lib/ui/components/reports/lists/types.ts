@@ -13,6 +13,7 @@ export interface ReportListItem {
 	/** Defines the ordering in the group. (e.g. derive from time) */
 	order?: number;
 	tags?: string[];
+	project?: string;
 }
 
 export interface ProjectSummaryItem {

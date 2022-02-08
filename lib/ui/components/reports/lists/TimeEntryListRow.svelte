@@ -10,9 +10,11 @@
 	<div
 		class="is-flex is-align-items-center group-item-description is-flex-wrap-wrap"
 	>
-		{#if data.hex}
-			<div class="project-circle mr-2" style="background-color:{data.hex}" />
-		{/if}
+		<div
+			aria-label={data.project || 'No project'}
+			class="project-circle mr-2"
+			style="background-color:{data.hex || 'var(--text-muted)'}"
+		/>
 		{#if data.count && data.count != 1}
 			<div
 				class="group-item-count mr-2 is-flex is-align-items-center is-justify-content-center"
