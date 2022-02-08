@@ -4,17 +4,20 @@
 	import TimerTag from '../../current_timer/TimerTag.svelte';
 
 	export let data: ReportListItem;
+	export let showProject: boolean;
 </script>
 
 <div class="group-item mb-2 is-flex is-justify-content-space-between">
 	<div
 		class="is-flex is-align-items-center group-item-description is-flex-wrap-wrap"
 	>
-		<div
-			aria-label={data.project || 'No project'}
-			class="project-circle mr-2"
-			style="background-color:{data.hex || 'var(--text-muted)'}"
-		/>
+		{#if showProject}
+			<div
+				aria-label={data.project || 'No project'}
+				class="project-circle mr-2"
+				style="background-color:{data.hex || 'var(--text-muted)'}"
+			/>
+		{/if}
 		{#if data.count && data.count != 1}
 			<div
 				class="group-item-count mr-2 is-flex is-align-items-center is-justify-content-center"

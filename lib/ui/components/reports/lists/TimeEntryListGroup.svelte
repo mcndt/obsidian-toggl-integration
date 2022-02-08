@@ -23,7 +23,7 @@
 	</div>
 	<div class="group-items">
 		{#each data as row}
-			<TimeEntryListRow data={row} />
+			<TimeEntryListRow data={row} showProject={!hex} />
 		{/each}
 	</div>
 </div>
