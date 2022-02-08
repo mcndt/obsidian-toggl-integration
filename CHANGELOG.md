@@ -9,6 +9,7 @@
 ### 🐛 Fixes
 
 - Fixed extra vertical whitespace appearing when a report block is rendered in preview mode.
+- Filtering by tags is now properly case insensitive.
 
 ## [0.7.0]
 

@@ -116,7 +116,7 @@
 		if (query.includedTags) {
 			report.data = report.data.filter((entry: Detailed) => {
 				return entry.tags.reduce((prev, curr) => {
-					return prev || query.includedTags.includes(curr);
+					return prev || query.includedTags.includes(curr.toLowerCase());
 				}, false);
 			});
 		}
@@ -124,7 +124,7 @@
 		if (query.excludedTags) {
 			report.data = report.data.filter((entry: Detailed) => {
 				return entry.tags.reduce((prev, curr) => {
-					return prev && !query.excludedTags.includes(curr);
+					return prev && !query.excludedTags.includes(curr.toLowerCase());
 				}, true);
 			});
 		}
