@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.7.1] 
+
+### 🐛 Fixes
+
+- Fixed extra vertical whitespace appearing when a report block is rendered in preview mode.
+
 ## [0.7.0]
 
 ### ✨ Features

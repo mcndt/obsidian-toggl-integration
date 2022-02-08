@@ -133,7 +133,7 @@
 	}
 </script>
 
-<div class="my-5">
+<div class="container my-5">
 	{#if _parseError}
 		<ParsingError query={source} message={_parseError} />
 	{/if}
@@ -162,4 +162,7 @@
 </div>
 
 <style>
+	.container {
+		white-space: normal;
+	}
 </style>
