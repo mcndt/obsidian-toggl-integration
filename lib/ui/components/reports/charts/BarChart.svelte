@@ -192,9 +192,4 @@
 	};
 </script>
 
-<main class="is-flex-grow-2">
-	<div bind:this={_el} />
-</main>
-
-<style>
-</style>
+<div class="is-flex-grow-2" bind:this={_el} />

@@ -11,19 +11,17 @@
 	});
 </script>
 
-<main>
-	<div class="is-flex is-align-items-center">
-		<span
-			id="icon"
-			class="mr-1 is-flex is-flex-direction-column is-justify-content-center"
-			bind:this={iconElement}
-		/>
-		<span>{name}</span>
-	</div>
-</main>
+<div class="is-flex is-align-items-center">
+	<span
+		id="icon"
+		class="mr-1 is-flex is-flex-direction-column is-justify-content-center"
+		bind:this={iconElement}
+	/>
+	<span>{name}</span>
+</div>
 
 <style>
-	main span {
+	span {
 		color: var(--text-muted);
 		font-size: 0.8em;
 	}

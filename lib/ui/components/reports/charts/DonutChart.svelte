@@ -52,8 +52,6 @@
 				})`
 			);
 
-		const color = d3.scaleOrdinal(data);
-
 		const arcs = d3.pie()(data.map((d) => d.value));
 
 		const pieChart = svg
@@ -91,10 +89,4 @@
 	};
 </script>
 
-<main>
-	<div bind:this={_el} />
-</main>
-
-<style>
-	/* your styles go here */
-</style>
+<div bind:this={_el} />
