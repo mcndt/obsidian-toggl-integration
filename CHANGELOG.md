@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.7.2]
+
+### ⚙️ Internal
+
+- When installed on API version 0.13.25 or higher, the plugin now uses Obsidian's own `requestUrl` API instead of the third-party dependency `got`. This lays the foundation for supporting Mobile platforms in the future.
+
 ## [0.7.1] 
 
 ### ✨ Features
