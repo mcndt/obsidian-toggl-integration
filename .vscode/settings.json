@@ -13,6 +13,7 @@
    80
 ],
 "conventionalCommits.scopes": [
-   "reports"
+   "reports",
+   "api"
 ]
 }

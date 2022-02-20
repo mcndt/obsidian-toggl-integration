@@ -41,6 +41,6 @@
 		"moment": "^2.29.1",
 		"supports-color": "^9.0.2",
 		"svelte-select": "^4.4.3",
-		"toggl-client": "git://github.com/mcndt/toggl-client.git"
+		"toggl-client": "git://github.com/mcndt/toggl-client.git#obsidian-request-api"
 	}
 }
