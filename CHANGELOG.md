@@ -5,6 +5,7 @@
 ### 🐛 Fixes
 
 - Fix timers having "Unknown project" on opening Obsidian (issue #32)
+- Fixed the start/stop button accent color to be more accessible on Minimal Theme (issue #67)
 
 ## [0.7.1] 
 

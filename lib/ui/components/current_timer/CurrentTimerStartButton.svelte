@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { ApiStatus } from 'lib/toggl/TogglManager';
-	import { apiStatusStore, togglStore } from 'lib/util/stores';
+	import { togglStore } from 'lib/util/stores';
 
 	export let buttonSize = 36;
 
@@ -30,11 +29,11 @@
 <style>
 	.timer-start-button {
 		--button-fill-outer: var(--interactive-accent);
-		--button-fill-inner: var(--interactive-normal);
+		--button-fill-inner: var(--background-primary);
 	}
 
 	.timer-start-button:hover {
 		--button-fill-outer: var(--interactive-accent-hover);
-		--button-fill-inner: var(--interactive-hover);
+		--button-fill-inner: var(--background-secondary);
 	}
 </style>
