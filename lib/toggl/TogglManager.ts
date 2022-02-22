@@ -92,6 +92,21 @@ export default class TogglManager {
 	private async _preloadWorkspaceData() {
 		this._apiManager.getProjects().then((response: Project[]) => {
 			this._projects = response;
+
+			// Update the current timer if it was fetched before the preload finished.
+			currentTimer.update((entry) => {
+				if (entry && entry.pid !== undefined) {
+					const project = response.find((p) => p.id === entry.pid);
+					return {
+						...entry,
+						project: project.name,
+						project_hex_color: project.hex_color
+					};
+				}
+				return entry;
+			});
+
+			// if there is already a timer running, add the project name.
 		});
 		this._apiManager.getTags().then((response: Tag[]) => {
 			this._tags = response;
@@ -142,7 +157,7 @@ export default class TogglManager {
 			if (new_timer == null) {
 				const project = await this._plugin.input.selectProject();
 				new_timer = await this._plugin.input.enterTimerDetails();
-				new_timer.pid = project != null ? parseInt(project.id) : null;
+				new_timer.pid = project != null ? project.id : null;
 			}
 
 			this._apiManager.startTimer(new_timer).then((t: TimeEntry) => {
@@ -415,7 +430,7 @@ export default class TogglManager {
 
 	// NOTE: relies on cached projects for project names
 	private responseToTimeEntry(response: any): TimeEntry {
-		let project = this.cachedProjects.find((p) => p.id == response.pid);
+		const project = this.cachedProjects.find((p) => p.id == response.pid);
 		return {
 			description: response.description,
 			pid: response.pid,

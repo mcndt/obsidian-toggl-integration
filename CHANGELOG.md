@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.7.2]
+
+### 🐛 Fixes
+
+- Fix timers having "Unknown project" on opening Obsidian (issue #32)
+
 ## [0.7.1] 
 
 ### ✨ Features

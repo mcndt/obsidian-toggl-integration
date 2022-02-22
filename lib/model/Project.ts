@@ -7,7 +7,7 @@ export interface Project {
 	/**
 	 * Project ID in Toggl API
 	 */
-	id: string;
+	id: number;
 
 	/**
 	 * Client ID for the project
