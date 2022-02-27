@@ -8,6 +8,8 @@ import type { ISODate } from 'lib/reports/ReportQuery';
 import { settingsStore } from 'lib/util/stores';
 import moment from 'moment';
 import TogglClient from 'toggl-client';
+import { apiVersion } from 'obsidian';
+import { checkVersion } from 'lib/util/checkVersion';
 
 /** http headers used on every call to the Toggl API. */
 const headers = {
@@ -26,7 +28,11 @@ export default class ApiManager {
 
 	/** Must be called after constructor and before use of the API. */
 	public async initialize(apiToken: string) {
-		this._api = TogglClient({ apiToken, headers });
+		this._api = TogglClient({
+			apiToken,
+			headers,
+			legacy: !checkVersion(apiVersion, 0, 13, 25)
+		});
 		try {
 			await this.testConnection();
 		} catch {
