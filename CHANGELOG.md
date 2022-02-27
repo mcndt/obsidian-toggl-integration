@@ -1,10 +1,17 @@
 # Changelog
 
-## [0.7.2]
+## [0.7.3]
 
 ### ⚙️ Internal
 
 - When installed on API version 0.13.25 or higher, the plugin now uses Obsidian's own `requestUrl` API instead of the third-party dependency `got`. This lays the foundation for supporting Mobile platforms in the future.
+
+## [0.7.2]
+
+### 🐛 Fixes
+
+- Fix timers having "Unknown project" on opening Obsidian (issue #32)
+- Fixed the start/stop button accent color to be more accessible on Minimal Theme (issue #67)
 
 ## [0.7.1] 
 
