@@ -16,6 +16,7 @@ import { ACTIVE_TIMER_POLLING_INTERVAL } from 'lib/constants';
 import type { Tag } from 'lib/model/Tag';
 import ApiManager from './ApiManager';
 import type { Query } from 'lib/reports/ReportQuery';
+import ReportCache from './TogglCache';
 
 export enum ApiStatus {
 	AVAILABLE,
@@ -30,6 +31,7 @@ export default class TogglManager {
 	// TODO: rewrite toggl API client with Obsidian Request API
 	// private _api: any;
 	private _apiManager: ApiManager;
+	private _reportCache = new ReportCache();
 
 	// UI references
 	private _statusBarItem: HTMLElement;
@@ -315,22 +317,6 @@ export default class TogglManager {
 	}
 
 	/**
-	 * Fullfills a query for Toggl Track reports and returns the report object.
-	 */
-	// TODO: these generics are awful...
-	// public async getReport(query: Query): Promise<{summary: Report<Summary>, detailed: Report<Detailed>}> {
-	// 	if (query.type === QueryType.SUMMARY) {
-	// 		return this._apiManager.getSummary(query.from, query.to);
-	// 	} else if (query.type === QueryType.LIST) {
-	// 		throw new Error('List queries are not yet implemented.');
-	// 	} else {
-	// 		throw new Error(
-	// 			`There is no query implementation for type ${query.type}.`
-	// 		);
-	// 	}
-	// }
-
-	/**
 	 * Gets a Toggl Summary report based on the query parameter.
 	 * @param query query to be fullfilled.
 	 * @returns Summary report returned by Toggl API.
@@ -347,6 +333,39 @@ export default class TogglManager {
 	 * @returns Summary report returned by Toggl API.
 	 */
 	public async GetDetailedReport(query: Query): Promise<Report<Detailed>> {
+		// First check the cache.
+		const { report, missing } = this._reportCache.get(query.from, query.to);
+		const reports = [report];
+
+		// Fetch from Toggl API for each missing range and add to cache.
+		for (const { from, to } of missing) {
+			const missingReport = await this._fetchDetailedReport({
+				...query,
+				from,
+				to
+			});
+			this._reportCache.put(from, to, missingReport.data);
+			reports.push(missingReport);
+		}
+
+		// Reduce into one report.
+		const completeReport = reduceReports(reports);
+
+		// Sometimes the Toggl API returns duplicate entries,
+		// need to deduplicate by entry id
+		completeReport.data = completeReport.data.filter(
+			(el, index, self) => index === self.findIndex((el2) => el2.id === el.id)
+		);
+
+		// Sort the results
+		completeReport.data.sort((a, b) =>
+			a.start < b.start ? -1 : a.start > b.start ? 1 : 0
+		);
+
+		return completeReport;
+	}
+
+	private async _fetchDetailedReport(query: Query): Promise<Report<Detailed>> {
 		const page0 = await this._apiManager.getDetailedReport(
 			query.from,
 			query.to,
@@ -358,7 +377,7 @@ export default class TogglManager {
 		}
 
 		const nPages = Math.ceil(page0.total_count / page0.per_page);
-		let pages: Report<Detailed>[];
+		let pages: Report<Detailed>[] = [page0];
 
 		if (nPages <= 8) {
 			console.debug(`Requesting ${nPages} time entry pages in parallel mode.`);
@@ -368,14 +387,13 @@ export default class TogglManager {
 					this._apiManager.getDetailedReport(query.from, query.to, i)
 				);
 			}
-			pages = await Promise.all(promises);
+			pages.push(...(await Promise.all(promises)));
 		} else {
 			console.debug(`Requesting ${nPages} time entry pages in batch mode.`);
 			// Stagger requests to avoid HTTP 429 Too Many Requests
 			const batchSize = 10;
 			const nBatches = Math.ceil(nPages / batchSize);
 
-			pages = [];
 			for (let batch = 0; batch < nBatches; batch++) {
 				const promises: Promise<Report<Detailed>>[] = [];
 				for (
@@ -387,21 +405,12 @@ export default class TogglManager {
 						this._apiManager.getDetailedReport(query.from, query.to, i)
 					);
 					const newPages = await Promise.all(promises);
-					pages = pages.concat(newPages);
+					pages.push(...newPages);
 				}
 			}
 		}
 
-		const completeReport = pages.reduce((prevPage, currPage) => {
-			prevPage.data = prevPage.data.concat(currPage.data);
-			return prevPage;
-		}, page0);
-
-		// Sometimes the Toggl API returns duplicate entries,
-		// need to deduplicate by entry id
-		completeReport.data = completeReport.data.filter(
-			(el, index, self) => index === self.findIndex((el2) => el2.id === el.id)
-		);
+		const completeReport = reduceReports(pages);
 
 		return completeReport;
 	}
@@ -463,4 +472,11 @@ function isTagsChanged(old_tags: string[], new_tags: string[]) {
 		}
 	}
 	return false;
+}
+
+function reduceReports(pages: Report<Detailed>[]): Report<Detailed> {
+	return pages.reduce((prevPage, currPage) => {
+		prevPage.data = prevPage.data.concat(currPage.data);
+		return prevPage;
+	});
 }
