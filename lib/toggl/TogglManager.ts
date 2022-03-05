@@ -16,6 +16,7 @@ import { ACTIVE_TIMER_POLLING_INTERVAL } from 'lib/constants';
 import type { Tag } from 'lib/model/Tag';
 import ApiManager from './ApiManager';
 import type { Query } from 'lib/reports/ReportQuery';
+import ReportCache from './TogglCache';
 
 export enum ApiStatus {
 	AVAILABLE,
@@ -30,6 +31,7 @@ export default class TogglManager {
 	// TODO: rewrite toggl API client with Obsidian Request API
 	// private _api: any;
 	private _apiManager: ApiManager;
+	private _reportCache = new ReportCache();
 
 	// UI references
 	private _statusBarItem: HTMLElement;
@@ -315,22 +317,6 @@ export default class TogglManager {
 	}
 
 	/**
-	 * Fullfills a query for Toggl Track reports and returns the report object.
-	 */
-	// TODO: these generics are awful...
-	// public async getReport(query: Query): Promise<{summary: Report<Summary>, detailed: Report<Detailed>}> {
-	// 	if (query.type === QueryType.SUMMARY) {
-	// 		return this._apiManager.getSummary(query.from, query.to);
-	// 	} else if (query.type === QueryType.LIST) {
-	// 		throw new Error('List queries are not yet implemented.');
-	// 	} else {
-	// 		throw new Error(
-	// 			`There is no query implementation for type ${query.type}.`
-	// 		);
-	// 	}
-	// }
-
-	/**
 	 * Gets a Toggl Summary report based on the query parameter.
 	 * @param query query to be fullfilled.
 	 * @returns Summary report returned by Toggl API.
@@ -402,6 +388,14 @@ export default class TogglManager {
 		completeReport.data = completeReport.data.filter(
 			(el, index, self) => index === self.findIndex((el2) => el2.id === el.id)
 		);
+
+		// Sort the results
+		completeReport.data.sort((a, b) =>
+			a.start < b.start ? -1 : a.start > b.start ? 1 : 0
+		);
+
+		this._reportCache.put(query.from, query.to, completeReport.data);
+		console.log(this._reportCache.get(query.from, query.to));
 
 		return completeReport;
 	}
