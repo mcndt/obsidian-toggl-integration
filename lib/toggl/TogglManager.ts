@@ -333,55 +333,23 @@ export default class TogglManager {
 	 * @returns Summary report returned by Toggl API.
 	 */
 	public async GetDetailedReport(query: Query): Promise<Report<Detailed>> {
-		const page0 = await this._apiManager.getDetailedReport(
-			query.from,
-			query.to,
-			0
-		);
+		// First check the cache.
+		const { report, missing } = this._reportCache.get(query.from, query.to);
+		const reports = [report];
 
-		if (page0.total_count <= page0.per_page) {
-			return page0;
+		// Fetch from Toggl API for each missing range and add to cache.
+		for (const { from, to } of missing) {
+			const missingReport = await this._fetchDetailedReport({
+				...query,
+				from,
+				to
+			});
+			this._reportCache.put(from, to, missingReport.data);
+			reports.push(missingReport);
 		}
 
-		const nPages = Math.ceil(page0.total_count / page0.per_page);
-		let pages: Report<Detailed>[];
-
-		if (nPages <= 8) {
-			console.debug(`Requesting ${nPages} time entry pages in parallel mode.`);
-			const promises: Promise<Report<Detailed>>[] = [];
-			for (let i = 2; i <= nPages; i++) {
-				promises.push(
-					this._apiManager.getDetailedReport(query.from, query.to, i)
-				);
-			}
-			pages = await Promise.all(promises);
-		} else {
-			console.debug(`Requesting ${nPages} time entry pages in batch mode.`);
-			// Stagger requests to avoid HTTP 429 Too Many Requests
-			const batchSize = 10;
-			const nBatches = Math.ceil(nPages / batchSize);
-
-			pages = [];
-			for (let batch = 0; batch < nBatches; batch++) {
-				const promises: Promise<Report<Detailed>>[] = [];
-				for (
-					let i = Math.max(2, batch * batchSize);
-					i <= Math.min(nPages, (batch + 1) * batchSize - 1);
-					i++
-				) {
-					promises.push(
-						this._apiManager.getDetailedReport(query.from, query.to, i)
-					);
-					const newPages = await Promise.all(promises);
-					pages = pages.concat(newPages);
-				}
-			}
-		}
-
-		const completeReport = pages.reduce((prevPage, currPage) => {
-			prevPage.data = prevPage.data.concat(currPage.data);
-			return prevPage;
-		}, page0);
+		// Reduce into one report.
+		const completeReport = reduceReports(reports);
 
 		// Sometimes the Toggl API returns duplicate entries,
 		// need to deduplicate by entry id
@@ -394,8 +362,55 @@ export default class TogglManager {
 			a.start < b.start ? -1 : a.start > b.start ? 1 : 0
 		);
 
-		this._reportCache.put(query.from, query.to, completeReport.data);
-		console.log(this._reportCache.get(query.from, query.to));
+		return completeReport;
+	}
+
+	private async _fetchDetailedReport(query: Query): Promise<Report<Detailed>> {
+		const page0 = await this._apiManager.getDetailedReport(
+			query.from,
+			query.to,
+			0
+		);
+
+		if (page0.total_count <= page0.per_page) {
+			return page0;
+		}
+
+		const nPages = Math.ceil(page0.total_count / page0.per_page);
+		let pages: Report<Detailed>[] = [page0];
+
+		if (nPages <= 8) {
+			console.debug(`Requesting ${nPages} time entry pages in parallel mode.`);
+			const promises: Promise<Report<Detailed>>[] = [];
+			for (let i = 2; i <= nPages; i++) {
+				promises.push(
+					this._apiManager.getDetailedReport(query.from, query.to, i)
+				);
+			}
+			pages.push(...(await Promise.all(promises)));
+		} else {
+			console.debug(`Requesting ${nPages} time entry pages in batch mode.`);
+			// Stagger requests to avoid HTTP 429 Too Many Requests
+			const batchSize = 10;
+			const nBatches = Math.ceil(nPages / batchSize);
+
+			for (let batch = 0; batch < nBatches; batch++) {
+				const promises: Promise<Report<Detailed>>[] = [];
+				for (
+					let i = Math.max(2, batch * batchSize);
+					i <= Math.min(nPages, (batch + 1) * batchSize - 1);
+					i++
+				) {
+					promises.push(
+						this._apiManager.getDetailedReport(query.from, query.to, i)
+					);
+					const newPages = await Promise.all(promises);
+					pages.push(...newPages);
+				}
+			}
+		}
+
+		const completeReport = reduceReports(pages);
 
 		return completeReport;
 	}
@@ -457,4 +472,11 @@ function isTagsChanged(old_tags: string[], new_tags: string[]) {
 		}
 	}
 	return false;
+}
+
+function reduceReports(pages: Report<Detailed>[]): Report<Detailed> {
+	return pages.reduce((prevPage, currPage) => {
+		prevPage.data = prevPage.data.concat(currPage.data);
+		return prevPage;
+	});
 }
