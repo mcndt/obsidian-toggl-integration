@@ -1,11 +1,5 @@
 # Changelog
 
-## [0.8.0] 
-
-### ✨ Features
-
-- Toggl reports are now cached for the duration of an Obsidian user session, meaning that reports are only fetched once. Subsequent reports over the same time spans should now load nearly instantly!
-
 ## [0.7.3]
 
 ### ⚙️ Internal
