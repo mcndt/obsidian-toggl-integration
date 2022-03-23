@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.8.1]
+
+### 🐛 Fixes
+
+- Reverted features from 0.8.0 release due to breaking errors. I will polish this up in the future for a rerelease.
+
 ## [0.8.0] 
 
 ### ✨ Features
