@@ -10,7 +10,25 @@ Add integration with the Toggl Track API to manage your timers inside Obsidian.
 
 ![](https://raw.githubusercontent.com/mcndt/obsidian-toggl-integration/master/demo2.gif)
 
+## Rendering time reports inside your notes
+
+Using simple code blocks it is possible to render time blocks. For example,
+
+~~~
+```toggl
+SUMMARY
+PAST 7 DAYS
+```
+~~~
+
+Will result in something like:
+
+![example-summary-report](https://user-images.githubusercontent.com/23149353/148293946-4e70ede9-0a9f-401e-af4b-f954caaeed84.png)
+
+You can find a full tutorial and reference on rendering time reports in the [plugin wiki](https://github.com/mcndt/obsidian-toggl-integration/wiki/Toggl-Query-Language-(TQL)-Reference).
+
 ## Setup
+
 Configuring this plugin requires you to first request an API token from Toggl. More info on how to do this [can be found here](https://support.toggl.com/en/articles/3116844-where-is-my-api-token-located).
 
 To set up this plugin, simply enter your API token in the settings tab, click connect and select the Toggl Workspace you wish to use.
