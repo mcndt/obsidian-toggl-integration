@@ -12,7 +12,7 @@ Add integration with the Toggl Track API to manage your timers inside Obsidian.
 
 ## Rendering time reports inside your notes
 
-Using simple code blocks it is possible to render time blocks. For example,
+Using simple code blocks it is possible to render time tracking reports inside your Obsidian notes. For example,
 
 ~~~
 ```toggl
