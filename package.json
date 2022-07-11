@@ -38,7 +38,7 @@
 	},
 	"dependencies": {
 		"d3": "^7.2.1",
-		"moment": "^2.29.1",
+		"moment": "^2.29.4",
 		"supports-color": "^9.0.2",
 		"svelte-select": "^4.4.3",
 		"toggl-client": "github:mcndt/toggl-client#obsidian-request-api"
