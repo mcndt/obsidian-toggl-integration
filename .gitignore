@@ -10,5 +10,8 @@ node_modules
 main.js
 *.js.map
 
+# test
+coverage/
+
 # obsidian
 data.json

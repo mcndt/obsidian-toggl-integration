@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import parseList from './parseList';
 import { Keyword, Token, UserInput } from './Parser';
 

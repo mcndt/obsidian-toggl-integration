@@ -1,3 +1,5 @@
+import { describe, beforeEach, test, expect, it } from 'vitest';
+
 import {
 	Query,
 	QueryType,
@@ -127,7 +129,12 @@ describe('parseSelection', () => {
 	it('fails on unknown mode keyword', () => {
 		testParseSelection(
 			{
-				input: [Keyword.WEEKS, Keyword.PROJECTS, 'project A', 1234567890],
+				input: [
+					Keyword.WEEKS,
+					Keyword.PROJECTS,
+					'project A',
+					1234567890
+				],
 				query: test_query,
 				remaining: null
 			},
@@ -138,7 +145,12 @@ describe('parseSelection', () => {
 	it('fails on unknown selection qualifier keyword', () => {
 		testParseSelection(
 			{
-				input: [Keyword.EXCLUDE, Keyword.WEEKS, 'project A', 1234567890],
+				input: [
+					Keyword.EXCLUDE,
+					Keyword.WEEKS,
+					'project A',
+					1234567890
+				],
 				query: test_query,
 				remaining: null
 			},
@@ -229,7 +241,9 @@ function testParseSelection(
 	const parser = new SelectionParser();
 
 	if (expectedError == undefined) {
-		expect(parser.parse(params.input, params.query)).toEqual(params.remaining);
+		expect(parser.parse(params.input, params.query)).toEqual(
+			params.remaining
+		);
 		if (params.projects) {
 			expect(params.query.projectSelection).toEqual(expect.anything());
 			expect(params.query.projectSelection).toMatchObject<Selection>({

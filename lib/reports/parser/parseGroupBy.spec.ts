@@ -1,3 +1,5 @@
+import { describe, beforeEach, test, expect } from 'vitest';
+
 import { GroupBy, Query, QueryType } from '../ReportQuery';
 import { GroupByParser } from './parseGroupBy';
 import { Keyword, newQuery, Token } from './Parser';
@@ -53,7 +55,12 @@ describe('parseGroupBy', () => {
 		test_query.groupBy = GroupBy.DATE;
 		testGroupBy(
 			{
-				input: [Keyword.GROUP, Keyword.BY, Keyword.PROJECT, 'extra token'],
+				input: [
+					Keyword.GROUP,
+					Keyword.BY,
+					Keyword.PROJECT,
+					'extra token'
+				],
 				query: test_query,
 				remaining: null,
 				expectedGroupBy: null
@@ -66,7 +73,12 @@ describe('parseGroupBy', () => {
 		test_query.type = QueryType.SUMMARY;
 		testGroupBy(
 			{
-				input: [Keyword.GROUP, Keyword.BY, Keyword.PROJECT, 'extra token'],
+				input: [
+					Keyword.GROUP,
+					Keyword.BY,
+					Keyword.PROJECT,
+					'extra token'
+				],
 				query: test_query,
 				remaining: null,
 				expectedGroupBy: null
