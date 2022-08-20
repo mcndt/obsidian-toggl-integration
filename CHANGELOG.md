@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.8.2]
+
+- Fix running the Toggl API client in legacy mode when Obsidian Request API is supported.
+
 ## [0.8.1]
 
 ### 🐛 Fixes

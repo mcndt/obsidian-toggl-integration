@@ -31,7 +31,7 @@ export default class ApiManager {
 		this._api = TogglClient({
 			apiToken,
 			headers,
-			legacy: !checkVersion(apiVersion, 0, 13, 25)
+			legacy: checkVersion(apiVersion, 0, 13, 25)
 		});
 		try {
 			await this.testConnection();
