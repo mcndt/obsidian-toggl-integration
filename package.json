@@ -23,7 +23,6 @@
 		"@types/d3": "^7.1.0",
 		"@types/jest": "^27.0.2",
 		"@types/node": "^14.17.18",
-		"@types/parsimmon": "^1.10.6",
 		"jest": "^27.2.2",
 		"obsidian": "^0.13.26",
 		"prettier": "^2.4.1",
@@ -39,7 +38,7 @@
 	"dependencies": {
 		"d3": "^7.2.1",
 		"moment": "^2.29.4",
-		"supports-color": "^9.0.2",
+		"supports-color": "^9.2.2",
 		"svelte-select": "^4.4.3",
 		"toggl-client": "github:mcndt/toggl-client#obsidian-request-api"
 	}
