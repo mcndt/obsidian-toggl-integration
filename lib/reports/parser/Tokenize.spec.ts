@@ -1,3 +1,5 @@
+import { describe, test, expect, it } from 'vitest';
+
 import { Keyword } from './Parser';
 import { tokenize } from './Tokenize';
 
@@ -7,7 +9,10 @@ describe('Tokenization', () => {
 	});
 
 	test('Keyword tokens', () => {
-		expect(tokenize('SUMMARY TODAY')).toEqual([Keyword.SUMMARY, Keyword.TODAY]);
+		expect(tokenize('SUMMARY TODAY')).toEqual([
+			Keyword.SUMMARY,
+			Keyword.TODAY
+		]);
 	});
 
 	test('String input (single quotes)', () => {
@@ -24,7 +29,10 @@ describe('Tokenization', () => {
 	});
 
 	test('Comma separated lists', () => {
-		expect(tokenize(`"item A", "item B"`)).toEqual(['"item A"', '"item B"']);
+		expect(tokenize(`"item A", "item B"`)).toEqual([
+			'"item A"',
+			'"item B"'
+		]);
 	});
 
 	test('ISO-formatted dates', () => {
@@ -38,9 +46,9 @@ describe('Tokenization', () => {
 	});
 
 	it('fails on malformed dates', () => {
-		expect(() => tokenize(`SUMMARY FROM 2020-1-2 TO 2020-1-3`)).toThrowError(
-			/is not a keyword/g
-		);
+		expect(() =>
+			tokenize(`SUMMARY FROM 2020-1-2 TO 2020-1-3`)
+		).toThrowError(/is not a keyword/g);
 	});
 
 	test('Decimal numbers', () => {
@@ -52,7 +60,9 @@ describe('Tokenization', () => {
 	});
 
 	it('fails on unknown keywords', () => {
-		expect(() => tokenize(`unknown_token`)).toThrowError(/is not a keyword/g);
+		expect(() => tokenize(`unknown_token`)).toThrowError(
+			/is not a keyword/g
+		);
 	});
 
 	it('uppercases non-string tokens', () => {

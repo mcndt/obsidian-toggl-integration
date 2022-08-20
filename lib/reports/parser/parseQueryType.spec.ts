@@ -1,6 +1,8 @@
+import { describe, beforeEach, test, expect } from 'vitest';
+
 import { Query, QueryType } from '../ReportQuery';
 import { QueryTypeParser } from './parseQueryType';
-import { Keyword, newQuery, Parser, Token } from './Parser';
+import { Keyword, newQuery, Token } from './Parser';
 
 let test_query: Query;
 

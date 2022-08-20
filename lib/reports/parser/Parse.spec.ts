@@ -1,3 +1,5 @@
+import { describe, beforeEach, test, expect, vi, afterEach } from 'vitest';
+
 import moment from 'moment';
 import { parse } from './Parse';
 import {
@@ -14,23 +16,20 @@ const CURRENT_WEEK_SINCE = '2020-01-27';
 const CURRENT_WEEK_UNTIL = '2020-02-02';
 
 /* MOCKS */
-let test_date: ISODate;
-jest.mock('moment');
+let test_date: ISODate = null;
 
-/* UNIT TESTS */
 describe('parse', () => {
 	beforeEach(() => {
 		test_date = CURRENT_DATE;
-		(moment as unknown as jest.Mock).mockImplementation((...args) => {
-			if (args.length == 0) {
-				return jest.requireActual('moment')(test_date, 'YYYY-MM-DD', true);
-			}
-			return jest.requireActual('moment')(...args);
-		});
+		vi.useFakeTimers();
+		vi.setSystemTime(moment(test_date, 'YYYY-MM-DD').toDate());
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
 	});
 
 	test('TC-01 (preset relative time interval)', () => {
-		let test = 0;
 		testParse({
 			queryString: 'SUMMARY WEEK',
 			expected: {
@@ -210,7 +209,7 @@ describe('parse', () => {
 				queryString: `LIST PAST 10 DAYS GROUP BY DATE GROUP BY PROJECT`,
 				expected: null
 			},
-			/A query can only contain a single \"GROUP BY\" expression/g
+			/A query can only contain a single "GROUP BY" expression/g
 		);
 	});
 
