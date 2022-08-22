@@ -8,11 +8,13 @@ import type { ISODate } from 'lib/reports/ReportQuery';
 import { settingsStore } from 'lib/util/stores';
 import { createClient } from './TogglClient';
 import moment from 'moment';
+import { ApiQueue } from './ApiQueue';
 
 /** Wrapper class for performing common operations on the Toggl API. */
 export default class TogglAPI {
 	private _api: typeof import('toggl-client');
 	private _settings: PluginSettings;
+	private _queue = new ApiQueue();
 
 	constructor() {
 		settingsStore.subscribe(
@@ -42,6 +44,8 @@ export default class TogglAPI {
 	/** @returns list of the user's workspaces. */
 	public async getWorkspaces(): Promise<TogglWorkspace[]> {
 		const response = await this._api.workspaces.list();
+
+		await this._api.workspaces.list();
 		return response.map(
 			(w: any) =>
 				({
@@ -140,14 +144,13 @@ export default class TogglAPI {
 		since: ISODate,
 		until: ISODate
 	): Promise<Report<Summary>> {
-		const response: Report<Summary> = await this._api.reports.summary(
-			this._settings.workspace.id,
-			{
+		const response: Report<Summary> = await this._queue.queue(() =>
+			this._api.reports.summary(this._settings.workspace.id, {
 				since: since,
 				until: until,
 				order_field: 'duration',
 				order_desc: 'on'
-			}
+			})
 		);
 		return response;
 	}
@@ -169,13 +172,11 @@ export default class TogglAPI {
 			total_grand: 0,
 			data: []
 		};
-
-		completeReport.data = await this._api.reports.detailsAll(
-			this._settings.workspace.id,
-			{
+		completeReport.data = await this._queue.queue<Detailed[]>(() =>
+			this._api.reports.detailsAll(this._settings.workspace.id, {
 				since: since,
 				until: until
-			}
+			})
 		);
 		completeReport.total_count = completeReport.data.length;
 		completeReport.total_grand = completeReport.data.reduce(

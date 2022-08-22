@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.9.0]
+
+- Some code cleanup 
+- Big queries are now performed sequentially to prevent all queries failing due to rate limiting (API error 429)
+
 ## [0.8.2]
 
 - Fix running the Toggl API client in legacy mode when Obsidian Request API is supported.
