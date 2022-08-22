@@ -166,12 +166,81 @@ export default class TogglAPI {
 
 	/**
 	 * Gets a Toggl Detailed Report between since and until date.
+	 * Makes multiple HTTP requests until all pages of the paginated result are
+	 * gathered, then returns the combined report as a single object.
 	 * @param since ISO-formatted date string of the first day of the summary range (inclusive).
 	 * @param until ISO-formatted date string of the last day of the summary range (inclusive).
-	 * @param page Pagination id. Note that the Toggl API counts pages from 1!
 	 * @returns The time entries on the specified page.
 	 */
 	public async getDetailedReport(
+		since: ISODate,
+		until: ISODate
+	): Promise<Report<Detailed>> {
+		// Note that pages start at 1 in Toggl Reports v2, not 0.
+		const page1 = await this._getDetailedReportPage(since, until, 1);
+
+		if (page1.total_count <= page1.per_page) {
+			return page1;
+		}
+
+		const nPages = Math.ceil(page1.total_count / page1.per_page);
+		let pages: Report<Detailed>[];
+
+		if (nPages <= 8) {
+			console.debug(
+				`Requesting ${nPages} time entry pages in parallel mode.`
+			);
+			const promises: Promise<Report<Detailed>>[] = [];
+			for (let i = 2; i <= nPages; i++) {
+				promises.push(this._getDetailedReportPage(since, until, i));
+			}
+			pages = await Promise.all(promises);
+		} else {
+			console.debug(
+				`Requesting ${nPages} time entry pages in batch mode.`
+			);
+			// Stagger requests to avoid HTTP 429 Too Many Requests
+			const batchSize = 10;
+			const nBatches = Math.ceil(nPages / batchSize);
+
+			pages = [];
+			for (let batch = 0; batch < nBatches; batch++) {
+				const promises: Promise<Report<Detailed>>[] = [];
+				for (
+					let i = Math.max(2, batch * batchSize);
+					i <= Math.min(nPages, (batch + 1) * batchSize - 1);
+					i++
+				) {
+					promises.push(this._getDetailedReportPage(since, until, i));
+					const newPages = await Promise.all(promises);
+					pages = pages.concat(newPages);
+				}
+			}
+		}
+
+		const completeReport = pages.reduce((prevPage, currPage) => {
+			prevPage.data = prevPage.data.concat(currPage.data);
+			return prevPage;
+		}, page1);
+
+		// Sometimes the Toggl API returns duplicate entries,
+		// need to deduplicate by entry id
+		completeReport.data = completeReport.data.filter(
+			(el, index, self) =>
+				index === self.findIndex((el2) => el2.id === el.id)
+		);
+
+		return completeReport;
+	}
+
+	/**
+	 * Gets a Toggl Detailed Report between since and until date.
+	 * @param since ISO-formatted date string of the first day of the summary range (inclusive).
+	 * @param until ISO-formatted date string of the last day of the summary range (inclusive).
+	 * @param page The page number to fetch. Note that the first page is 1.
+	 * @returns The time entries on the specified page.
+	 */
+	private async _getDetailedReportPage(
 		since: ISODate,
 		until: ISODate,
 		page: number

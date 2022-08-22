@@ -312,72 +312,7 @@ export default class TogglService {
 	 * @returns Summary report returned by Toggl API.
 	 */
 	public async GetDetailedReport(query: Query): Promise<Report<Detailed>> {
-		const page0 = await this._apiManager.getDetailedReport(
-			query.from,
-			query.to,
-			0
-		);
-
-		if (page0.total_count <= page0.per_page) {
-			return page0;
-		}
-
-		const nPages = Math.ceil(page0.total_count / page0.per_page);
-		let pages: Report<Detailed>[];
-
-		if (nPages <= 8) {
-			console.debug(
-				`Requesting ${nPages} time entry pages in parallel mode.`
-			);
-			const promises: Promise<Report<Detailed>>[] = [];
-			for (let i = 2; i <= nPages; i++) {
-				promises.push(
-					this._apiManager.getDetailedReport(query.from, query.to, i)
-				);
-			}
-			pages = await Promise.all(promises);
-		} else {
-			console.debug(
-				`Requesting ${nPages} time entry pages in batch mode.`
-			);
-			// Stagger requests to avoid HTTP 429 Too Many Requests
-			const batchSize = 10;
-			const nBatches = Math.ceil(nPages / batchSize);
-
-			pages = [];
-			for (let batch = 0; batch < nBatches; batch++) {
-				const promises: Promise<Report<Detailed>>[] = [];
-				for (
-					let i = Math.max(2, batch * batchSize);
-					i <= Math.min(nPages, (batch + 1) * batchSize - 1);
-					i++
-				) {
-					promises.push(
-						this._apiManager.getDetailedReport(
-							query.from,
-							query.to,
-							i
-						)
-					);
-					const newPages = await Promise.all(promises);
-					pages = pages.concat(newPages);
-				}
-			}
-		}
-
-		const completeReport = pages.reduce((prevPage, currPage) => {
-			prevPage.data = prevPage.data.concat(currPage.data);
-			return prevPage;
-		}, page0);
-
-		// Sometimes the Toggl API returns duplicate entries,
-		// need to deduplicate by entry id
-		completeReport.data = completeReport.data.filter(
-			(el, index, self) =>
-				index === self.findIndex((el2) => el2.id === el.id)
-		);
-
-		return completeReport;
+		return this._apiManager.getDetailedReport(query.from, query.to);
 	}
 
 	/** True if API token is valid and Toggl API is responsive. */
