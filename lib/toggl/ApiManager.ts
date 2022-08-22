@@ -6,16 +6,8 @@ import type { TimeEntry, TimeEntryStart } from 'lib/model/TimeEntry';
 import type { TogglWorkspace } from 'lib/model/TogglWorkspace';
 import type { ISODate } from 'lib/reports/ReportQuery';
 import { settingsStore } from 'lib/util/stores';
+import { createClient } from './TogglClient';
 import moment from 'moment';
-import TogglClient from 'toggl-client';
-import { apiVersion } from 'obsidian';
-import { checkVersion } from 'lib/util/checkVersion';
-
-/** http headers used on every call to the Toggl API. */
-const headers = {
-	'user-agent':
-		'Toggl Integration for Obsidian (https://github.com/mcndt/obsidian-toggl-integration)'
-};
 
 /** Wrapper class for performing common operations on the Toggl API. */
 export default class TogglAPI {
@@ -32,11 +24,7 @@ export default class TogglAPI {
 	 * Must be called after constructor and before use of the API.
 	 */
 	public async setToken(apiToken: string) {
-		this._api = TogglClient({
-			apiToken,
-			headers,
-			legacy: checkVersion(apiVersion, 0, 13, 25)
-		});
+		this._api = createClient(apiToken);
 		try {
 			await this.testConnection();
 		} catch {
@@ -176,84 +164,32 @@ export default class TogglAPI {
 		since: ISODate,
 		until: ISODate
 	): Promise<Report<Detailed>> {
-		// Note that pages start at 1 in Toggl Reports v2, not 0.
-		const page1 = await this._getDetailedReportPage(since, until, 1);
+		const completeReport: Report<Detailed> = {
+			total_count: 0,
+			total_grand: 0,
+			data: []
+		};
 
-		if (page1.total_count <= page1.per_page) {
-			return page1;
-		}
-
-		const nPages = Math.ceil(page1.total_count / page1.per_page);
-		let pages: Report<Detailed>[];
-
-		if (nPages <= 8) {
-			console.debug(
-				`Requesting ${nPages} time entry pages in parallel mode.`
-			);
-			const promises: Promise<Report<Detailed>>[] = [];
-			for (let i = 2; i <= nPages; i++) {
-				promises.push(this._getDetailedReportPage(since, until, i));
+		completeReport.data = await this._api.reports.detailsAll(
+			this._settings.workspace.id,
+			{
+				since: since,
+				until: until
 			}
-			pages = await Promise.all(promises);
-		} else {
-			console.debug(
-				`Requesting ${nPages} time entry pages in batch mode.`
-			);
-			// Stagger requests to avoid HTTP 429 Too Many Requests
-			const batchSize = 10;
-			const nBatches = Math.ceil(nPages / batchSize);
+		);
+		completeReport.total_count = completeReport.data.length;
+		completeReport.total_grand = completeReport.data.reduce(
+			(acc, curr) => acc + curr.dur,
+			0
+		);
 
-			pages = [];
-			for (let batch = 0; batch < nBatches; batch++) {
-				const promises: Promise<Report<Detailed>>[] = [];
-				for (
-					let i = Math.max(2, batch * batchSize);
-					i <= Math.min(nPages, (batch + 1) * batchSize - 1);
-					i++
-				) {
-					promises.push(this._getDetailedReportPage(since, until, i));
-					const newPages = await Promise.all(promises);
-					pages = pages.concat(newPages);
-				}
-			}
-		}
-
-		const completeReport = pages.reduce((prevPage, currPage) => {
-			prevPage.data = prevPage.data.concat(currPage.data);
-			return prevPage;
-		}, page1);
-
-		// Sometimes the Toggl API returns duplicate entries,
-		// need to deduplicate by entry id
+		// Sometimes the Toggl API returns duplicate entries, need to deduplicate by entry id
 		completeReport.data = completeReport.data.filter(
 			(el, index, self) =>
 				index === self.findIndex((el2) => el2.id === el.id)
 		);
 
 		return completeReport;
-	}
-
-	/**
-	 * Gets a Toggl Detailed Report between since and until date.
-	 * @param since ISO-formatted date string of the first day of the summary range (inclusive).
-	 * @param until ISO-formatted date string of the last day of the summary range (inclusive).
-	 * @param page The page number to fetch. Note that the first page is 1.
-	 * @returns The time entries on the specified page.
-	 */
-	private async _getDetailedReportPage(
-		since: ISODate,
-		until: ISODate,
-		page: number
-	): Promise<Report<Detailed>> {
-		const response = this._api.reports.details(
-			this._settings.workspace.id,
-			{
-				since: since,
-				until: until,
-				page: page
-			}
-		);
-		return response;
 	}
 
 	/**
