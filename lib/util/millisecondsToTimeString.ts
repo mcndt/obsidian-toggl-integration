@@ -1,5 +1,3 @@
-import moment from 'moment';
-
 export default function millisecondsToTimeString(ms: number): string {
 	const sec = Math.round((ms / 1000) % 60);
 	const min = Math.floor((ms / 1000 / 60) % 60);

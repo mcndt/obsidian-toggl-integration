@@ -1,4 +1,3 @@
-import type { TimeEntry } from 'lib/model/TimeEntry';
 import type MyPlugin from 'main';
 import { ItemView, WorkspaceLeaf } from 'obsidian';
 import TogglSidebarPane from './TogglSidebarPane.svelte';

@@ -84,7 +84,9 @@
 			// sanitize Markdown links
 			const match = entry.description.match(/\[([^\[]+)\](\(.*\))/gm);
 			if (match) {
-				const linkText = /\[([^\[]+)\](\(.*\))/.exec(entry.description)[1];
+				const linkText = /\[([^\[]+)\](\(.*\))/.exec(
+					entry.description
+				)[1];
 				entry.description =
 					linkText.trim().length > 0 ? linkText : '(Empty link)';
 			}

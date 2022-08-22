@@ -1,12 +1,6 @@
 import type { Query } from '../ReportQuery';
 
-import {
-	CombinedParser,
-	InvalidTokenError,
-	newQuery,
-	QueryParseError,
-	Token
-} from './Parser';
+import { CombinedParser, newQuery, QueryParseError, Token } from './Parser';
 import { tokenize } from './Tokenize';
 import { QueryTypeParser } from './parseQueryType';
 import { QueryIntervalParser } from './parseQueryInterval';
@@ -22,7 +16,7 @@ import { CustomTitleParser } from './parseCustomTitle';
  */
 export function parse(queryString: string): Query {
 	let tokens = tokenize(queryString);
-	let query = newQuery();
+	const query = newQuery();
 
 	// Expression 1: Query Type
 	tokens = new QueryTypeParser().parse(tokens, query);

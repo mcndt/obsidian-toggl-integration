@@ -21,7 +21,7 @@ export function tokenize(query: string): Token[] {
 			!(token.toUpperCase() in Keyword) && // a keyword
 			!/".*"/g.test(token) && // a string
 			!/\d{4}-\d{2}-\d{2}/g.test(token) && // a ISO-formatted date
-			!/(\#.*)/g.test(token) && // a tag of the format "#tag"
+			!/(#.*)/g.test(token) && // a tag of the format "#tag"
 			!/^\d+$/g.test(token) // an integer (for project or client IDs)
 		) {
 			throw new UnknownKeywordError(token);
@@ -30,7 +30,7 @@ export function tokenize(query: string): Token[] {
 		if (/^\d+$/g.test(token)) {
 			// Convert to number type
 			results.push(parseInt(token));
-		} else if (/(\#.*)/g.test(token)) {
+		} else if (/(#.*)/g.test(token)) {
 			// Normalize all tags to lowercase, remove pound sign
 			results.push(token.slice(1).toLowerCase());
 		} else if (!/".*"/g.test(token)) {

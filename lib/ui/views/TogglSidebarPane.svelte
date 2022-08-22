@@ -61,8 +61,8 @@
 
 		{#if $apiStatusStore === ApiStatus.UNREACHABLE}
 			<p class="error-message">
-				The Toggl Track API is unreachable. Either the Toggl services are down,
-				or your API token is incorrect.
+				The Toggl Track API is unreachable. Either the Toggl services
+				are down, or your API token is incorrect.
 			</p>
 		{/if}
 
@@ -80,7 +80,9 @@
 						<span class="total-duration"
 							>{millisecondsToTimeString(
 								$dailySummary.total_grand +
-									($settingsStore.updateInRealTime ? duration : 0)
+									($settingsStore.updateInRealTime
+										? duration
+										: 0)
 							)}</span
 						>
 					</div>

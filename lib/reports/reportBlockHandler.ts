@@ -1,4 +1,5 @@
 import type { MarkdownPostProcessorContext } from 'obsidian';
+// @ts-ignore (no default export detected by vscode's typescript language server)
 import TogglReportBlock from '../ui/views/TogglReportBlock.svelte';
 
 /**
