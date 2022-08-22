@@ -1,3 +1,4 @@
+import { describe, beforeEach, test, expect } from 'vitest';
 import IntervalCache, { Interval } from './IntervalCache';
 
 let intervalCache: IntervalCache;
@@ -24,20 +25,28 @@ describe('parse', () => {
 
 	test('Returns empty array for fully included intervals', () => {
 		intervalCache.insert({ start: 0, end: 10 });
-		expect(intervalCache.check({ start: 2, end: 8 })).toEqual<Interval[]>([]);
-		expect(intervalCache.check({ start: 0, end: 8 })).toEqual<Interval[]>([]);
-		expect(intervalCache.check({ start: 2, end: 10 })).toEqual<Interval[]>([]);
-		expect(intervalCache.check({ start: 0, end: 10 })).toEqual<Interval[]>([]);
+		expect(intervalCache.check({ start: 2, end: 8 })).toEqual<Interval[]>(
+			[]
+		);
+		expect(intervalCache.check({ start: 0, end: 8 })).toEqual<Interval[]>(
+			[]
+		);
+		expect(intervalCache.check({ start: 2, end: 10 })).toEqual<Interval[]>(
+			[]
+		);
+		expect(intervalCache.check({ start: 0, end: 10 })).toEqual<Interval[]>(
+			[]
+		);
 	});
 
 	test('Returns same interval for fully excluded intervals', () => {
 		intervalCache.insert({ start: 0, end: 10 });
-		expect(intervalCache.check({ start: -2, end: -1 })).toEqual<Interval[]>([
-			{ start: -2, end: -1 }
-		]);
-		expect(intervalCache.check({ start: 11, end: 12 })).toEqual<Interval[]>([
-			{ start: 11, end: 12 }
-		]);
+		expect(intervalCache.check({ start: -2, end: -1 })).toEqual<Interval[]>(
+			[{ start: -2, end: -1 }]
+		);
+		expect(intervalCache.check({ start: 11, end: 12 })).toEqual<Interval[]>(
+			[{ start: 11, end: 12 }]
+		);
 	});
 
 	test('Returns Interval for partially excluded intervals (right-overlapping)', () => {
@@ -48,12 +57,14 @@ describe('parse', () => {
 				end: 14
 			}
 		]);
-		expect(intervalCache.check({ start: 10, end: 14 })).toEqual<Interval[]>([
-			{
-				start: 11,
-				end: 14
-			}
-		]);
+		expect(intervalCache.check({ start: 10, end: 14 })).toEqual<Interval[]>(
+			[
+				{
+					start: 11,
+					end: 14
+				}
+			]
+		);
 	});
 
 	test('Returns Interval for partially excluded intervals (left-overlapping)', () => {
