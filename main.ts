@@ -1,6 +1,6 @@
 import type { PluginSettings } from 'lib/config/PluginSettings';
 import { Plugin, WorkspaceLeaf } from 'obsidian';
-import TogglManager from 'lib/toggl/TogglManager';
+import TogglService from 'lib/toggl/TogglService';
 import TogglSettingsTab from 'lib/ui/TogglSettingsTab';
 import { DEFAULT_SETTINGS } from 'lib/config/DefaultSettings';
 import UserInputHelper from 'lib/util/UserInputHelper';
@@ -12,23 +12,54 @@ import { settingsStore, versionLogDismissed } from 'lib/util/stores';
 
 export default class MyPlugin extends Plugin {
 	public settings: PluginSettings;
-	public toggl: TogglManager;
+	public toggl: TogglService;
 	public input: UserInputHelper;
 	public reportView: TogglReportView;
 
 	async onload() {
-		console.log(`Loading obsidian-toggl-integration ${this.manifest.version}`);
+		console.log(
+			`Loading obsidian-toggl-integration ${this.manifest.version}`
+		);
 
 		await this.loadSettings();
 
 		this.addSettingTab(new TogglSettingsTab(this.app, this));
 
 		// instantiate toggl class and set the API token if set in settings.
-		this.toggl = new TogglManager(this);
+		this.toggl = new TogglService(this);
 		if (this.settings.apiToken != null || this.settings.apiToken != '') {
 			this.toggl.setToken(this.settings.apiToken);
 			this.input = new UserInputHelper(this);
 		}
+
+		// Register commands
+		// start timer command
+		this.addCommand({
+			id: 'start-timer',
+			name: 'Start Toggl Timer',
+			icon: 'clock',
+			checkCallback: (checking: boolean) => {
+				if (!checking) {
+					this.toggl.startTimer();
+				} else {
+					return true;
+				}
+			}
+		});
+
+		// stop timer command
+		this.addCommand({
+			id: 'stop-timer',
+			name: 'Stop Toggl Timer',
+			icon: 'clock',
+			checkCallback: (checking: boolean) => {
+				if (!checking) {
+					this.toggl.stopTimer();
+				} else {
+					return this.toggl.currentTimeEntry != null;
+				}
+			}
+		});
 
 		// Register the timer report view
 		this.registerView(
@@ -62,13 +93,20 @@ export default class MyPlugin extends Plugin {
 	 * codeblock queries.
 	 */
 	registerCodeBlockProcessor() {
-		this.registerMarkdownCodeBlockProcessor(CODEBLOCK_LANG, reportBlockHandler);
+		this.registerMarkdownCodeBlockProcessor(
+			CODEBLOCK_LANG,
+			reportBlockHandler
+		);
 	}
 
 	onunload() {}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		this.settings = Object.assign(
+			{},
+			DEFAULT_SETTINGS,
+			await this.loadData()
+		);
 		if (!this.settings.hasDismissedAlert) {
 			this.settings.hasDismissedAlert = false;
 		}

@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { togglStore } from 'lib/util/stores';
+	import { togglService } from 'lib/util/stores';
 
 	export let buttonSize = 36;
 
 	const onClick = () => {
-		if ($togglStore != null) {
-			$togglStore.commandTimerStart();
+		if ($togglService != null) {
+			$togglService.startTimer();
 		}
 	};
 </script>

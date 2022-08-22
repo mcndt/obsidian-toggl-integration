@@ -18,8 +18,8 @@ const headers = {
 };
 
 /** Wrapper class for performing common operations on the Toggl API. */
-export default class ApiManager {
-	private _api: any;
+export default class TogglAPI {
+	private _api: typeof import('toggl-client');
 	private _settings: PluginSettings;
 
 	constructor() {
@@ -28,8 +28,10 @@ export default class ApiManager {
 		);
 	}
 
-	/** Must be called after constructor and before use of the API. */
-	public async initialize(apiToken: string) {
+	/**
+	 * Must be called after constructor and before use of the API.
+	 */
+	public async setToken(apiToken: string) {
 		this._api = TogglClient({
 			apiToken,
 			headers,
@@ -42,7 +44,9 @@ export default class ApiManager {
 		}
 	}
 
-	/** Throws an Error when the Toggl Track API cannot be reached. */
+	/**
+	 * @throws an Error when the Toggl Track API cannot be reached.
+	 */
 	public async testConnection() {
 		await this._api.workspaces.list();
 	}
@@ -93,7 +97,9 @@ export default class ApiManager {
 		return response as Tag[];
 	}
 
-	/** @returns list of recent time entries for the user's workspace. */
+	/**
+	 * @returns list of recent time entries for the user's workspace.
+	 */
 	public async getRecentTimeEntries(): Promise<TimeEntry[]> {
 		const response = await this._api.reports.details(
 			this._settings.workspace.id
@@ -190,12 +196,16 @@ export default class ApiManager {
 		return this._api.timeEntries.start(entry);
 	}
 
-	/** Stops the currently running timer. */
+	/**
+	 * Stops the currently running timer.
+	 */
 	public async stopTimer(id: number): Promise<TimeEntry> {
 		return this._api.timeEntries.stop(id);
 	}
 
-	/** Returns the currently running timer, if any. */
+	/**
+	 * Returns the currently running timer, if any.
+	 */
 	public async getCurrentTimer() {
 		return this._api.timeEntries.current();
 	}

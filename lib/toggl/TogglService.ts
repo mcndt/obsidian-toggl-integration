@@ -10,11 +10,11 @@ import {
 	currentTimer,
 	dailySummary,
 	apiStatusStore,
-	togglStore
+	togglService
 } from 'lib/util/stores';
 import { ACTIVE_TIMER_POLLING_INTERVAL } from 'lib/constants';
 import type { Tag } from 'lib/model/Tag';
-import ApiManager from './ApiManager';
+import TogglAPI from './ApiManager';
 import type { Query } from 'lib/reports/ReportQuery';
 
 export enum ApiStatus {
@@ -24,12 +24,12 @@ export enum ApiStatus {
 	UNTESTED
 }
 
-export default class TogglManager {
+export default class TogglService {
 	private _plugin: MyPlugin;
 
 	// TODO: rewrite toggl API client with Obsidian Request API
 	// private _api: any;
-	private _apiManager: ApiManager;
+	private _apiManager: TogglAPI;
 
 	// UI references
 	private _statusBarItem: HTMLElement;
@@ -45,10 +45,10 @@ export default class TogglManager {
 		this._statusBarItem = this._plugin.addStatusBarItem();
 		this._statusBarItem = this._plugin.addStatusBarItem();
 		this._statusBarItem.setText('Connecting to Toggl...');
-		this.addCommands();
+		// this.addCommands();
 		// Store a reference to the manager in a svelte store to avoid passing
 		// of references around the component trees.
-		togglStore.set(this);
+		togglService.set(this);
 		apiStatusStore.set(ApiStatus.UNTESTED);
 	}
 
@@ -60,8 +60,8 @@ export default class TogglManager {
 		window.clearInterval(this._currentTimerInterval);
 		if (token != null && token != '') {
 			try {
-				this._apiManager = new ApiManager();
-				this._apiManager.initialize(token);
+				this._apiManager = new TogglAPI();
+				this._apiManager.setToken(token);
 				this._ApiAvailable = ApiStatus.AVAILABLE;
 				this.startTimerInterval();
 				this._preloadWorkspaceData();
@@ -119,38 +119,7 @@ export default class TogglManager {
 			.then((response: Report<Summary>) => dailySummary.set(response));
 	}
 
-	/** Register Toggl commands for the Obsidian command palette. */
-	private async addCommands() {
-		// start timer command
-		this._plugin.addCommand({
-			id: 'start-timer',
-			name: 'Start Toggl Timer',
-			icon: 'clock',
-			checkCallback: (checking: boolean) => {
-				if (!checking) {
-					this.commandTimerStart();
-				} else {
-					return true;
-				}
-			}
-		});
-
-		// stop timer command
-		this._plugin.addCommand({
-			id: 'stop-timer',
-			name: 'Stop Toggl Timer',
-			icon: 'clock',
-			checkCallback: (checking: boolean) => {
-				if (!checking) {
-					this.commandTimerStop();
-				} else {
-					return this._currentTimeEntry != null;
-				}
-			}
-		});
-	}
-
-	public async commandTimerStart() {
+	public async startTimer() {
 		this.executeIfAPIAvailable(async () => {
 			let new_timer: TimeEntryStart;
 			const timers = await this._apiManager.getRecentTimeEntries();
@@ -170,7 +139,7 @@ export default class TogglManager {
 		});
 	}
 
-	public async commandTimerStop() {
+	public async stopTimer() {
 		this.executeIfAPIAvailable(() => {
 			if (this._currentTimeEntry != null) {
 				this._apiManager
@@ -327,22 +296,6 @@ export default class TogglManager {
 	}
 
 	/**
-	 * Fullfills a query for Toggl Track reports and returns the report object.
-	 */
-	// TODO: these generics are awful...
-	// public async getReport(query: Query): Promise<{summary: Report<Summary>, detailed: Report<Detailed>}> {
-	// 	if (query.type === QueryType.SUMMARY) {
-	// 		return this._apiManager.getSummary(query.from, query.to);
-	// 	} else if (query.type === QueryType.LIST) {
-	// 		throw new Error('List queries are not yet implemented.');
-	// 	} else {
-	// 		throw new Error(
-	// 			`There is no query implementation for type ${query.type}.`
-	// 		);
-	// 	}
-	// }
-
-	/**
 	 * Gets a Toggl Summary report based on the query parameter.
 	 * @param query query to be fullfilled.
 	 * @returns Summary report returned by Toggl API.
@@ -443,6 +396,11 @@ export default class TogglManager {
 	/** User's workspace tags as preloaded on plugin init */
 	public get cachedTags(): Tag[] {
 		return this._tags;
+	}
+
+	// Get the current time entry
+	public get currentTimeEntry(): any {
+		return this._currentTimeEntry;
 	}
 
 	private get workspaceId(): string {

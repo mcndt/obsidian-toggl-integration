@@ -1,8 +1,8 @@
 import type { PluginSettings } from 'lib/config/PluginSettings';
 import type { Report, Summary } from 'lib/model/Report';
 import type { TimeEntry } from 'lib/model/TimeEntry';
-import type TogglManager from 'lib/toggl/TogglManager';
-import type { ApiStatus } from 'lib/toggl/TogglManager';
+import type TogglService from 'lib/toggl/TogglService';
+import type { ApiStatus } from 'lib/toggl/TogglService';
 import { writable } from 'svelte/store';
 
 /**
@@ -13,7 +13,7 @@ import { writable } from 'svelte/store';
 export const settingsStore = writable<PluginSettings>(null);
 export const versionLogDismissed = writable<boolean>(false);
 
-export const togglStore = writable<TogglManager>(null);
+export const togglService = writable<TogglService>(null);
 export const apiStatusStore = writable<ApiStatus>(null);
 export const currentTimer = writable<TimeEntry>(null);
 export const dailySummary = writable<Report<Summary>>(null);

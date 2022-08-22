@@ -1,5 +1,5 @@
 import type { Project } from 'lib/model/Project';
-import type TogglManager from 'lib/toggl/TogglManager';
+import type TogglService from 'lib/toggl/TogglService';
 import type MyPlugin from 'main';
 import { FuzzyMatch, FuzzySuggestModal } from 'obsidian';
 import SelectProjectModalListItem from './SelectProjectModalListItem.svelte';
@@ -17,7 +17,7 @@ interface ProjectItem {
 }
 
 export class SelectProjectModal extends FuzzySuggestModal<ProjectItem> {
-	private readonly toggl: TogglManager;
+	private readonly toggl: TogglService;
 	private readonly list: ProjectItem[];
 	private readonly resolve: (value: Project) => void;
 

@@ -7,7 +7,7 @@
 		SelectionMode,
 		tag
 	} from 'lib/reports/ReportQuery';
-	import { togglStore } from 'lib/util/stores';
+	import { togglService } from 'lib/util/stores';
 	import { onMount } from 'svelte';
 	import ParsingError from './ParsingError.svelte';
 	import ApiError from './ApiError.svelte';
@@ -82,11 +82,11 @@
 	}
 
 	async function getDetailedReport(query: Query): Promise<Report<Detailed>> {
-		return $togglStore.GetDetailedReport(query);
+		return $togglService.GetDetailedReport(query);
 	}
 
 	async function getSummaryReport(query: Query): Promise<Report<Summary>> {
-		return $togglStore.getSummaryReport(query);
+		return $togglService.getSummaryReport(query);
 	}
 
 	function filterDetailedReport(

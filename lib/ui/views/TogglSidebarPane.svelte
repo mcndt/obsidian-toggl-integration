@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { TimeEntry } from 'lib/model/TimeEntry';
 
-	import { ApiStatus } from 'lib/toggl/TogglManager';
+	import { ApiStatus } from 'lib/toggl/TogglService';
 
 	import millisecondsToTimeString from 'lib/util/millisecondsToTimeString';
 	import {
