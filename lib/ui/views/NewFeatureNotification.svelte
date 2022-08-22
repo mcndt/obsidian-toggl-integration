@@ -4,8 +4,8 @@
 
 <div class="message px-4 py-4">
 	<p>
-		New in 0.4.0: Create Toggl reports inside of your notes with code blocks.
-		Learn more by reading the
+		New in 0.4.0: Create Toggl reports inside of your notes with code
+		blocks. Learn more by reading the
 		<a
 			href="https://github.com/mcndt/obsidian-toggl-integration/wiki/Creating-Toggl-reports-inside-notes"
 			>getting started page</a

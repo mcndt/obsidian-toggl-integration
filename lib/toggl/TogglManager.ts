@@ -43,6 +43,7 @@ export default class TogglManager {
 	constructor(plugin: MyPlugin) {
 		this._plugin = plugin;
 		this._statusBarItem = this._plugin.addStatusBarItem();
+		this._statusBarItem = this._plugin.addStatusBarItem();
 		this._statusBarItem.setText('Connecting to Toggl...');
 		this.addCommands();
 		// Store a reference to the manager in a svelte store to avoid passing
@@ -71,7 +72,9 @@ export default class TogglManager {
 				this.noticeAPINotAvailable();
 			}
 		} else {
-			this._statusBarItem.setText('Open settings to add a Toggl API token.');
+			this._statusBarItem.setText(
+				'Open settings to add a Toggl API token.'
+			);
 			this._ApiAvailable = ApiStatus.NO_TOKEN;
 			this.noticeAPINotAvailable();
 		}
@@ -170,9 +173,11 @@ export default class TogglManager {
 	public async commandTimerStop() {
 		this.executeIfAPIAvailable(() => {
 			if (this._currentTimeEntry != null) {
-				this._apiManager.stopTimer(this._currentTimeEntry.id).then(() => {
-					this.updateCurrentTimer();
-				});
+				this._apiManager
+					.stopTimer(this._currentTimeEntry.id)
+					.then(() => {
+						this.updateCurrentTimer();
+					});
 			}
 		});
 	}
@@ -206,7 +211,11 @@ export default class TogglManager {
 
 		// TODO properly handle multiple workspaces
 		// Drop timers from different workspaces
-		if (curr != null && curr.wid != this.workspaceId && curr.pid != undefined) {
+		if (
+			curr != null &&
+			curr.wid != this.workspaceId &&
+			curr.pid != undefined
+		) {
 			curr = null;
 		}
 
@@ -247,7 +256,9 @@ export default class TogglManager {
 			// fetch updated daily summary report
 			this._apiManager
 				.getDailySummary()
-				.then((response: Report<Summary>) => dailySummary.set(response));
+				.then((response: Report<Summary>) =>
+					dailySummary.set(response)
+				);
 		}
 
 		this._currentTimeEntry = curr;
@@ -293,6 +304,7 @@ export default class TogglManager {
 	}
 
 	/** Runs the passed function if the API is available, else emits a notice. */
+	// eslint-disable-next-line @typescript-eslint/ban-types
 	private executeIfAPIAvailable(func: Function) {
 		if (this.isApiAvailable) {
 			func();
@@ -361,7 +373,9 @@ export default class TogglManager {
 		let pages: Report<Detailed>[];
 
 		if (nPages <= 8) {
-			console.debug(`Requesting ${nPages} time entry pages in parallel mode.`);
+			console.debug(
+				`Requesting ${nPages} time entry pages in parallel mode.`
+			);
 			const promises: Promise<Report<Detailed>>[] = [];
 			for (let i = 2; i <= nPages; i++) {
 				promises.push(
@@ -370,7 +384,9 @@ export default class TogglManager {
 			}
 			pages = await Promise.all(promises);
 		} else {
-			console.debug(`Requesting ${nPages} time entry pages in batch mode.`);
+			console.debug(
+				`Requesting ${nPages} time entry pages in batch mode.`
+			);
 			// Stagger requests to avoid HTTP 429 Too Many Requests
 			const batchSize = 10;
 			const nBatches = Math.ceil(nPages / batchSize);
@@ -384,7 +400,11 @@ export default class TogglManager {
 					i++
 				) {
 					promises.push(
-						this._apiManager.getDetailedReport(query.from, query.to, i)
+						this._apiManager.getDetailedReport(
+							query.from,
+							query.to,
+							i
+						)
 					);
 					const newPages = await Promise.all(promises);
 					pages = pages.concat(newPages);
@@ -400,7 +420,8 @@ export default class TogglManager {
 		// Sometimes the Toggl API returns duplicate entries,
 		// need to deduplicate by entry id
 		completeReport.data = completeReport.data.filter(
-			(el, index, self) => index === self.findIndex((el2) => el2.id === el.id)
+			(el, index, self) =>
+				index === self.findIndex((el2) => el2.id === el.id)
 		);
 
 		return completeReport;
@@ -444,7 +465,9 @@ export default class TogglManager {
 						? project.name
 						: '(Unknown)'
 					: '(No project)',
-			project_hex_color: project ? project.hex_color : 'var(--text-muted)',
+			project_hex_color: project
+				? project.hex_color
+				: 'var(--text-muted)',
 			tags: response.tags
 		};
 	}

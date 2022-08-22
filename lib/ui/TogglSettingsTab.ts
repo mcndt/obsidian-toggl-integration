@@ -20,7 +20,7 @@ export default class TogglSettingsTab extends PluginSettingTab {
 	}
 
 	display(): void {
-		let { containerEl } = this;
+		const { containerEl } = this;
 
 		containerEl.empty();
 		containerEl.createEl('h2', {
@@ -66,7 +66,9 @@ export default class TogglSettingsTab extends PluginSettingTab {
 	private addWorkspaceSetting(containerEl: HTMLElement) {
 		new Setting(containerEl)
 			.setName('Toggl Workspace')
-			.setDesc('Select your Toggl Workspace for fetching past timer entries.')
+			.setDesc(
+				'Select your Toggl Workspace for fetching past timer entries.'
+			)
 			.addExtraButton((button: ExtraButtonComponent) => {
 				button.setIcon('reset').setTooltip('Fetch Workspaces');
 				button.extraSettingsEl.addClass('extra-button');
@@ -77,7 +79,9 @@ export default class TogglSettingsTab extends PluginSettingTab {
 			.addDropdown(async (dropdown: DropdownComponent) => {
 				// Register callback for saving new value
 				dropdown.onChange(async (value: string) => {
-					const workspace = this.workspaces.find((w) => w.id === value);
+					const workspace = this.workspaces.find(
+						(w) => w.id === value
+					);
 					this.plugin.settings.workspace = workspace;
 					await this.plugin.saveSettings();
 				});

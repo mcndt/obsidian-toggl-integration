@@ -23,7 +23,9 @@ export default class ApiManager {
 	private _settings: PluginSettings;
 
 	constructor() {
-		settingsStore.subscribe((val: PluginSettings) => (this._settings = val));
+		settingsStore.subscribe(
+			(val: PluginSettings) => (this._settings = val)
+		);
 	}
 
 	/** Must be called after constructor and before use of the API. */
@@ -50,7 +52,10 @@ export default class ApiManager {
 		const response = await this._api.workspaces.list();
 		return response.map(
 			(w: any) =>
-				({ id: (w.id as number).toString(), name: w.name } as TogglWorkspace)
+				({
+					id: (w.id as number).toString(),
+					name: w.name
+				} as TogglWorkspace)
 		);
 	}
 
@@ -165,11 +170,14 @@ export default class ApiManager {
 		until: ISODate,
 		page: number
 	): Promise<Report<Detailed>> {
-		const response = this._api.reports.details(this._settings.workspace.id, {
-			since: since,
-			until: until,
-			page: page
-		});
+		const response = this._api.reports.details(
+			this._settings.workspace.id,
+			{
+				since: since,
+				until: until,
+				page: page
+			}
+		);
 		return response;
 	}
 

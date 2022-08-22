@@ -22,7 +22,7 @@ export default class UserInputHelper {
 	 * 					"new timer".
 	 */
 	public async selectTimer(timers: TimeEntry[]): Promise<TimeEntry> {
-		let [promise, resolve, reject] = externalizedPromise<TimeEntry>();
+		const [promise, resolve] = externalizedPromise<TimeEntry>();
 		new SelectTimerModal(this.plugin, resolve, timers).open();
 		return promise;
 	}
@@ -33,7 +33,7 @@ export default class UserInputHelper {
 	 * The value will be null when the user selected "no project".
 	 */
 	public async selectProject(): Promise<Project> {
-		let [promise, resolve, reject] = externalizedPromise<Project>();
+		const [promise, resolve] = externalizedPromise<Project>();
 		new SelectProjectModal(this.plugin, resolve).open();
 		return promise;
 	}
@@ -43,7 +43,7 @@ export default class UserInputHelper {
 	 * @returns The user input.
 	 */
 	public async enterTimerDetails(): Promise<TimeEntryStart> {
-		let [promise, resolve, reject] = externalizedPromise<TimeEntryStart>();
+		const [promise, resolve] = externalizedPromise<TimeEntryStart>();
 		new TimerDescriptionModal(this.plugin, resolve).open();
 		return promise;
 	}

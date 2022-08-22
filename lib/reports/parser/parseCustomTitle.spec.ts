@@ -36,7 +36,7 @@ describe('parseCustomTitle', () => {
 		test_query.customTitle = 'existing title';
 		testGroupBy(
 			{
-				input: [Keyword.TITLE, , Keyword.WEEK],
+				input: [Keyword.TITLE, Keyword.WEEK],
 				query: test_query,
 				remaining: null,
 				expectedTitle: null

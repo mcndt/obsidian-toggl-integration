@@ -40,7 +40,8 @@
 			_query = parseQuery(source);
 			getDetailedReport(_query)
 				.then(
-					(report) => (_detailedReport = filterDetailedReport(report, _query))
+					(report) =>
+						(_detailedReport = filterDetailedReport(report, _query))
 				)
 				.catch((err) => {
 					_apiError = err.message;
@@ -94,7 +95,8 @@
 	): Report<Detailed> {
 		// filter by project
 		if (query.projectSelection) {
-			const include = query.projectSelection.mode === SelectionMode.INCLUDE;
+			const include =
+				query.projectSelection.mode === SelectionMode.INCLUDE;
 			const list = query.projectSelection.list;
 			report.data = report.data.filter((d: Detailed) => {
 				const match = list.includes(d.project) || list.includes(d.pid);
@@ -104,7 +106,8 @@
 
 		// filter by client
 		if (query.clientSelection) {
-			const include = query.clientSelection.mode === SelectionMode.INCLUDE;
+			const include =
+				query.clientSelection.mode === SelectionMode.INCLUDE;
 			const list = query.clientSelection.list;
 			report.data = report.data.filter((d: Detailed) => {
 				const match = list.includes(d.client);
@@ -116,7 +119,9 @@
 		if (query.includedTags) {
 			report.data = report.data.filter((entry: Detailed) => {
 				return entry.tags.reduce((prev, curr) => {
-					return prev || query.includedTags.includes(curr.toLowerCase());
+					return (
+						prev || query.includedTags.includes(curr.toLowerCase())
+					);
 				}, false);
 			});
 		}
@@ -124,7 +129,9 @@
 		if (query.excludedTags) {
 			report.data = report.data.filter((entry: Detailed) => {
 				return entry.tags.reduce((prev, curr) => {
-					return prev && !query.excludedTags.includes(curr.toLowerCase());
+					return (
+						prev && !query.excludedTags.includes(curr.toLowerCase())
+					);
 				}, true);
 			});
 		}
