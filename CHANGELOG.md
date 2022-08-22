@@ -4,6 +4,7 @@
 
 - Some code cleanup 
 - Big queries are now performed sequentially to prevent all queries failing due to rate limiting (API error 429)
+- Timer suggestions now come from up to 10 days in the past (previously 7 days)
 
 ## [0.8.2]
 

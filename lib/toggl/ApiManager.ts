@@ -94,7 +94,10 @@ export default class TogglAPI {
 	 */
 	public async getRecentTimeEntries(): Promise<TimeEntry[]> {
 		const response = await this._api.reports.details(
-			this._settings.workspace.id
+			this._settings.workspace.id,
+			{
+				since: moment().subtract(9, 'day').format('YYYY-MM-DD')
+			}
 		);
 		console.debug('Toggl API response: recent time entries');
 		return response.data.map(
