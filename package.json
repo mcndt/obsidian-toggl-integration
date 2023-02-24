@@ -1,48 +1,54 @@
 {
-	"name": "obsidian-toggl-integration",
-	"version": "0.9.0",
-	"description": "Manage timers and generate time reports using Toggl Track without leaving Obsidian.",
-	"main": "main.js",
-	"files": [
-		"lib/**/*"
-	],
-	"scripts": {
-		"dev": "node esbuild.config.mjs",
-		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"test": "vitest run",
-		"test-watch": "vitest",
-		"coverage": "vitest run --coverage",
-		"version": "node version-bump.mjs && git add manifest.json versions.json"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "MIT",
-	"devDependencies": {
-		"@tsconfig/svelte": "^2.0.1",
-		"@types/d3": "^7.1.0",
-		"@types/node": "^14.17.18",
-		"@typescript-eslint/eslint-plugin": "^5.2.0",
-		"@typescript-eslint/parser": "^5.2.0",
-		"@vitest/coverage-c8": "^0.22.1",
-		"builtin-modules": "^3.2.0",
-		"esbuild": "0.13.12",
-		"esbuild-svelte": "^0.7.1",
-		"obsidian": "^0.13.26",
-		"prettier": "^2.4.1",
-		"rollup": "^2.57.0",
-		"rollup-plugin-svelte": "^7.1.0",
-		"svelte": "^3.49.0",
-		"svelte-check": "^2.2.6",
-		"svelte-preprocess": "^4.9.5",
-		"tslib": "^2.3.1",
-		"typescript": "^4.4.3",
-		"vitest": "^0.22.1"
-	},
-	"dependencies": {
-		"d3": "^7.2.1",
-		"moment": "^2.29.4",
-		"supports-color": "^9.2.2",
-		"svelte-select": "^4.4.3",
-		"toggl-client": "github:mcndt/toggl-client#obsidian-request-api"
-	}
+  "name": "obsidian-toggl-integration",
+  "version": "0.9.0",
+  "description": "Manage timers and generate time reports using Toggl Track without leaving Obsidian.",
+  "main": "main.js",
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "test": "vitest run",
+    "test-watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "version": "node version-bump.mjs && git add manifest.json versions.json"
+  },
+  "keywords": [],
+  "author": "Maxime Cannoodt (@mcndt)",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "@tsconfig/svelte": "^2.0.1",
+    "@types/d3": "^7.1.0",
+    "@types/node": "^14.17.18",
+    "@typescript-eslint/eslint-plugin": "^5.2.0",
+    "@typescript-eslint/parser": "^5.2.0",
+    "@vitest/coverage-c8": "^0.22.1",
+    "builtin-modules": "^3.2.0",
+    "dotenv": "^16.0.3",
+    "esbuild": "^0.15.14",
+    "esbuild-copy-static-files": "^0.1.0",
+    "esbuild-envfile-plugin": "^1.0.5",
+    "esbuild-plugin-eslint": "^0.1.1",
+    "esbuild-svelte": "^0.7.1",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-sort-keys-fix": "^1.1.2",
+    "obsidian": "^0.13.26",
+    "prettier": "^2.4.1",
+    "rollup": "^2.57.0",
+    "rollup-plugin-svelte": "^7.1.0",
+    "svelte": "^3.49.0",
+    "svelte-check": "^2.2.6",
+    "svelte-preprocess": "^4.9.5",
+    "tslib": "^2.3.1",
+    "typescript": "^4.4.3",
+    "vitest": "^0.22.1"
+  },
+  "dependencies": {
+    "d3": "^7.2.1",
+    "moment": "^2.29.4",
+    "supports-color": "^9.2.2",
+    "svelte-select": "^4.4.3",
+    "toggl-client": "github:mcndt/toggl-client#obsidian-request-api"
+  }
 }

@@ -2,7 +2,7 @@
  * Workspace-associated tag from the Toggl API.
  */
 export interface Tag {
-	id: number;
-	wid: number;
-	name: string;
+  id: number;
+  wid: number;
+  name: string;
 }

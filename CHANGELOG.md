@@ -2,7 +2,7 @@
 
 ## [0.9.0]
 
-- Some code cleanup 
+- Some code cleanup
 - Big queries are now performed sequentially to prevent all queries failing due to rate limiting (API error 429)
 - Timer suggestions now come from up to 10 days in the past (previously 7 days)
 
@@ -16,12 +16,11 @@
 
 - Reverted features from 0.8.0 release due to breaking errors. I will polish this up in the future for a rerelease.
 
-## [0.8.0] 
+## [0.8.0]
 
 ### ✨ Features
 
 - Toggl reports are now cached for the duration of an Obsidian user session, meaning that reports are only fetched once. Subsequent reports over the same time spans should now load nearly instantly!
-
 
 ## [0.7.3]
 
@@ -36,7 +35,7 @@
 - Fix timers having "Unknown project" on opening Obsidian (issue #32)
 - Fixed the start/stop button accent color to be more accessible on Minimal Theme (issue #67)
 
-## [0.7.1] 
+## [0.7.1]
 
 ### ✨ Features
 
@@ -54,7 +53,7 @@
 - Entries in a list report now show applied tags. Entries will only stack if their tags are the same. (issue #44)
 - Added support for filtering reports by tags via `{INCLUDE|EXCLUDE} TAGS #tag1[, #tag2, ...]` (issue #55)
 
-See the [documentation](https://github.com/mcndt/obsidian-toggl-integration/wiki/Toggl-Query-Language-(TQL)-Reference#filtering-tags) on how to use tag filters.
+See the [documentation](<https://github.com/mcndt/obsidian-toggl-integration/wiki/Toggl-Query-Language-(TQL)-Reference#filtering-tags>) on how to use tag filters.
 
 ### ⚙️ Internal
 
@@ -77,13 +76,12 @@ See the [documentation](https://github.com/mcndt/obsidian-toggl-integration/wiki
 ### 🐛 Fixes
 
 - Fixed summary report pie chart showing a black segment for time entries with no assigned project. (issue #53)
- 
-## [0.5.1] 
+
+## [0.5.1]
 
 ### ✨ Features
 
 - Time entries with a Markdown link as description (e.g. automatically started from Todoist tasks) will now only display the link annotation in list reports. (issue #43)
-
 
 ### 🐛 Fixes
 
@@ -98,7 +96,7 @@ See the [documentation](https://github.com/mcndt/obsidian-toggl-integration/wiki
 - Added support for filtering reports by client via `{INCLUDE|EXCLUDE} CLIENTS "Client A"[, "Client B", ...]`
 - Added support for grouping list reports by client via `GROUP BY CLIENT`
 
-## [0.4.1] 
+## [0.4.1]
 
 ### 🐛 Fixes
 
@@ -171,10 +169,10 @@ Hopefully this won't happen again!
 
 Hello! This release features a basic implementation of the Toggl Track summary view for the sidebar.
 Currently, this view can show you an overview of your day (total time + breakdown per project),
-but in the future I will add more functionality to it (e.g. choose between day or week summary). 
+but in the future I will add more functionality to it (e.g. choose between day or week summary).
 Additonally, you can see your current time entry here as well as a button to start or stop time entries.
 
-If you have any suggestions on how this sidebar panel can be improved for your workflow, please post in the Discussions tab on GitHub or tag me on the Obsidian Discord server! 
+If you have any suggestions on how this sidebar panel can be improved for your workflow, please post in the Discussions tab on GitHub or tag me on the Obsidian Discord server!
 
 ### ✨ Features
 
@@ -193,7 +191,6 @@ If you have any suggestions on how this sidebar panel can be improved for your w
 - Add license file
 
 ## [0.1.1] - 2021-08-08
-
 
 ### ✨ Features
 

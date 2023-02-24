@@ -1,9 +1,9 @@
-import type { PluginSettings } from 'lib/config/PluginSettings';
-import type { Report, Summary } from 'lib/model/Report';
-import type { TimeEntry } from 'lib/model/TimeEntry';
-import type TogglService from 'lib/toggl/TogglService';
-import type { ApiStatus } from 'lib/toggl/TogglService';
-import { writable } from 'svelte/store';
+import type { PluginSettings } from "lib/config/PluginSettings";
+import type { Report, Summary } from "lib/model/Report";
+import type { TimeEntry } from "lib/model/TimeEntry";
+import type TogglService from "lib/toggl/TogglService";
+import type { ApiStatus } from "lib/toggl/TogglService";
+import { writable } from "svelte/store";
 
 /**
  * NOTE: using {@link writable} for all of the stores because
