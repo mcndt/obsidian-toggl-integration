@@ -45,7 +45,6 @@ export default class TogglAPI {
 	public async getWorkspaces(): Promise<TogglWorkspace[]> {
 		const response = await this._api.workspaces.list();
 
-		await this._api.workspaces.list();
 		return response.map(
 			(w: any) =>
 				({
