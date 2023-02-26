@@ -1,5 +1,5 @@
 /**
- * Object to request start of new timers.
+ * @deprecated
  */
 export interface TimeEntryStart {
   /**
@@ -9,17 +9,20 @@ export interface TimeEntryStart {
   /**
    * The id of the project to start the new time entry on
    */
-  pid: number;
+  project_id: number;
   /**
    * a list of tag names (optional)
    */
-  tags?: string[];
+  tag_ids?: string[];
 }
 
 /**
  * Time entry data from the Toggl Track API.
  */
 
+/**
+ * @deprecated
+ */
 export interface TimeEntry extends TimeEntryStart {
   /**
    * time entry id
@@ -47,4 +50,8 @@ export interface TimeEntry extends TimeEntryStart {
    * project color in hex format
    */
   project_hex_color?: string;
+  /**
+   * Workspace id
+   */
+  workspace_id: number;
 }

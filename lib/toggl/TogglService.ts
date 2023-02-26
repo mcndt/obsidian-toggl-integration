@@ -1,41 +1,74 @@
 import { ACTIVE_TIMER_POLLING_INTERVAL } from "lib/constants";
-import type { Project } from "lib/model/Project";
-import type { Detailed, Report, Summary } from "lib/model/Report";
-import type { Tag } from "lib/model/Tag";
-import type { TimeEntry , TimeEntryStart } from "lib/model/TimeEntry";
+import type {
+  ClientId,
+  EnrichedWithClient,
+  ProjectId,
+  ProjectsResponseItem,
+  SummaryReportResponse,
+  SummaryTimeChart,
+  TagId,
+  TimeEntry,
+  TimeEntryStart,
+} from "lib/model/Report-v3";
 import type { TogglWorkspace } from "lib/model/TogglWorkspace";
-import type { Query } from "lib/reports/ReportQuery";
+import { ISODate, Query, SelectionMode } from "lib/reports/ReportQuery";
+import { getClientIds, setClients } from "lib/stores/clients";
+import { setCurrentTimer } from "lib/stores/currentTimer";
+import { setDailySummaryItems } from "lib/stores/dailySummary";
 import {
-  currentTimer,
-  dailySummary,
-  apiStatusStore,
-  togglService,
-} from "lib/util/stores";
+  enrichObjectWithProject,
+  getProjectIds,
+  Projects,
+  setProjects,
+} from "lib/stores/projects";
+import {
+  enrichObjectWithTags,
+  getTagIds,
+  setTags,
+  Tags,
+} from "lib/stores/tags";
+import { apiStatusStore, togglService } from "lib/util/stores";
 import type MyPlugin from "main";
+import moment from "moment";
 import { Notice } from "obsidian";
+import { derived, get } from "svelte/store";
 
 import TogglAPI from "./ApiManager";
 
-
 export enum ApiStatus {
-  AVAILABLE,
-  NO_TOKEN,
-  UNREACHABLE,
-  UNTESTED,
+  AVAILABLE = "AVAILABLE",
+  NO_TOKEN = "NO_TOKEN",
+  UNREACHABLE = "UNREACHABLE",
+  UNTESTED = "UNTESTED",
 }
+
+export type SummaryReport = {
+  projectSummary: (SummaryReportResponse["groups"][number] & {
+    $project: EnrichedWithClient<ProjectsResponseItem>;
+  })[];
+  timeChart: Omit<SummaryTimeChart, "graph"> & {
+    graph: {
+      date: string;
+      seconds: number;
+    }[];
+  };
+};
+
+export type EnrichedDetailedReportItem = Awaited<
+  ReturnType<InstanceType<typeof TogglService>["getEnrichedDetailedReport"]>
+>[number];
+
+export type SummaryReportStore = Awaited<
+  ReturnType<InstanceType<typeof TogglService>["getSummaryReport"]>
+>;
 
 export default class TogglService {
   private _plugin: MyPlugin;
-
-  // TODO: rewrite toggl API client with Obsidian Request API
-  // private _api: any;
   private _apiManager: TogglAPI;
 
   // UI references
   private _statusBarItem: HTMLElement;
 
-  private _projects: Project[] = [];
-  private _tags: Tag[] = [];
   private _currentTimerInterval: number = null;
   private _currentTimeEntry: TimeEntry = null;
   private _ApiAvailable = ApiStatus.UNTESTED;
@@ -61,16 +94,23 @@ export default class TogglService {
     if (token != null && token != "") {
       try {
         this._apiManager = new TogglAPI();
-        this._apiManager.setToken(token);
+        await this._apiManager.setToken(token);
         this._ApiAvailable = ApiStatus.AVAILABLE;
-        this.startTimerInterval();
-        this._preloadWorkspaceData();
       } catch {
         console.error("Cannot connect to toggl API.");
         this._statusBarItem.setText("Cannot connect to Toggl API");
         this._ApiAvailable = ApiStatus.UNREACHABLE;
         this.noticeAPINotAvailable();
+        return;
       }
+      // Cache the projects and tags.
+      await this._preloadWorkspaceData();
+
+      // Fetch daily summary data and start polling for current timers.
+      this.startTimerInterval();
+      this._apiManager
+        .getDailySummary()
+        .then((response) => setDailySummaryItems(response));
     } else {
       this._statusBarItem.setText("Open settings to add a Toggl API token.");
       this._ApiAvailable = ApiStatus.NO_TOKEN;
@@ -91,47 +131,32 @@ export default class TogglService {
 
   /** Preloads data such as the user's projects. */
   private async _preloadWorkspaceData() {
-    this._apiManager.getProjects().then((response: Project[]) => {
-      this._projects = response;
-
-      // Update the current timer if it was fetched before the preload finished.
-      currentTimer.update((entry) => {
-        if (entry && entry.pid !== undefined) {
-          const project = response.find((p) => p.id === entry.pid);
-          return {
-            ...entry,
-            project: project.name,
-            project_hex_color: project.hex_color,
-          };
-        }
-        return entry;
-      });
-
-      // if there is already a timer running, add the project name.
-    });
-    this._apiManager.getTags().then((response: Tag[]) => {
-      this._tags = response;
-    });
-    this._apiManager
-      .getDailySummary()
-      .then((response: Report<Summary>) => dailySummary.set(response));
+    // Preload projects and tags.
+    await Promise.all([
+      this._apiManager.getProjects().then(setProjects),
+      this._apiManager.getTags().then(setTags),
+      this._apiManager.getClients().then(setClients),
+    ]);
   }
 
   public async startTimer() {
     this.executeIfAPIAvailable(async () => {
-      let new_timer: TimeEntryStart;
-      const timers = await this._apiManager.getRecentTimeEntries();
-      new_timer = await this._plugin.input.selectTimer(timers);
+      let selectedEntry: TimeEntryStart;
 
-      // user wants to start a new timer
-      if (new_timer == null) {
+      const recentEntries = await this._apiManager.getRecentTimeEntries();
+      const enrichedEntries = recentEntries.map((entry) =>
+        enrichObjectWithProject(entry),
+      );
+
+      selectedEntry = await this._plugin.input.selectTimer(enrichedEntries);
+
+      if (selectedEntry == null) {
         const project = await this._plugin.input.selectProject();
-        new_timer = await this._plugin.input.enterTimerDetails();
-        new_timer.pid = project != null ? project.id : null;
+        selectedEntry = await this._plugin.input.enterTimerDetails();
+        selectedEntry.project_id = project != null ? project.id : null;
       }
 
-      this._apiManager.startTimer(new_timer).then((t: TimeEntry) => {
-        console.debug(`Started timer: ${t}`);
+      this._apiManager.startTimer(selectedEntry).then((entry) => {
         this.updateCurrentTimer();
       });
     });
@@ -140,7 +165,7 @@ export default class TogglService {
   public async stopTimer() {
     this.executeIfAPIAvailable(() => {
       if (this._currentTimeEntry != null) {
-        this._apiManager.stopTimer(this._currentTimeEntry.id).then(() => {
+        this._apiManager.stopTimer(this._currentTimeEntry).then(() => {
           this.updateCurrentTimer();
         });
       }
@@ -163,8 +188,9 @@ export default class TogglService {
     if (!this.isApiAvailable) {
       return;
     }
+
     const prev = this._currentTimeEntry;
-    let curr: any;
+    let curr: TimeEntry;
 
     try {
       curr = await this._apiManager.getCurrentTimer();
@@ -176,7 +202,11 @@ export default class TogglService {
 
     // TODO properly handle multiple workspaces
     // Drop timers from different workspaces
-    if (curr != null && curr.wid != this.workspaceId && curr.pid != undefined) {
+    if (
+      curr != null &&
+      curr.workspace_id != this.workspaceId &&
+      curr.project_id != undefined
+    ) {
       curr = null;
     }
 
@@ -195,9 +225,9 @@ export default class TogglService {
         } else {
           if (
             prev.description != curr.description ||
-            prev.pid != curr.pid ||
+            prev.project_id != curr.project_id ||
             prev.start != curr.start ||
-            isTagsChanged(prev.tags, curr.tags)
+            isTagsChanged(prev.tag_ids, curr.tag_ids)
           ) {
             // Case 3: timer details update (same ID)
             changed = true;
@@ -212,12 +242,11 @@ export default class TogglService {
     }
 
     if (changed) {
-      const val = curr != null ? this.responseToTimeEntry(curr) : null;
-      currentTimer.set(val);
+      setCurrentTimer(curr);
       // fetch updated daily summary report
       this._apiManager
         .getDailySummary()
-        .then((response: Report<Summary>) => dailySummary.set(response));
+        .then((response) => setDailySummaryItems(response));
     }
 
     this._currentTimeEntry = curr;
@@ -285,13 +314,54 @@ export default class TogglService {
     }
   }
 
-  /**
-   * Gets a Toggl Summary report based on the query parameter.
-   * @param query query to be fullfilled.
-   * @returns Summary report returned by Toggl API.
-   */
-  public async getSummaryReport(query: Query): Promise<Report<Summary>> {
-    return this._apiManager.getSummary(query.from, query.to);
+  public async getSummaryReport(query: Query) {
+    const filters = getObjectIdsFromQuery(query);
+    const requestOptions = {
+      ...filters,
+      end_date: query.to,
+      resolution: getTimeChartResolution(query.from, query.to),
+      start_date: query.from,
+    };
+
+    const timeChartRequest =
+      this._apiManager.getSummaryTimeChart(requestOptions);
+    const projectSummaryRequest = this._apiManager.getSummary(requestOptions);
+
+    const [timeChart, projectSummary] = await Promise.all([
+      timeChartRequest,
+      projectSummaryRequest,
+    ]);
+
+    // enrich the timeChart with dates
+    const dates = getTimeChartDates(
+      query.from,
+      timeChart.resolution,
+      timeChart.graph.length,
+    );
+
+    const enrichedTimeChart = {
+      ...timeChart,
+      graph: timeChart.graph.map((item, index) => ({
+        ...item,
+        date: dates[index],
+      })),
+    };
+
+    // NOTE: we return a store so that reports will reactively
+    //       re-render when the projects are refetched.
+    const store = derived([Projects], (): SummaryReport => {
+      // enrich the projectSummary
+      const enrichedProjectSummary = projectSummary.groups.map((item) =>
+        enrichObjectWithProject(item, "id"),
+      );
+
+      return {
+        projectSummary: enrichedProjectSummary,
+        timeChart: enrichedTimeChart,
+      };
+    });
+
+    return store;
   }
 
   /**
@@ -301,8 +371,20 @@ export default class TogglService {
    * @param query query to be fullfilled.
    * @returns Summary report returned by Toggl API.
    */
-  public async GetDetailedReport(query: Query): Promise<Report<Detailed>> {
-    return this._apiManager.getDetailedReport(query.from, query.to);
+  public async getEnrichedDetailedReport(query: Query) {
+    const { client_ids, project_ids, tag_ids } = getObjectIdsFromQuery(query);
+
+    const items = await this._apiManager.getDetailedReport({
+      client_ids,
+      end_date: query.to,
+      project_ids,
+      start_date: query.from,
+      tag_ids,
+    });
+
+    return items
+      .map((item) => enrichObjectWithProject(item))
+      .map(enrichObjectWithTags);
   }
 
   /** True if API token is valid and Toggl API is responsive. */
@@ -313,14 +395,17 @@ export default class TogglService {
     return false;
   }
 
-  /** User's projects as preloaded on plugin init. */
-  public get cachedProjects(): Project[] {
-    return this._projects;
+  /** User's projects as preloaded on plugin init. @deprecated */
+  public get cachedProjects() {
+    return get(Projects);
   }
 
-  /** User's workspace tags as preloaded on plugin init */
-  public get cachedTags(): Tag[] {
-    return this._tags;
+  /**
+   * User's workspace tags as preloaded on plugin init
+   * @deprecated read from the store instead.
+   *  */
+  public get cachedTags() {
+    return get(Tags);
   }
 
   // Get the current time entry
@@ -328,43 +413,77 @@ export default class TogglService {
     return this._currentTimeEntry;
   }
 
-  private get workspaceId(): string {
-    return this._plugin.settings.workspace.id;
-  }
-
-  // NOTE: relies on cached projects for project names
-  private responseToTimeEntry(response: any): TimeEntry {
-    const project = this.cachedProjects.find((p) => p.id == response.pid);
-    return {
-      description: response.description,
-      duration: response.duration,
-      end: response.end,
-      id: response.id,
-      pid: response.pid,
-      project:
-        response.pid != undefined
-          ? project
-            ? project.name
-            : "(Unknown)"
-          : "(No project)",
-      project_hex_color: project ? project.hex_color : "var(--text-muted)",
-      start: response.start,
-      tags: response.tags,
-    };
+  private get workspaceId(): number {
+    return parseInt(this._plugin.settings.workspace.id);
   }
 }
 
-function isTagsChanged(old_tags: string[], new_tags: string[]) {
-  old_tags = old_tags || [];
-  new_tags = new_tags || [];
+function isTagsChanged(old_tag_ids: number[], new_tags_ids: number[]) {
+  old_tag_ids = old_tag_ids || [];
+  new_tags_ids = new_tags_ids || [];
 
-  if (old_tags.length != new_tags.length) {
+  if (old_tag_ids.length != new_tags_ids.length) {
     return true;
   }
-  for (const tag of old_tags) {
-    if (new_tags.indexOf(tag) < 0) {
+  for (const tag of old_tag_ids) {
+    if (new_tags_ids.indexOf(tag) < 0) {
       return true;
     }
   }
   return false;
+}
+
+function getObjectIdsFromQuery(query: Query): {
+  project_ids: ProjectId[];
+  client_ids: ClientId[];
+  tag_ids: TagId[];
+} {
+  const project_ids =
+    query.projectSelection &&
+    query.projectSelection.mode === SelectionMode.INCLUDE
+      ? getProjectIds(query.projectSelection.list)
+      : undefined;
+
+  const client_ids =
+    query.clientSelection &&
+    query.clientSelection.mode === SelectionMode.INCLUDE
+      ? getClientIds(query.clientSelection.list)
+      : undefined;
+
+  const tag_ids = query.includedTags
+    ? getTagIds(query.includedTags)
+    : undefined;
+
+  return { client_ids, project_ids, tag_ids };
+}
+
+function getTimeChartResolution(
+  from: ISODate,
+  to: ISODate,
+): SummaryTimeChart["resolution"] {
+  const durationInDays = moment(to).diff(moment(from), "days");
+
+  if (durationInDays <= 31) {
+    return "day";
+  }
+  if (durationInDays <= 120) {
+    return "week";
+  }
+  return "month";
+}
+
+function getTimeChartDates(
+  from: ISODate,
+  resolution: SummaryTimeChart["resolution"],
+  count: number,
+): ISODate[] {
+  const startDate = moment(from);
+
+  const dates = [];
+  for (let i = 0; i < count; i++) {
+    const date = startDate.clone().add(i, resolution);
+    dates.push(date.format("YYYY-MM-DD"));
+  }
+
+  return dates;
 }

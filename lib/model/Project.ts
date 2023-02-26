@@ -1,3 +1,4 @@
+/** @deprecated */
 export interface Project {
   /**
    * The name of the project

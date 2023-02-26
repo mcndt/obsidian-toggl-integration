@@ -1,4 +1,5 @@
 /**
+ * @deprecated
  * Workspace-associated tag from the Toggl API.
  */
 export interface Tag {

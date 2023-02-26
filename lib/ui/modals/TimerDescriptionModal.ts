@@ -1,4 +1,4 @@
-import type { TimeEntryStart } from "lib/model/TimeEntry";
+import type { TimeEntryStart } from "lib/model/Report-v3";
 import type MyPlugin from "main";
 import { Modal } from "obsidian";
 
@@ -25,7 +25,7 @@ export class TimerDescriptionModal extends Modal {
         onSubmit: (input: { description: string; tags: string[] }) => {
           this.resolve({
             description: input.description,
-            pid: null,
+            project_id: null,
             tags: input.tags != null ? input.tags : [],
           });
           this.close();

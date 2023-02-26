@@ -1,9 +1,14 @@
+import type {
+  EnrichedWithProject,
+  SearchTimeEntriesResponseItem,
+  TimeEntryStart,
+} from "lib/model/Report-v3";
 import type MyPlugin from "main";
 import { FuzzyMatch, FuzzySuggestModal } from "obsidian";
 
-import type { TimeEntry } from "../../model/TimeEntry";
-
 import StartTimerModalListItem from "./StartTimerModalListItem.svelte";
+
+type TimeEntry = EnrichedWithProject<SearchTimeEntriesResponseItem>;
 
 enum TimerListItemType {
   NEW_TIMER,
@@ -12,19 +17,19 @@ enum TimerListItemType {
 
 interface TimerListItem {
   type: TimerListItemType;
-  entry?: TimeEntry;
+  item?: TimeEntry;
   description?: string;
   project?: string;
   color?: string;
 }
 
 export default class StartTimerModal extends FuzzySuggestModal<TimerListItem> {
-  private readonly resolve: (value: TimeEntry) => void;
+  private readonly resolve: (value: TimeEntryStart) => void;
   private readonly list: TimerListItem[];
 
   constructor(
     plugin: MyPlugin,
-    resolve: (value: TimeEntry) => void,
+    resolve: (value: TimeEntryStart) => void,
     timeEntries: TimeEntry[],
   ) {
     super(plugin.app);
@@ -62,7 +67,10 @@ export default class StartTimerModal extends FuzzySuggestModal<TimerListItem> {
     });
   }
 
-  updateSuggestionElForMode(item: FuzzyMatch<TimeEntry>, el: HTMLElement) {}
+  updateSuggestionElForMode(
+    item: FuzzyMatch<SearchTimeEntriesResponseItem>,
+    el: HTMLElement,
+  ) {}
 
   async onChooseItem(
     item: TimerListItem,
@@ -71,30 +79,34 @@ export default class StartTimerModal extends FuzzySuggestModal<TimerListItem> {
     if (item.type === TimerListItemType.NEW_TIMER) {
       this.resolve(null);
     } else if (item.type === TimerListItemType.PAST_ENTRY) {
-      this.resolve(item.entry);
+      this.resolve({
+        description: item.item.description,
+        project_id: item.item.project_id,
+      });
     }
     this.close();
   }
 
   private _generateTimerList(items: TimeEntry[]): TimerListItem[] {
     // remove repeated entries
-    items = uniqueBy(items, (a: TimeEntry, b: TimeEntry) => {
+    items = uniqueBy(items, (a, b) => {
       const cond1 = a.description === b.description;
-      const cond2 = a.pid === b.pid;
+      const cond2 = a.project_id === b.project_id;
       return cond1 && cond2;
     });
+
     // remove the entries without a description
     items = items.filter(
-      (t: TimeEntry) => t.description != null && t.description != "",
+      (item) => item.description != null && item.description != "",
     );
 
     let list: TimerListItem[] = items.map(
-      (e: TimeEntry) =>
+      (item) =>
         ({
-          color: e.project_hex_color || "#CECECE",
-          description: e.description,
-          entry: e,
-          project: e.project || "(No Project)",
+          color: item.$project?.color,
+          description: item.description,
+          item: item,
+          project: item.$project?.name || "(No Project)",
           type: TimerListItemType.PAST_ENTRY,
         } as TimerListItem),
     );

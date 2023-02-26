@@ -1,7 +1,11 @@
-import type { Project } from "lib/model/Project";
-import type { TimeEntry, TimeEntryStart } from "lib/model/TimeEntry";
+import type {
+  EnrichedWithProject,
+  ProjectsResponseItem,
+  SearchTimeEntriesResponseItem,
+  TimeEntryStart,
+} from "lib/model/Report-v3";
 import { SelectProjectModal } from "lib/ui/modals/SelectProjectModal";
-import SelectTimerModal from "lib/ui/modals/StartTimerModal";
+import StartTimerModal from "lib/ui/modals/StartTimerModal";
 import { TimerDescriptionModal } from "lib/ui/modals/TimerDescriptionModal";
 import type MyPlugin from "main";
 
@@ -16,15 +20,17 @@ export default class UserInputHelper {
 
   /**
    *
-   * @param timers List of {@link TimeEntry} objects to display in the
+   * @param timers List of {@link SearchTimeEntriesResponseItem} objects to display in the
    * 				Fuzzy suggest modal
    * @returns Promise which resolves when the user selected a time entry from
    * 					the passed list. Resolves to null value if user selects
    * 					"new timer".
    */
-  public async selectTimer(timers: TimeEntry[]): Promise<TimeEntry> {
-    const [promise, resolve] = externalizedPromise<TimeEntry>();
-    new SelectTimerModal(this.plugin, resolve, timers).open();
+  public async selectTimer(
+    timers: EnrichedWithProject<SearchTimeEntriesResponseItem>[],
+  ): Promise<TimeEntryStart> {
+    const [promise, resolve] = externalizedPromise<TimeEntryStart>();
+    new StartTimerModal(this.plugin, resolve, timers).open();
     return promise;
   }
 
@@ -33,8 +39,8 @@ export default class UserInputHelper {
    * @returns a promise that returns the user-selected project.
    * The value will be null when the user selected "no project".
    */
-  public async selectProject(): Promise<Project> {
-    const [promise, resolve] = externalizedPromise<Project>();
+  public async selectProject(): Promise<ProjectsResponseItem> {
+    const [promise, resolve] = externalizedPromise<ProjectsResponseItem>();
     new SelectProjectModal(this.plugin, resolve).open();
     return promise;
   }

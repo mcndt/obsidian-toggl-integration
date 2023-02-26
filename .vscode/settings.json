@@ -14,7 +14,9 @@
   },
   "editor.rulers": [80],
   "editor.tabSize": 2,
-  "editor.detectIndentation": false,
+  "editor.detectIndentation": true,
   "conventionalCommits.scopes": ["reports", "api"],
-  "editor.definitionLinkOpensInPeek": true
+  "editor.definitionLinkOpensInPeek": true,
+"editor.guides.highlightActiveIndentation": true,
+"editor.indentSize": "tabSize"	
 }

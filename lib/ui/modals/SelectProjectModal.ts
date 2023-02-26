@@ -1,7 +1,8 @@
-import type { Project } from "lib/model/Project";
-import type TogglService from "lib/toggl/TogglService";
+import type { ProjectsResponseItem } from "lib/model/Report-v3";
+import { Projects } from "lib/stores/projects";
 import type MyPlugin from "main";
 import { FuzzyMatch, FuzzySuggestModal } from "obsidian";
+import { get } from "svelte/store";
 
 import SelectProjectModalListItem from "./SelectProjectModalListItem.svelte";
 
@@ -10,28 +11,29 @@ enum ProjectItemType {
   NO_PROJECT,
 }
 
-interface ProjectItem {
+type ProjectItem = {
   type: ProjectItemType;
-  project?: Project;
+  project?: ProjectsResponseItem;
   projectName?: string;
   color?: string;
-}
+};
 
 export class SelectProjectModal extends FuzzySuggestModal<ProjectItem> {
-  private readonly toggl: TogglService;
   private readonly list: ProjectItem[];
-  private readonly resolve: (value: Project) => void;
+  private readonly resolve: (value: ProjectsResponseItem) => void;
 
   /**
    * The resolve callback will be called with the selected
    * project as parameter when the user makes input. Value
    * will be null if the user selected 'No Project'.
    */
-  constructor(plugin: MyPlugin, resolve: (value: Project) => void) {
+  constructor(
+    plugin: MyPlugin,
+    resolve: (value: ProjectsResponseItem) => void,
+  ) {
     super(plugin.app);
-    this.toggl = plugin.toggl;
     this.resolve = resolve;
-    this.list = this._generateProjectList(this.toggl.cachedProjects);
+    this.list = this._generateProjectList(get(Projects));
     this.setPlaceholder("Select a project");
     this.setInstructions([
       { command: "↑↓", purpose: "to navigate" },
@@ -68,14 +70,14 @@ export class SelectProjectModal extends FuzzySuggestModal<ProjectItem> {
     this.close();
   }
 
-  private _generateProjectList(items: Project[]): ProjectItem[] {
-    items = items.filter((p: Project) => p.active === true);
+  private _generateProjectList(items: ProjectsResponseItem[]): ProjectItem[] {
+    items = items.filter((project) => project.active === true);
     const list = items.map(
-      (p: Project) =>
+      (project) =>
         ({
-          color: p.hex_color,
-          project: p,
-          projectName: p.name,
+          color: project.color,
+          project: project,
+          projectName: project.name,
           type: ProjectItemType.PROJECT,
         } as ProjectItem),
     );

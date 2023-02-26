@@ -4,6 +4,7 @@ https://github.com/toggl/toggl_api_docs/blob/master/reports.md#successful-respon
 https://github.com/toggl/toggl_api_docs/blob/master/reports/detailed.md#response
 */
 
+/** @deprecated */
 export interface Report<T> {
   /** total time in milliseconds for the selected report. */
   total_grand?: number;
@@ -32,6 +33,7 @@ export interface Report<T> {
 
 /**
  * Object returned by the /reports/api/v2/details endpoint.
+ * @deprecated
  */
 export interface Detailed {
   id: any;
@@ -58,6 +60,7 @@ export interface Detailed {
 
 /**
  * Object returned by the /reports/api/v2/summary endpoint
+ * @deprecated
  */
 export interface Summary {
   id?: number;
@@ -67,17 +70,20 @@ export interface Summary {
   items?: any[];
 }
 
+/** @deprecated */
 export interface SummaryTitle {
   project: string;
   hex_color: string;
   client: string;
 }
 
+/** @deprecated */
 export interface TotalCurrency {
   currency?: string;
   amount?: number;
 }
 
+/** @deprecated */
 export interface Error {
   /** the general message of the occurred error */
   message: string;
