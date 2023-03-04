@@ -6,7 +6,9 @@ import { Keyword, Token } from "./Parser";
  */
 export function tokenize(query: string): Token[] {
   // split into array of tokens
-  let match = query.match(/(?:[^\s"',]+|"[^"]*"|'[^']*')+/g);
+  let match: RegExpMatchArray | [] = query.match(
+    /(?:[^\s"',]+|"[^"]*"|'[^']*')+/g,
+  );
   match = match || [];
 
   // only use double quotes to signify user-strings
