@@ -1,19 +1,22 @@
 {
-  "editor.formatOnSave": true, 
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
   "[html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
- },
- "[javascript]": {
+  },
+  "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
- },
- "[typescript]": {
+  },
+  "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
- },
-"editor.rulers": [
-   80
-],
-"conventionalCommits.scopes": [
-   "reports",
-   "api"
-]
+  },
+  "editor.rulers": [80],
+  "editor.tabSize": 2,
+  "editor.detectIndentation": true,
+  "conventionalCommits.scopes": ["reports", "api"],
+  "editor.definitionLinkOpensInPeek": true,
+"editor.guides.highlightActiveIndentation": true,
+"editor.indentSize": "tabSize"	
 }

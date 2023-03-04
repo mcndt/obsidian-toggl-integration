@@ -1,14 +1,16 @@
-import esbuild from 'esbuild';
-import process from 'process';
-import builtins from 'builtin-modules';
+/* eslint-disable no-mixed-spaces-and-tabs */
+import { copyFileSync, writeFileSync } from "fs";
+import { join } from "path";
+import process from "process";
 
-import esbuildSvelte from 'esbuild-svelte';
-import sveltePreprocess from 'svelte-preprocess';
-
-import { config } from 'dotenv';
-import { join } from 'path';
-import { copyFileSync, writeFileSync } from 'fs';
-import copyStaticFiles from 'esbuild-copy-static-files';
+import builtins from "builtin-modules";
+import { config } from "dotenv";
+import esbuild from "esbuild";
+import copyStaticFiles from "esbuild-copy-static-files";
+import envFilePlugin from "esbuild-envfile-plugin";
+import eslint from "esbuild-plugin-eslint";
+import esbuildSvelte from "esbuild-svelte";
+import sveltePreprocess from "svelte-preprocess";
 
 config();
 
@@ -18,74 +20,77 @@ if you want to view the source, please visit the github repository of this plugi
 */
 `;
 
-const prod = process.argv[2] === 'production';
-const dir = prod ? './' : process.env.OUTDIR;
-const outfile = join(dir, 'main.js');
-const outstyles = join(dir, 'styles.css');
+const prod = process.argv[2] === "production";
+const dir = prod ? "./" : process.env.OUTDIR;
+const outfile = join(dir, "main.js");
+const outstyles = join(dir, "styles.css");
 
 if (!prod) {
-    copyFileSync('./manifest.json', join(dir, 'manifest.json'));
-    writeFileSync(
-        join(dir, '.hotreload'),
-        'This file is used to enable hot reloading using the Hot Reload plugin. See https://github.com/pjeby/hot-reload for more information.'
-    );
+  copyFileSync("./manifest.json", join(dir, "manifest.json"));
+  writeFileSync(
+    join(dir, ".hotreload"),
+    "This file is used to enable hot reloading using the Hot Reload plugin. See https://github.com/pjeby/hot-reload for more information.",
+  );
 }
 
 esbuild
-    .build({
-        banner: {
-            js: banner
-        },
-        entryPoints: ['main.ts'],
-        bundle: true,
-        plugins: [
-            esbuildSvelte({
-                compilerOptions: { css: true },
-                preprocess: sveltePreprocess()
+  .build({
+    banner: {
+      js: banner,
+    },
+    bundle: true,
+    entryPoints: ["main.ts"],
+    external: [
+      "obsidian",
+      "electron",
+      "env",
+      "@codemirror/autocomplete",
+      "@codemirror/closebrackets",
+      "@codemirror/collab",
+      "@codemirror/commands",
+      "@codemirror/comment",
+      "@codemirror/fold",
+      "@codemirror/gutter",
+      "@codemirror/highlight",
+      "@codemirror/history",
+      "@codemirror/language",
+      "@codemirror/lint",
+      "@codemirror/matchbrackets",
+      "@codemirror/panel",
+      "@codemirror/rangeset",
+      "@codemirror/rectangular-selection",
+      "@codemirror/search",
+      "@codemirror/state",
+      "@codemirror/stream-parser",
+      "@codemirror/text",
+      "@codemirror/tooltip",
+      "@codemirror/view",
+      ...builtins,
+    ],
+    format: "cjs",
+    logLevel: "info",
+    outfile: outfile,
+    plugins: [
+      envFilePlugin,
+      esbuildSvelte({
+        compilerOptions: { css: true },
+        preprocess: sveltePreprocess(),
+      }),
+      eslint(),
+      ...(!prod
+        ? [
+            copyStaticFiles({
+              dereference: true,
+              dest: outstyles,
+              errorOnExist: false,
+              src: "./styles.css",
             }),
-            ...(!prod
-                ? [
-                      copyStaticFiles({
-                          src: './styles.css',
-                          dest: outstyles,
-                          dereference: true,
-                          errorOnExist: false
-                      })
-                  ]
-                : [])
-        ],
-        external: [
-            'obsidian',
-            'electron',
-            '@codemirror/autocomplete',
-            '@codemirror/closebrackets',
-            '@codemirror/collab',
-            '@codemirror/commands',
-            '@codemirror/comment',
-            '@codemirror/fold',
-            '@codemirror/gutter',
-            '@codemirror/highlight',
-            '@codemirror/history',
-            '@codemirror/language',
-            '@codemirror/lint',
-            '@codemirror/matchbrackets',
-            '@codemirror/panel',
-            '@codemirror/rangeset',
-            '@codemirror/rectangular-selection',
-            '@codemirror/search',
-            '@codemirror/state',
-            '@codemirror/stream-parser',
-            '@codemirror/text',
-            '@codemirror/tooltip',
-            '@codemirror/view',
-            ...builtins
-        ],
-        format: 'cjs',
-        watch: !prod,
-        target: 'es2018',
-        logLevel: 'info',
-        sourcemap: prod ? false : 'inline',
-        treeShaking: true,
-        outfile: outfile
-    })
-    .catch(() => process.exit(1));
+          ]
+        : []),
+    ],
+    sourcemap: prod ? false : "inline",
+    target: "es2018",
+    treeShaking: true,
+    watch: !prod,
+  })
+  .catch(() => process.exit(1));
