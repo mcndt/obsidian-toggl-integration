@@ -31,6 +31,7 @@
     "esbuild-envfile-plugin": "^1.0.5",
     "esbuild-plugin-eslint": "^0.1.1",
     "esbuild-svelte": "^0.7.1",
+    "eslint": "^8.35.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-sort-keys-fix": "^1.1.2",
     "obsidian": "^0.13.26",
