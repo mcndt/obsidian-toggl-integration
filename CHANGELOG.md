@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.10.0]
+
+- Upgraded to Toggl v9 API and Toggl Reports v3 API. Summary reports are now much faster to load, even for longer time spans (e.g. 1 year)
+
 ## [0.9.0]
 
 - Some code cleanup
