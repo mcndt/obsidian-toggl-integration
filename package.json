@@ -1,6 +1,6 @@
 {
   "name": "obsidian-toggl-integration",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Manage timers and generate time reports using Toggl Track without leaving Obsidian.",
   "main": "main.js",
   "files": [
