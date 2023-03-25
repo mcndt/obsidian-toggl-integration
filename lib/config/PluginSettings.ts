@@ -22,4 +22,7 @@ export interface PluginSettings {
 
   /** Update the day's total time in real-time in the sidebar */
   updateInRealTime?: boolean;
+
+  /** Parse the description of timers and projects as Markdown. */
+  parseMarkdown?: boolean;
 }

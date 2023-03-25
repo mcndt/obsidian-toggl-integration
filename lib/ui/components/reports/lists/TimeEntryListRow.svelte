@@ -2,6 +2,8 @@
   import type { ReportListItem } from "./types";
   import TimerTag from "../../current_timer/TimerTag.svelte";
   import { secondsToTimeString } from "lib/util/millisecondsToTimeString";
+  import { renderMarkdown } from "lib/util/renderMarkdown";
+  import { settingsStore } from "lib/util/stores";
 
   export let data: ReportListItem;
   export let showProject: boolean;
@@ -25,7 +27,13 @@
         <span>{data.count}</span>
       </div>
     {/if}
-    <span class="mr-2">{data.name}</span>
+    <span class="mr-2">
+      {#if $settingsStore.parseMarkdown}
+        {@html renderMarkdown(data.name)}
+      {:else}
+        {data.name}
+      {/if}
+    </span>
     {#each data.tags as tag}
       <span class="mr-1"><TimerTag name={tag} /></span>
     {/each}
