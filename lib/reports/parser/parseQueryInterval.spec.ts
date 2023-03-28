@@ -83,6 +83,33 @@ describe("parseQueryInterval (relative intervals)", () => {
     );
   });
 
+  test("Single date", () => {
+    const other_test_date = "2023-05-13";
+
+    testParseQueryInterval(
+      {
+        from: other_test_date,
+        input: [other_test_date, "extra_token"],
+        remaining: ["extra_token"],
+        until: other_test_date,
+      },
+      test_date,
+    );
+  });
+
+  test("fails for gibberish date", () => {
+    testParseQueryInterval(
+      {
+        from: null,
+        input: ["gibberish", "extra_token"],
+        remaining: null,
+        until: null,
+      },
+      test_date,
+      /Query must include a time interval expression/,
+    );
+  });
+
   test('"PAST 10 DAYS" includes the last ten days', () => {
     test_date = "2020-01-10";
 
