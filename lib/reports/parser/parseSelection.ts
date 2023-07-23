@@ -1,4 +1,4 @@
-import { Query, SelectionMode, tag } from "../ReportQuery";
+import { Query, QueryType, SelectionMode, tag } from "../ReportQuery";
 
 import {
   InvalidTokenError,
@@ -96,6 +96,11 @@ export class SelectionParser extends Parser {
         if (mode === SelectionMode.INCLUDE) {
           query.includedTags = list as tag[];
         } else if (mode === SelectionMode.EXCLUDE) {
+          if (query.type === QueryType.SUMMARY) {
+            throw new QueryParseError(
+              "Filtering by excluded tags is not supported for summary reports.",
+            );
+          }
           query.excludedTags = list as tag[];
         }
         break;

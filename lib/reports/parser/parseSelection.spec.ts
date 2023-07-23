@@ -79,11 +79,23 @@ describe("parseSelection", () => {
     });
   });
 
-  test('"EXCLUDE TAGS" adds excludedTags array to query object', () => {
+  test('"EXCLUDE TAGS" throws on SUMMARY QUERY', () => {
+    testParseSelection(
+      {
+        excludedTags: ["tag1", "tag2"],
+        input: [Keyword.EXCLUDE, Keyword.TAGS, "tag1", "tag2"],
+        query: test_query,
+        remaining: null,
+      },
+      /Filtering by excluded tags is not supported for summary reports./,
+    );
+  });
+
+  test('"EXCLUDE TAGS" adds excludedTags array to query object for LIST query', () => {
     testParseSelection({
       excludedTags: ["tag1", "tag2"],
       input: [Keyword.EXCLUDE, Keyword.TAGS, "tag1", "tag2"],
-      query: test_query,
+      query: { ...test_query, type: QueryType.LIST },
       remaining: [],
     });
   });
