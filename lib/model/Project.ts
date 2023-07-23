@@ -1,31 +1,32 @@
+/** @deprecated */
 export interface Project {
-	/**
-	 * The name of the project
-	 */
-	name: string;
+  /**
+   * The name of the project
+   */
+  name: string;
 
-	/**
-	 * Project ID in Toggl API
-	 */
-	id: number;
+  /**
+   * Project ID in Toggl API
+   */
+  id: number;
 
-	/**
-	 * Client ID for the project
-	 */
-	cid: string;
+  /**
+   * Client ID for the project
+   */
+  cid: string;
 
-	/**
-	 * is the project marked as active
-	 */
-	active: boolean;
+  /**
+   * is the project marked as active
+   */
+  active: boolean;
 
-	/**
-	 * hours spent on project
-	 */
-	actual_hours: number;
+  /**
+   * hours spent on project
+   */
+  actual_hours: number;
 
-	/**
-	 * color of project in Toggl UI
-	 */
-	hex_color: string;
+  /**
+   * color of project in Toggl UI
+   */
+  hex_color: string;
 }

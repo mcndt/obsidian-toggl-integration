@@ -2,11 +2,11 @@
 
 To create a Toggl report query, create a codeblock with the `toggl` language:
 
-~~~
+````
 ```toggl
 // your query here
 ```
-~~~
+````
 
 Queries must always have a report type and a time range. Query expressions must always following the following order:
 
@@ -23,7 +23,7 @@ Queries must always have a report type and a time range. Query expressions must 
 
 **Time ranges:**
 
-- `TODAY` 
+- `TODAY`
 - `WEEK` (this week)
 - `MONTH` (this month)
 - `PAST {int} {DAYS|WEEKS|MONTHS)`

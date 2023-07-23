@@ -1,8 +1,8 @@
-import type { PluginSettings } from './PluginSettings';
+import type { PluginSettings } from "./PluginSettings";
 
 export const DEFAULT_SETTINGS: PluginSettings = {
-	apiToken: null,
-	workspace: { id: 'none', name: 'None selected' },
-	charLimitStatusBar: 40,
-	updateInRealTime: true
+  apiToken: null,
+  charLimitStatusBar: 40,
+  updateInRealTime: true,
+  workspace: { id: "none", name: "None selected" },
 };

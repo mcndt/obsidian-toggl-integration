@@ -1,6 +1,6 @@
 # Toggl Query Language (TQL)
 
-To easily define the scope of your reports and configure them visually, I wrote a tiny query language inspired by [Dataview's DQL](https://blacksmithgu.github.io/obsidian-dataview/query/queries/). 
+To easily define the scope of your reports and configure them visually, I wrote a tiny query language inspired by [Dataview's DQL](https://blacksmithgu.github.io/obsidian-dataview/query/queries/).
 
 Don't be intimidated by the word "language", there is only a handful of keywords to learn and the resulting query reads more or less like an English sentence.
 
@@ -26,12 +26,12 @@ Summary reports show a bar chart and pie chart breaking down the time spent by d
 
 **Example:**
 
-~~~
+````
 ```toggl
 SUMMARY
 PAST 7 DAYS
 ```
-~~~
+````
 
 Will result in something like:
 
@@ -43,12 +43,12 @@ List reports generate a list of time entries recorded over the selected time ran
 
 **Example:**
 
-~~~
+````
 ```toggl
 LIST
 PAST 2 DAYS
 ```
-~~~
+````
 
 Will result in something like:
 
@@ -58,7 +58,7 @@ Will result in something like:
 
 The query type must always be followed by a time range to have a valid query. The query language supports the following time range expressions:
 
-- `TODAY` 
+- `TODAY`
 - `WEEK` (this week)
 - `MONTH` (this month)
 - `PAST ... {DAYS|WEEKS|MONTHS)`
@@ -70,11 +70,11 @@ Time ranges can span at most one year. To select a specific range of dates, year
 
 This query will generate a summary report for the month of December 2021:
 
-~~~
+````
 ```toggl
 SUMMARY FROM 2021-12-01 TO 2021-12-31
 ```
-~~~
+````
 
 Note that you don't need to start the different sections of the query on new lines.
 
@@ -90,12 +90,12 @@ Projects can be identified by their name, or by their Toggl API ID (useful if yo
 
 This query will list all time entries today in the "Reading" project.
 
-~~~
+````
 ```toggl
 SUMMARY TODAY
 INCLUDE PROJECTS "Reading"
 ```
-~~~
+````
 
 (Note that the PROJECTS keyword is plural even when you only filter by one project!)
 
@@ -109,14 +109,14 @@ By default, list reports are grouped by date and ordered chronologically. To gro
 
 This query will list all time entries in the past two days in the "Reading" or "Obsidian Plugin Development" projects, grouped by project.
 
-~~~
+````
 ```toggl
 list
 past 2 days
 include projects "Reading", "Obsidian Plugin Development"
 group by project
 ```
-~~~
+````
 
 This query will result in something like this:
 
@@ -135,13 +135,13 @@ By default, projects are ordered alphabetically and dates chronologically. Depen
 
 This query lists all time entries in the past 7 days, grouped by date, with the most recent date first:
 
-~~~
+````
 ```toggl
 LIST PAST 7 DAYS
 GROUP BY DATE
 SORT DESC
 ```
-~~~
+````
 
 Note that the `GROUP BY DATE` expression is redundant because this is the default behavior.
 
@@ -155,13 +155,13 @@ By default, summary reports have a title that reflects the time range of the rep
 
 The following query will generate a summary report for the month of January 2022, with the custom title "Fall Semester Finals 2022
 
-~~~
+````
 ```toggl
 SUMMARY FROM 2022-01-01 TO 2022-01-31
 INCLUDE PROJECTS "Examen CG", "Examen QAS"
 TITLE "Fall Semester Finals 2022"
 ```
-~~~
+````
 
 The report's title will look like this:
 
