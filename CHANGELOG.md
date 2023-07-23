@@ -3,6 +3,7 @@
 ## [0.11.0]
 
 - TQL now supports filters with a single date. Thanks to the code contribution from [Mihai Bîrsan](https://github.com/mcndt/obsidian-toggl-integration/pull/121)!
+- On no internet, a warning is only shown once [issue #131](https://github.com/mcndt/obsidian-toggl-integration/issues/131)
 
 ## [0.10.0]
 

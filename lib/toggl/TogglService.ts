@@ -40,6 +40,7 @@ export enum ApiStatus {
   NO_TOKEN = "NO_TOKEN",
   UNREACHABLE = "UNREACHABLE",
   UNTESTED = "UNTESTED",
+  DEGRADED = "DEGRADED",
 }
 
 export type SummaryReport = {
@@ -78,7 +79,6 @@ export default class TogglService {
     this._statusBarItem = this._plugin.addStatusBarItem();
     this._statusBarItem = this._plugin.addStatusBarItem();
     this._statusBarItem.setText("Connecting to Toggl...");
-    // this.addCommands();
     // Store a reference to the manager in a svelte store to avoid passing
     // of references around the component trees.
     togglService.set(this);
@@ -194,9 +194,16 @@ export default class TogglService {
 
     try {
       curr = await this._apiManager.getCurrentTimer();
+      if (this._ApiAvailable === ApiStatus.DEGRADED) {
+        this._ApiAvailable = ApiStatus.AVAILABLE;
+      }
     } catch (err) {
       console.error("Error reaching Toggl API");
       console.error(err);
+      if (this._ApiAvailable !== ApiStatus.DEGRADED) {
+        new Notice("Error updating active Toggl time entry. Retrying...");
+        this._ApiAvailable = ApiStatus.DEGRADED;
+      }
       return;
     }
 

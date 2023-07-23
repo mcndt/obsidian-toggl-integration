@@ -236,7 +236,7 @@ export default class TogglAPI {
    * Returns the currently running timer, if any.
    */
   public async getCurrentTimer(): Promise<TimeEntry> {
-    return this._api.timeEntries.current().catch(handleError);
+    return this._api.timeEntries.current();
   }
 }
 
