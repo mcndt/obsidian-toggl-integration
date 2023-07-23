@@ -14,7 +14,7 @@
   import TogglSummaryReport from "./TogglSummaryReport.svelte";
   import TogglListReport from "./TogglListReport.svelte";
   import LoadingAnimation from "../components/LoadingAnimation.svelte";
-  import { Keyword, Token } from "lib/reports/parser/Parser";
+  import { ISODateFormat, Keyword, Token } from "lib/reports/parser/Parser";
   import { tokenize } from "lib/reports/parser/Tokenize";
   import { getProjectIds } from "lib/stores/projects";
   import { getClientIds } from "lib/stores/clients";
@@ -24,6 +24,7 @@
     EnrichedDetailedReportItem,
     SummaryReportStore,
   } from "lib/toggl/TogglService";
+  import moment from "moment";
 
   export let source: string;
 
@@ -88,6 +89,10 @@
       case Keyword.PAST:
         return `Past ${tokens[2]} ${(<string>tokens[3]).toLowerCase()}`;
       default:
+        const defaultDate = moment(tokens[1], ISODateFormat, true);
+        if (defaultDate.isValid()) {
+          return defaultDate.format("LL");
+        }
         return "Untitled Toggl Report";
     }
   }

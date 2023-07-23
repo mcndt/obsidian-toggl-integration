@@ -89,6 +89,15 @@ export class QueryIntervalParser extends Parser {
         }
 
         _tokens.splice(0, 3);
+        break;
+      }
+      default: {
+        const defaultDate = moment(_tokens[pos], ISODateFormat, true);
+        if (defaultDate.isValid()) {
+          _from = defaultDate;
+          _to = _from.clone();
+          _tokens.splice(0, 1);
+        }
       }
     }
 
