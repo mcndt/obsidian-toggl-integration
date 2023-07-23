@@ -39,7 +39,7 @@ export default class TogglSettingsTab extends PluginSettingTab {
       .setName("API Token")
       .setDesc(
         "Enter your Toggl Track API token to use this plugin. " +
-          "You can find yours at https://track.toggl.com/profile.",
+          "You can find yours at the bottom of https://track.toggl.com/profile.",
       )
       .addText((text) =>
         text
