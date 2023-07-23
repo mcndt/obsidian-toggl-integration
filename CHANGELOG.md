@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.11.0]
+
+- TQL now supports filters with a single date. Thanks to the code contribution from [Mihai Bîrsan](https://github.com/mcndt/obsidian-toggl-integration/pull/121)!
+
 ## [0.10.0]
 
 - Upgraded to Toggl v9 API and Toggl Reports v3 API. Summary reports are now much faster to load, even for longer time spans (e.g. 1 year)
