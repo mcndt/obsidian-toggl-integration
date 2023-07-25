@@ -2,6 +2,7 @@
   import { CurrentTimer } from "lib/stores/currentTimer";
   import { DailySummary } from "lib/stores/dailySummary";
   import { secondsToTimeString } from "lib/util/millisecondsToTimeString";
+  import { renderMarkdown } from "lib/util/renderMarkdown";
   import { settingsStore } from "lib/util/stores";
 
   export let duration_seconds: number;
@@ -38,7 +39,11 @@
       <div class="is-flex is-align-items-center">
         <span class="project-circle" style="background-color: {e.color};" />
         <span class="ml-3 project-row-name" style="color: {e.color};">
-          {e.name ? e.name : "(No project)"}
+          {#if $settingsStore.parseMarkdown}
+            {@html e.name ? renderMarkdown(e.name) : "(No project)"}
+          {:else}
+            {e.name ? e.name : "(No project)"}
+          {/if}
         </span>
       </div>
       <span class="project-row-duration">{e.duration}</span>

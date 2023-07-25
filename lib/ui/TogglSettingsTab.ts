@@ -32,6 +32,7 @@ export default class TogglSettingsTab extends PluginSettingTab {
     this.addTestConnectionSetting(containerEl);
     this.addWorkspaceSetting(containerEl);
     this.addUpdateRealTimeSetting(containerEl);
+    this.addParseMarkdownSetting(containerEl);
   }
 
   private addApiTokenSetting(containerEl: HTMLElement) {
@@ -99,6 +100,23 @@ export default class TogglSettingsTab extends PluginSettingTab {
           .setValue(this.plugin.settings.updateInRealTime || false)
           .onChange(async (value) => {
             this.plugin.settings.updateInRealTime = value;
+            await this.plugin.saveSettings();
+          });
+      });
+  }
+
+  private addParseMarkdownSetting(containerEl: HTMLElement) {
+    new Setting(containerEl)
+      .setName("Markdown descriptions")
+      .setDesc(
+        "Parse the descriptions of timers and projects as Markdown. " +
+          "(For example, use links to notes as timer descriptions.)",
+      )
+      .addToggle((toggle) => {
+        toggle
+          .setValue(this.plugin.settings.parseMarkdown || false)
+          .onChange(async (value) => {
+            this.plugin.settings.parseMarkdown = value;
             await this.plugin.saveSettings();
           });
       });
