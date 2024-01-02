@@ -11,15 +11,20 @@ export interface PluginSettings {
    */
   workspace: TogglWorkspace;
 
+  /** Has dismissed the update alert for 0.4.0 */
+  hasDismissedAlert?: boolean;
+  
+  /** Update the day's total time in real-time in the sidebar */
+  updateInRealTime?: boolean;
+
   /**
    * The max. allowed characters in the title of a timer in
    * the status bar.
    */
   charLimitStatusBar: number;
 
-  /** Has dismissed the update alert for 0.4.0 */
-  hasDismissedAlert?: boolean;
-
-  /** Update the day's total time in real-time in the sidebar */
-  updateInRealTime?: boolean;
+  /**
+   * The time format for the status bar.
+   */
+  statusBarFormat?: string;
 }

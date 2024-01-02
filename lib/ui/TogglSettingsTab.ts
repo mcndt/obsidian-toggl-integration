@@ -33,7 +33,12 @@ export default class TogglSettingsTab extends PluginSettingTab {
     this.addTestConnectionSetting(containerEl);
     this.addWorkspaceSetting(containerEl);
     this.addUpdateRealTimeSetting(containerEl);
+
+    containerEl.createEl("h2", {
+      text: "Status bar display options",
+    });
     this.addCharLimitStatusBarSetting(containerEl);
+    this.addStatusBarFormatSetting(containerEl);
   }
 
   private addApiTokenSetting(containerEl: HTMLElement) {
@@ -124,6 +129,24 @@ export default class TogglSettingsTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         });
     });
+  }
+
+  private addStatusBarFormatSetting(containerEl: HTMLElement) {
+    new Setting(containerEl)
+      .setName("Status bar time format")
+      .setDesc(
+        "Time format for the status bar. " +
+          "See https://github.com/jsmreese/moment-duration-format for format options.",
+      )
+      .addText((text) =>
+        text
+          .setPlaceholder(DEFAULT_SETTINGS.statusBarFormat)
+          .setValue(this.plugin.settings.statusBarFormat || "")
+          .onChange(async (value) => {
+            this.plugin.settings.statusBarFormat = value;
+            await this.plugin.saveSettings();
+          }),
+      );
   }
 
   private async fetchWorkspaces() {

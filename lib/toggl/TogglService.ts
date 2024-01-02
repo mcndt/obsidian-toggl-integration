@@ -292,7 +292,7 @@ export default class TogglService {
       }
       const duration = this.getTimerDuration(this._currentTimeEntry);
       const time_string = moment.duration(duration, 'seconds').format(
-        'm [minute]',
+        this._plugin.settings.statusBarFormat,
         { trim: false, trunc: true },
       )
       timer_msg = `${title} (${time_string})`;
