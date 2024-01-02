@@ -48,6 +48,7 @@
   "dependencies": {
     "d3": "^7.2.1",
     "moment": "^2.29.4",
+    "moment-duration-format": "^2.3.2",
     "supports-color": "^9.2.2",
     "svelte-select": "^4.4.3",
     "toggl-client": "github:mcndt/toggl-client#b8d88805fb"

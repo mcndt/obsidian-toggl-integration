@@ -30,6 +30,7 @@ import {
 import { apiStatusStore, togglService } from "lib/util/stores";
 import type MyPlugin from "main";
 import moment from "moment";
+import "moment-duration-format";
 import { Notice } from "obsidian";
 import { derived, get } from "svelte/store";
 
@@ -290,8 +291,10 @@ export default class TogglService {
         )}...`;
       }
       const duration = this.getTimerDuration(this._currentTimeEntry);
-      const minutes = Math.floor(duration / 60);
-      const time_string = `${minutes} minute${minutes != 1 ? "s" : ""}`;
+      const time_string = moment.duration(duration, 'seconds').format(
+        'm [minute]',
+        { trim: false, trunc: true },
+      )
       timer_msg = `${title} (${time_string})`;
     }
     this._statusBarItem.setText(`Timer: ${timer_msg}`);
