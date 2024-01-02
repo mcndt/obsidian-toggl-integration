@@ -1,3 +1,4 @@
+import { DEFAULT_SETTINGS } from "lib/config/DefaultSettings";
 import type MyPlugin from "main";
 import {
   App,
@@ -32,6 +33,7 @@ export default class TogglSettingsTab extends PluginSettingTab {
     this.addTestConnectionSetting(containerEl);
     this.addWorkspaceSetting(containerEl);
     this.addUpdateRealTimeSetting(containerEl);
+    this.addCharLimitStatusBarSetting(containerEl);
   }
 
   private addApiTokenSetting(containerEl: HTMLElement) {
@@ -102,6 +104,26 @@ export default class TogglSettingsTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           });
       });
+  }
+
+  private addCharLimitStatusBarSetting(containerEl: HTMLElement) {
+    new Setting(containerEl)
+      .setName("Status bar character limit")
+      .setDesc(
+        "Set a character limit for the time entry " + 
+        "displayed in the status bar."
+      )
+      .addText((text) => {
+        text.setPlaceholder(String(DEFAULT_SETTINGS.charLimitStatusBar))
+        text.inputEl.type = "number"
+        text.setValue(String(this.plugin.settings.charLimitStatusBar))
+        text.onChange(async (value) => {
+          this.plugin.settings.charLimitStatusBar = (
+            value !== "" ? Number(value) : DEFAULT_SETTINGS.charLimitStatusBar
+          );
+          await this.plugin.saveSettings();
+        });
+    });
   }
 
   private async fetchWorkspaces() {
