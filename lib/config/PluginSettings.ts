@@ -27,4 +27,9 @@ export interface PluginSettings {
    * The time format for the status bar.
    */
   statusBarFormat?: string;
+
+  /**
+   * The prefix to show before the time entry in the status bar.
+   */
+  statusBarPrefix?: string;
 }

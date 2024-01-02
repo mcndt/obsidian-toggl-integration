@@ -297,7 +297,7 @@ export default class TogglService {
       )
       timer_msg = `${title} (${time_string})`;
     }
-    this._statusBarItem.setText(`Timer: ${timer_msg}`);
+    this._statusBarItem.setText(`${this._plugin.settings.statusBarPrefix}${timer_msg}`);
   }
 
   /**

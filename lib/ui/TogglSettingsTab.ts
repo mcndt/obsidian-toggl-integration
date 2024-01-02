@@ -39,6 +39,7 @@ export default class TogglSettingsTab extends PluginSettingTab {
     });
     this.addCharLimitStatusBarSetting(containerEl);
     this.addStatusBarFormatSetting(containerEl);
+    this.addStatusBarPrefixSetting(containerEl);
   }
 
   private addApiTokenSetting(containerEl: HTMLElement) {
@@ -144,6 +145,24 @@ export default class TogglSettingsTab extends PluginSettingTab {
           .setValue(this.plugin.settings.statusBarFormat || "")
           .onChange(async (value) => {
             this.plugin.settings.statusBarFormat = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+  }
+
+  private addStatusBarPrefixSetting(containerEl: HTMLElement) {
+    new Setting(containerEl)
+      .setName("Status bar prefix")
+      .setDesc(
+        "Prefix before the time entry in the status bar. " +
+          "Leave blank for no prefix.",
+      )
+      .addText((text) =>
+        text
+          .setPlaceholder(DEFAULT_SETTINGS.statusBarPrefix)
+          .setValue(this.plugin.settings.statusBarPrefix || "")
+          .onChange(async (value) => {
+            this.plugin.settings.statusBarPrefix = value;
             await this.plugin.saveSettings();
           }),
       );
