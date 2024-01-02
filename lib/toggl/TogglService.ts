@@ -1,4 +1,4 @@
-import { ACTIVE_TIMER_POLLING_INTERVAL } from "lib/constants";
+import { ACTIVE_TIMER_POLLING_INTERVAL, STATUS_BAR_UPDATE_INTERVAL } from "lib/constants";
 import type {
   ClientId,
   EnrichedWithClient,
@@ -71,6 +71,7 @@ export default class TogglService {
   private _statusBarItem: HTMLElement;
 
   private _currentTimerInterval: number = null;
+  private _statusBarInterval: number = null;
   private _currentTimeEntry: TimeEntry = null;
   private _ApiAvailable = ApiStatus.UNTESTED;
 
@@ -90,6 +91,7 @@ export default class TogglService {
    */
   public async setToken(token: string) {
     window.clearInterval(this._currentTimerInterval);
+    window.clearInterval(this._statusBarInterval);
     if (token != null && token != "") {
       try {
         this._apiManager = new TogglAPI();
@@ -107,6 +109,7 @@ export default class TogglService {
 
       // Fetch daily summary data and start polling for current timers.
       this.startTimerInterval();
+      this.startStatusBarInterval();
       this._apiManager
         .getDailySummary()
         .then((response) => setDailySummaryItems(response));
@@ -183,6 +186,17 @@ export default class TogglService {
     this._plugin.registerInterval(this._currentTimerInterval);
   }
 
+  /**
+   * Start updating the status bar periodically.
+   */
+  private startStatusBarInterval() {
+    this.updateStatusBarText();
+    this._statusBarInterval = window.setInterval(() => {
+      this.updateStatusBarText();
+    }, STATUS_BAR_UPDATE_INTERVAL);
+    this._plugin.registerInterval(this._statusBarInterval);
+  }
+
   private async updateCurrentTimer() {
     if (!this.isApiAvailable) {
       return;
@@ -256,7 +270,6 @@ export default class TogglService {
     }
 
     this._currentTimeEntry = curr;
-    this.updateStatusBarText();
   }
 
   /**
