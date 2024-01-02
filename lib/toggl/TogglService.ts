@@ -77,7 +77,6 @@ export default class TogglService {
   constructor(plugin: MyPlugin) {
     this._plugin = plugin;
     this._statusBarItem = this._plugin.addStatusBarItem();
-    this._statusBarItem = this._plugin.addStatusBarItem();
     this._statusBarItem.setText("Connecting to Toggl...");
     // Store a reference to the manager in a svelte store to avoid passing
     // of references around the component trees.
