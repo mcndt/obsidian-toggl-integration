@@ -40,6 +40,7 @@ export default class TogglSettingsTab extends PluginSettingTab {
     this.addCharLimitStatusBarSetting(containerEl);
     this.addStatusBarFormatSetting(containerEl);
     this.addStatusBarPrefixSetting(containerEl);
+    this.addStatusBarProjectSetting(containerEl);
   }
 
   private addApiTokenSetting(containerEl: HTMLElement) {
@@ -166,6 +167,22 @@ export default class TogglSettingsTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           }),
       );
+  }
+
+  private addStatusBarProjectSetting(containerEl: HTMLElement) {
+    new Setting(containerEl)
+      .setName("Show project in status bar")
+      .setDesc(
+        "Show the project of the time entry displayed in the status bar."
+      )
+      .addToggle((toggle) => {
+        toggle
+          .setValue(this.plugin.settings.statusBarShowProject || false)
+          .onChange(async (value) => {
+            this.plugin.settings.statusBarShowProject = value;
+            await this.plugin.saveSettings();
+          });
+      });
   }
 
   private async fetchWorkspaces() {

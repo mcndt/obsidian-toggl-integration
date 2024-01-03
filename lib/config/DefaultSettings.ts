@@ -5,6 +5,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   charLimitStatusBar: 40,
   statusBarFormat: "m [minute]",
   statusBarPrefix: "Timer: ",
+  statusBarShowProject: false,
   updateInRealTime: true,
   workspace: { id: "none", name: "None selected" },
 };

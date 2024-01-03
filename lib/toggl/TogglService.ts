@@ -295,6 +295,10 @@ export default class TogglService {
         this._plugin.settings.statusBarFormat,
         { trim: false, trunc: true },
       )
+      if (this._plugin.settings.statusBarShowProject){
+        const currentEnhanced = enrichObjectWithProject(this._currentTimeEntry)
+        title += ` - ${currentEnhanced.$project?.name || "No project"}`
+      }
       timer_msg = `${title} (${time_string})`;
     }
     this._statusBarItem.setText(`${this._plugin.settings.statusBarPrefix}${timer_msg}`);

@@ -32,4 +32,7 @@ export interface PluginSettings {
    * The prefix to show before the time entry in the status bar.
    */
   statusBarPrefix?: string;
+
+  /** Whether to show the project in the status bar. */
+  statusBarShowProject?: boolean;
 }
