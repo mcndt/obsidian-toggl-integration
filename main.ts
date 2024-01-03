@@ -72,6 +72,35 @@ export default class MyPlugin extends Plugin {
       this.app.workspace.onLayoutReady(this.initLeaf.bind(this));
     }
 
+    this.addCommand({
+      callback: async () => {
+        const existing = this.app.workspace.getLeavesOfType(VIEW_TYPE_REPORT);
+        if (existing.length) {
+          this.app.workspace.revealLeaf(existing[0]);
+          return;
+        }
+        await this.app.workspace.getRightLeaf(false).setViewState({
+          active: true,
+          type: VIEW_TYPE_REPORT,
+        });
+        this.app.workspace.revealLeaf(this.app.workspace.getLeavesOfType(VIEW_TYPE_REPORT)[0]);
+      },
+      id: "show-report-view",
+      name: "Open report view",
+    });
+
+    this.addCommand({
+      checkCallback: (checking: boolean) => {
+        if (!checking) {
+          this.toggl.setToken(this.settings.apiToken);
+        } else {
+          return this.settings.apiToken != null || this.settings.apiToken != "";
+        }
+      },
+      id: "refresh-api",
+      name: "Refresh API Connection",
+    });
+
     // Enable processing codeblocks for rendering in-note reports
     this.registerCodeBlockProcessor();
   }

@@ -79,6 +79,13 @@ export default class TogglService {
     this._statusBarItem = this._plugin.addStatusBarItem();
     this._statusBarItem = this._plugin.addStatusBarItem();
     this._statusBarItem.setText("Connecting to Toggl...");
+
+    this._plugin.registerDomEvent(
+      this._statusBarItem, "click", () => {
+        new Notice('Reconnecting to Toggl...')
+        this.setToken(this._plugin.settings.apiToken)
+      }
+    )
     // Store a reference to the manager in a svelte store to avoid passing
     // of references around the component trees.
     togglService.set(this);
