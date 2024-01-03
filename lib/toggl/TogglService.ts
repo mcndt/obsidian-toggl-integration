@@ -291,6 +291,7 @@ export default class TogglService {
         )}...`;
       }
       const duration = this.getTimerDuration(this._currentTimeEntry);
+      // @ts-expect-error
       const time_string = moment.duration(duration, 'seconds').format(
         this._plugin.settings.statusBarFormat,
         { trim: false, trunc: true },
