@@ -33,7 +33,7 @@
         <span
           class="timer-project-name"
           style:color={timer.$project?.color ?? "var(--text-muted)"}
-          >{timer.$project.name}</span
+          >{timer.$project?.name ?? "No project"}</span
         >
         <span class="divider-bullet mx-1">•</span>
         <span class="timer-duration">{secondsToTimeString(duration)}</span>
