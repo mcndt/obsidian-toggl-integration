@@ -89,6 +89,18 @@ export default class MyPlugin extends Plugin {
       name: "Open report view",
     });
 
+    this.addCommand({
+      checkCallback: (checking: boolean) => {
+        if (!checking) {
+          this.toggl.setToken(this.settings.apiToken);
+        } else {
+          return this.settings.apiToken != null || this.settings.apiToken != "";
+        }
+      },
+      id: "refresh-api",
+      name: "Refresh API Connection",
+    });
+
     // Enable processing codeblocks for rendering in-note reports
     this.registerCodeBlockProcessor();
   }
