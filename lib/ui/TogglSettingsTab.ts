@@ -41,6 +41,7 @@ export default class TogglSettingsTab extends PluginSettingTab {
     this.addStatusBarFormatSetting(containerEl);
     this.addStatusBarPrefixSetting(containerEl);
     this.addStatusBarProjectSetting(containerEl);
+    this.addStatusBarNoEntrySetting(containerEl);
   }
 
   private addApiTokenSetting(containerEl: HTMLElement) {
@@ -183,6 +184,23 @@ export default class TogglSettingsTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           });
       });
+  }
+
+  private addStatusBarNoEntrySetting(containerEl: HTMLElement) {
+    new Setting(containerEl)
+      .setName("No entry status bar message")
+      .setDesc(
+        "Message in the status bar when no time entry is running."
+      )
+      .addText((text) =>
+        text
+          .setPlaceholder(DEFAULT_SETTINGS.statusBarNoEntryMesssage)
+          .setValue(this.plugin.settings.statusBarNoEntryMesssage || "")
+          .onChange(async (value) => {
+            this.plugin.settings.statusBarNoEntryMesssage = value;
+            await this.plugin.saveSettings();
+          }),
+      );
   }
 
   private async fetchWorkspaces() {

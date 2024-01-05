@@ -280,7 +280,7 @@ export default class TogglService {
   private updateStatusBarText() {
     let timer_msg = null;
     if (this._currentTimeEntry == null) {
-      timer_msg = "-";
+      timer_msg = this._plugin.settings.statusBarNoEntryMesssage;
     } else {
       let title: string =
         this._currentTimeEntry.description || "No description";

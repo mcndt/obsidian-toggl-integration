@@ -35,4 +35,7 @@ export interface PluginSettings {
 
   /** Whether to show the project in the status bar. */
   statusBarShowProject?: boolean;
+
+  /** Message shown in the status bar when no time entry is running. */
+  statusBarNoEntryMesssage?: string;
 }
