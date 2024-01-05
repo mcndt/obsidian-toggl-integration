@@ -1,4 +1,4 @@
-import { ACTIVE_TIMER_POLLING_INTERVAL } from "lib/constants";
+import { ACTIVE_TIMER_POLLING_INTERVAL, STATUS_BAR_UPDATE_INTERVAL } from "lib/constants";
 import type {
   ClientId,
   EnrichedWithClient,
@@ -30,6 +30,7 @@ import {
 import { apiStatusStore, togglService } from "lib/util/stores";
 import type MyPlugin from "main";
 import moment from "moment";
+import "moment-duration-format";
 import { Notice } from "obsidian";
 import { derived, get } from "svelte/store";
 
@@ -71,12 +72,12 @@ export default class TogglService {
   private _statusBarItem: HTMLElement;
 
   private _currentTimerInterval: number = null;
+  private _statusBarInterval: number = null;
   private _currentTimeEntry: TimeEntry = null;
   private _ApiAvailable = ApiStatus.UNTESTED;
 
   constructor(plugin: MyPlugin) {
     this._plugin = plugin;
-    this._statusBarItem = this._plugin.addStatusBarItem();
     this._statusBarItem = this._plugin.addStatusBarItem();
     this._statusBarItem.setText("Connecting to Toggl...");
     // Store a reference to the manager in a svelte store to avoid passing
@@ -91,6 +92,7 @@ export default class TogglService {
    */
   public async setToken(token: string) {
     window.clearInterval(this._currentTimerInterval);
+    window.clearInterval(this._statusBarInterval);
     if (token != null && token != "") {
       try {
         this._apiManager = new TogglAPI();
@@ -108,6 +110,7 @@ export default class TogglService {
 
       // Fetch daily summary data and start polling for current timers.
       this.startTimerInterval();
+      this.startStatusBarInterval();
       this._apiManager
         .getDailySummary()
         .then((response) => setDailySummaryItems(response));
@@ -184,6 +187,17 @@ export default class TogglService {
     this._plugin.registerInterval(this._currentTimerInterval);
   }
 
+  /**
+   * Start updating the status bar periodically.
+   */
+  private startStatusBarInterval() {
+    this.updateStatusBarText();
+    this._statusBarInterval = window.setInterval(() => {
+      this.updateStatusBarText();
+    }, STATUS_BAR_UPDATE_INTERVAL);
+    this._plugin.registerInterval(this._statusBarInterval);
+  }
+
   private async updateCurrentTimer() {
     if (!this.isApiAvailable) {
       return;
@@ -257,7 +271,6 @@ export default class TogglService {
     }
 
     this._currentTimeEntry = curr;
-    this.updateStatusBarText();
   }
 
   /**
@@ -267,7 +280,7 @@ export default class TogglService {
   private updateStatusBarText() {
     let timer_msg = null;
     if (this._currentTimeEntry == null) {
-      timer_msg = "-";
+      timer_msg = this._plugin.settings.statusBarNoEntryMesssage;
     } else {
       let title: string =
         this._currentTimeEntry.description || "No description";
@@ -278,11 +291,18 @@ export default class TogglService {
         )}...`;
       }
       const duration = this.getTimerDuration(this._currentTimeEntry);
-      const minutes = Math.floor(duration / 60);
-      const time_string = `${minutes} minute${minutes != 1 ? "s" : ""}`;
+      // @ts-expect-error
+      const time_string = moment.duration(duration, 'seconds').format(
+        this._plugin.settings.statusBarFormat,
+        { trim: false, trunc: true },
+      )
+      if (this._plugin.settings.statusBarShowProject){
+        const currentEnhanced = enrichObjectWithProject(this._currentTimeEntry)
+        title += ` - ${currentEnhanced.$project?.name || "No project"}`
+      }
       timer_msg = `${title} (${time_string})`;
     }
-    this._statusBarItem.setText(`Timer: ${timer_msg}`);
+    this._statusBarItem.setText(`${this._plugin.settings.statusBarPrefix}${timer_msg}`);
   }
 
   /**

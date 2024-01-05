@@ -1,3 +1,4 @@
+import { DEFAULT_SETTINGS } from "lib/config/DefaultSettings";
 import type MyPlugin from "main";
 import {
   App,
@@ -32,6 +33,15 @@ export default class TogglSettingsTab extends PluginSettingTab {
     this.addTestConnectionSetting(containerEl);
     this.addWorkspaceSetting(containerEl);
     this.addUpdateRealTimeSetting(containerEl);
+
+    containerEl.createEl("h2", {
+      text: "Status bar display options",
+    });
+    this.addCharLimitStatusBarSetting(containerEl);
+    this.addStatusBarFormatSetting(containerEl);
+    this.addStatusBarPrefixSetting(containerEl);
+    this.addStatusBarProjectSetting(containerEl);
+    this.addStatusBarNoEntrySetting(containerEl);
   }
 
   private addApiTokenSetting(containerEl: HTMLElement) {
@@ -102,6 +112,95 @@ export default class TogglSettingsTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           });
       });
+  }
+
+  private addCharLimitStatusBarSetting(containerEl: HTMLElement) {
+    new Setting(containerEl)
+      .setName("Status bar character limit")
+      .setDesc(
+        "Set a character limit for the time entry " + 
+        "displayed in the status bar."
+      )
+      .addText((text) => {
+        text.setPlaceholder(String(DEFAULT_SETTINGS.charLimitStatusBar))
+        text.inputEl.type = "number"
+        text.setValue(String(this.plugin.settings.charLimitStatusBar))
+        text.onChange(async (value) => {
+          this.plugin.settings.charLimitStatusBar = (
+            value !== "" ? Number(value) : DEFAULT_SETTINGS.charLimitStatusBar
+          );
+          await this.plugin.saveSettings();
+        });
+    });
+  }
+
+  private addStatusBarFormatSetting(containerEl: HTMLElement) {
+    new Setting(containerEl)
+      .setName("Status bar time format")
+      .setDesc(
+        "Time format for the status bar. " +
+          "See https://github.com/jsmreese/moment-duration-format for format options.",
+      )
+      .addText((text) =>
+        text
+          .setPlaceholder(DEFAULT_SETTINGS.statusBarFormat)
+          .setValue(this.plugin.settings.statusBarFormat || "")
+          .onChange(async (value) => {
+            this.plugin.settings.statusBarFormat = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+  }
+
+  private addStatusBarPrefixSetting(containerEl: HTMLElement) {
+    new Setting(containerEl)
+      .setName("Status bar prefix")
+      .setDesc(
+        "Prefix before the time entry in the status bar. " +
+          "Leave blank for no prefix.",
+      )
+      .addText((text) =>
+        text
+          .setPlaceholder(DEFAULT_SETTINGS.statusBarPrefix)
+          .setValue(this.plugin.settings.statusBarPrefix || "")
+          .onChange(async (value) => {
+            this.plugin.settings.statusBarPrefix = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+  }
+
+  private addStatusBarProjectSetting(containerEl: HTMLElement) {
+    new Setting(containerEl)
+      .setName("Show project in status bar")
+      .setDesc(
+        "Show the project of the time entry displayed in the status bar."
+      )
+      .addToggle((toggle) => {
+        toggle
+          .setValue(this.plugin.settings.statusBarShowProject || false)
+          .onChange(async (value) => {
+            this.plugin.settings.statusBarShowProject = value;
+            await this.plugin.saveSettings();
+          });
+      });
+  }
+
+  private addStatusBarNoEntrySetting(containerEl: HTMLElement) {
+    new Setting(containerEl)
+      .setName("No entry status bar message")
+      .setDesc(
+        "Message in the status bar when no time entry is running."
+      )
+      .addText((text) =>
+        text
+          .setPlaceholder(DEFAULT_SETTINGS.statusBarNoEntryMesssage)
+          .setValue(this.plugin.settings.statusBarNoEntryMesssage || "")
+          .onChange(async (value) => {
+            this.plugin.settings.statusBarNoEntryMesssage = value;
+            await this.plugin.saveSettings();
+          }),
+      );
   }
 
   private async fetchWorkspaces() {

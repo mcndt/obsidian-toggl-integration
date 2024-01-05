@@ -14,14 +14,14 @@ export const DailySummary = derived(
   [summaryItems, Projects],
   ([$summaryItems, $projects]) => {
     const summary = {
-      projects_breakdown: $summaryItems.map(
+      projects_breakdown: ($summaryItems ?? []).map(
         (item): EnrichedWithProject<typeof item> => ({
           ...item,
           $project:
             $projects.find((project) => project.id === item.project_id) ?? null,
         }),
       ),
-      total_seconds: $summaryItems.reduce((a, b) => a + b.tracked_seconds, 0),
+      total_seconds: ($summaryItems ?? []).reduce((a, b) => a + b.tracked_seconds, 0),
     };
 
     return summary;
