@@ -33,6 +33,7 @@ export default class TogglSettingsTab extends PluginSettingTab {
     this.addTestConnectionSetting(containerEl);
     this.addWorkspaceSetting(containerEl);
     this.addUpdateRealTimeSetting(containerEl);
+    this.addAutoRefreshIntervalSetting(containerEl);
 
     containerEl.createEl("h2", {
       text: "Status bar display options",
@@ -57,7 +58,7 @@ export default class TogglSettingsTab extends PluginSettingTab {
           .setValue(this.plugin.settings.apiToken || "")
           .onChange(async (value) => {
             this.plugin.settings.apiToken = value;
-            this.plugin.toggl.refreshApiConnection(value);
+            this.plugin.toggl.refreshApiConnection(value, this.plugin.settings.autoRefreshInterval);
             await this.plugin.saveSettings();
           }),
       );
@@ -111,6 +112,23 @@ export default class TogglSettingsTab extends PluginSettingTab {
             this.plugin.settings.updateInRealTime = value;
             await this.plugin.saveSettings();
           });
+      });
+  }
+
+  private addAutoRefreshIntervalSetting(containerEl: HTMLElement) {
+    new Setting(containerEl)
+      .setName("API connection auto refresh")
+      .setDesc(
+        "Automatically refresh connection to the Toggl API every 3 minutes."
+      )
+      .addToggle((toggle) => {
+        toggle
+          .setValue(this.plugin.settings.autoRefreshInterval || true)
+          .onChange(async (value) => {
+            this.plugin.settings.autoRefreshInterval = value;
+            await this.plugin.toggl.refreshApiConnection(this.plugin.settings.apiToken, this.plugin.settings.autoRefreshInterval)
+            await this.plugin.saveSettings();
+          })
       });
   }
 

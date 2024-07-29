@@ -9,6 +9,11 @@ export const ACTIVE_TIMER_POLLING_INTERVAL = 6000;
 export const STATUS_BAR_UPDATE_INTERVAL = 1000;
 
 /**
+ * The interval in ms at which the API connection is auto-refreshed
+ */
+export const API_REFRESH_INTERVAL = 3 * 60000;
+
+/**
  * The language string used for report code blocks.
  */
 export const CODEBLOCK_LANG = "toggl";

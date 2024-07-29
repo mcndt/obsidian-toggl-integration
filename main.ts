@@ -27,7 +27,7 @@ export default class MyPlugin extends Plugin {
     // instantiate toggl class and set the API token if set in settings.
     this.toggl = new TogglService(this);
     if (this.settings.apiToken != null || this.settings.apiToken != "") {
-      this.toggl.refreshApiConnection(this.settings.apiToken);
+      this.toggl.refreshApiConnection(this.settings.apiToken, this.settings.autoRefreshInterval);
       this.input = new UserInputHelper(this);
     }
 
@@ -96,7 +96,7 @@ export default class MyPlugin extends Plugin {
     this.addCommand({
       checkCallback: (checking: boolean) => {
         if (!checking) {
-          this.toggl.refreshApiConnection(this.settings.apiToken);
+          this.toggl.refreshApiConnection(this.settings.apiToken, this.settings.autoRefreshInterval);
         } else {
           return this.settings.apiToken != null || this.settings.apiToken != "";
         }
