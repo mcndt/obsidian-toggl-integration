@@ -140,6 +140,8 @@
 
     // Fill the map
     for (const item of detailed) {
+      if (!item || !item.time_entries) continue;
+      
       const name = getItemName(item);
       const itemSeconds = item.time_entries.reduce(
         (acc, cur) => acc + cur.seconds,
@@ -151,13 +153,14 @@
       }
 
       const group = entryMap.get(name);
+      const firstEntry = item.time_entries[0];
       group.data.push({
-        name: item.description,
+        name: item.description || 'No description',
         totalTime: itemSeconds,
         count: item.time_entries.length,
         hex: nameAttr === "client" ? item.$project?.color : null,
-        order: moment(item.time_entries.first()?.start).unix(),
-        tags: item.$tags?.map((t) => t.name),
+        order: firstEntry ? moment(firstEntry.start).unix() : 0,
+        tags: item.$tags?.map((t) => t?.name).filter(Boolean) || [],
         project: item.$project?.name,
       });
       group.totalTime += itemSeconds;
@@ -188,8 +191,14 @@
 
     // Fill the map
     for (const item of detailed) {
-      const groupKey = item.time_entries.first()?.start.slice(0, 10);
+      if (!item || !item.time_entries || item.time_entries.length === 0) continue;
+      
+      const firstEntry = item.time_entries[0];
+      const groupKey = firstEntry?.start?.slice(0, 10);
+      if (!groupKey) continue;
+      
       const group = entryMap.get(groupKey);
+      if (!group) continue;
 
       const itemSeconds = item.time_entries.reduce(
         (acc, cur) => acc + cur.seconds,
@@ -197,12 +206,12 @@
       );
 
       group.data.push({
-        name: item.description,
+        name: item.description || 'No description',
         totalTime: itemSeconds,
         count: 1,
         hex: item.$project?.color,
-        order: moment(item.time_entries.first()?.start).unix(),
-        tags: item.$tags?.map((t) => t.name),
+        order: moment(firstEntry.start).unix(),
+        tags: item.$tags?.map((t) => t?.name).filter(Boolean) || [],
         project: item.$project?.name,
       });
       group.totalTime += itemSeconds;

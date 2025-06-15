@@ -18,7 +18,7 @@ export function getTagIds(item: (string | number)[]): number[] {
       const tag = tags.find(
         (tag) => tag.name.toLowerCase() === item.toLowerCase(),
       );
-      return tag.id ?? null;
+      return tag?.id ?? null;
     })
     .filter((id) => id !== null) as number[];
 }

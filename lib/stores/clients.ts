@@ -18,7 +18,7 @@ export function getClientIds(item: (string | number)[]): number[] {
       const client = clients.find(
         (client) => client.name.toLowerCase() === item.toLowerCase(),
       );
-      return client.id ?? null;
+      return client?.id ?? null;
     })
     .filter((id) => id !== null) as number[];
 }
