@@ -10,7 +10,7 @@ const projects = writable<ProjectsResponseItem[]>([]);
 
 const enrichedProjects = derived(
   [projects, Clients],
-  ([$projects, $clients]): EnrichedWithClient<typeof $projects[number]>[] => {
+  ([$projects, $clients]): EnrichedWithClient<(typeof $projects)[number]>[] => {
     return $projects.map((project) => ({
       ...project,
       $client: $clients.find((client) => client.id === project.cid),
@@ -33,7 +33,7 @@ export function getProjectIds(items: (string | number)[]): number[] {
       const project = projects.find(
         (project) => project.name.toLowerCase() === item.toLowerCase(),
       );
-      return project.id ?? null;
+      return project?.id ?? null;
     })
     .filter((id) => id !== null) as number[];
 }
