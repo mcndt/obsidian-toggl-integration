@@ -123,7 +123,9 @@ export default class MyPlugin extends Plugin {
    * codeblock queries.
    */
   registerCodeBlockProcessor() {
-    this.registerMarkdownCodeBlockProcessor(CODEBLOCK_LANG, reportBlockHandler);
+    this.registerMarkdownCodeBlockProcessor(CODEBLOCK_LANG, (source, el, ctx) =>
+      reportBlockHandler(source, el, ctx, this),
+    );
   }
 
   onunload() {}

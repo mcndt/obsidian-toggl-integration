@@ -3,6 +3,7 @@ import type { PluginSettings } from "./PluginSettings";
 export const DEFAULT_SETTINGS: PluginSettings = {
   apiToken: null,
   charLimitStatusBar: 40,
+  parseMarkdown: false,
   statusBarFormat: "m [minute]",
   statusBarNoEntryMesssage: "-",
   statusBarPrefix: "Timer: ",

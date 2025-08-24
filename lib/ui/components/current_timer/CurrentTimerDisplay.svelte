@@ -7,6 +7,15 @@
   import TimerTag from "./TimerTag.svelte";
   import type { TimeEntry } from "lib/model/Report-v3";
   import type { CurrentTimer } from "lib/stores/currentTimer";
+  import { Component } from "obsidian";
+  import { getContext } from "svelte";
+  import { renderMarkdown } from "lib/util/renderMarkdown";
+  import { settingsStore } from "lib/util/stores";
+
+  const component: Component = getContext("component");
+  if (!component) {
+    console.error('CurrentTimerDisplay: "component" context is undefined');
+  }
 
   export let timer: typeof $CurrentTimer;
   export let duration: number;
@@ -20,7 +29,13 @@
     {#if timer}
       <div id="description">
         {#if timer.description}
-          <span class="timer-description">{timer.description}</span>
+          <span class="timer-description">
+            {#if component && $settingsStore.parseMarkdown}
+              {@html renderMarkdown(timer.description, component)}
+            {:else}
+              {timer.description}
+            {/if}
+          </span>
         {:else}
           <span class="timer-no-description">No description</span>
         {/if}

@@ -38,4 +38,7 @@ export interface PluginSettings {
 
   /** Message shown in the status bar when no time entry is running. */
   statusBarNoEntryMesssage?: string;
+
+  /** Parse the description of timers and projects as Markdown. */
+  parseMarkdown?: boolean;
 }

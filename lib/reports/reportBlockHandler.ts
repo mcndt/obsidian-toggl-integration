@@ -1,4 +1,4 @@
-import type { MarkdownPostProcessorContext } from "obsidian";
+import type { Component, MarkdownPostProcessorContext } from "obsidian";
 
 // @ts-ignore (no default export detected by vscode's typescript language server)
 import TogglReportBlock from "../ui/views/TogglReportBlock.svelte";
@@ -10,10 +10,15 @@ export default function reportBlockHandler(
   source: string,
   el: HTMLElement,
   ctx: MarkdownPostProcessorContext,
+  component: Component,
 ) {
   if (!source) {
     return;
   }
 
-  new TogglReportBlock({ props: { source: source }, target: el });
+  new TogglReportBlock({
+    context: new Map([["component", component]]),
+    props: { source: source },
+    target: el,
+  });
 }

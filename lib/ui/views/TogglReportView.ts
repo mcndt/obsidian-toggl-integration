@@ -17,10 +17,20 @@ export default class TogglReportView extends ItemView {
 
   /* Obsidian event lifecycle */
   async onOpen(): Promise<void> {
+    if (this.content) {
+      return;
+    }
     this.content = new TogglSidebarPane({
+      context: new Map([
+        ["component", this]
+      ]),
       props: {},
       target: this.contentEl,
     });
+  }
+
+  onunload(): void {
+    this.content.$destroy();
   }
 
   /* View abstract method implementations */
