@@ -113,8 +113,8 @@ export default class TogglService {
         this._apiManager = new TogglAPI();
         await this._apiManager.setToken(token);
         this._setApiStatus(ApiStatus.AVAILABLE);
-      } catch {
-        console.error("Cannot connect to toggl API.");
+      } catch (err) {
+        console.error("Cannot connect to toggl API.", err);
         this._statusBarItem.setText("Cannot connect to Toggl API");
         this._setApiStatus(ApiStatus.UNREACHABLE);
         this.noticeAPINotAvailable();

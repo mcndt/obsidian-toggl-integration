@@ -7,6 +7,13 @@ export interface PluginSettings {
   apiToken: string;
 
   /**
+   * The base URL of the Toggl API. Useful for self-hosted proxies
+   * or alternative endpoints. The path `/api/v9` is appended
+   * automatically. Defaults to `https://api.track.toggl.com`.
+   */
+  apiBaseUrl?: string;
+
+  /**
    * The Toggl workspace to be used for the user's timer.
    */
   workspace: TogglWorkspace;
