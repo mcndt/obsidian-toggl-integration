@@ -46,7 +46,7 @@ The developer of the QuickAdd plugin has created a preset menu for timers using 
 
 ## Roadmap
 
-You can see my more detailed roadmap for this plugin on this page: [Development Roadmap](https://github.com/mcndt/obsidian-toggl-integration/projects/1). I try to keep the cards in each column sorted by priority.
+You can see my more detailed roadmap for this plugin on this page: [Development Roadmap](https://github.com/users/mcndt/projects/2/views/2). I try to keep the cards in each column sorted by priority.
 
 ## Feature Requests
 
